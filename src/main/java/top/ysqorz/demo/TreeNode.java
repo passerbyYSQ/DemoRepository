@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author passerbyYSQ
@@ -15,12 +16,19 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class TreeNode<T> {
+    private String id;
     private T data;
     private int level;
-    private List<TreeNode<T>> children = new ArrayList<>();
+    private String parentId;
+    private List<TreeNode<T>> children;
+
+    public TreeNode(String id, T data) {
+        this.id = id;
+        this.data = data;
+    }
 
     public TreeNode(T data) {
-        this.data = data;
+        this(UUID.randomUUID().toString(), data);
     }
 
     public void addChild(List<TreeNode<T>> childrenToAdd) {

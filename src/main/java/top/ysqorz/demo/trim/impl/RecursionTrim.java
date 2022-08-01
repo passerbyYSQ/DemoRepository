@@ -33,7 +33,6 @@ public class RecursionTrim<T> implements TrimTreeAlgorithm<T> {
             Iterator<TreeNode<T>> iterator = children.iterator();
             while (iterator.hasNext()) {
                 TreeNode<T> child = iterator.next();
-                child.setLevel(root.getLevel() + 1);
                 if (!dfs(child, notTrimPredicate)) {
                     isTrim = false;
                 } else {

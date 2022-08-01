@@ -30,26 +30,25 @@ public class NonRecursionTrim<T> implements TrimTreeAlgorithm<T> {
                 if (children != null && !children.isEmpty()) {
                     curr = children.get(0);
                     parentMap.put(curr, parent);
-                    curr.setLevel(parent.getLevel() + 1);
                     childIdxStack.push(0);
                 }
             }
             // 出栈
             curr = nodeStack.pop();
 
+            // 寻找下一个入栈的子节点
             List<TreeNode<T>> children = curr.getChildren();
             TreeNode<T> nextChild = null;
-            // 寻找下一个入栈的子节点
             if (children != null && !children.isEmpty()) {
                 // 弹出上一次入栈的子节点索引，+1即为下一个入栈的子节点
                 int nextChildIdx = childIdxStack.pop() + 1;
                 if (nextChildIdx < children.size()) {
                     nextChild = children.get(nextChildIdx);
                     parentMap.put(nextChild, curr);
-                    nextChild.setLevel(curr.getLevel() + 1);
                     childIdxStack.push(nextChildIdx);
                 }
             }
+
             if (nextChild == null) {
                 System.out.println(curr);
                 TreeNode<T> parent = parentMap.get(curr);
