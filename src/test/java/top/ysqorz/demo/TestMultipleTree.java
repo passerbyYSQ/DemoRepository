@@ -2,20 +2,23 @@ package top.ysqorz.demo;
 
 import org.junit.Before;
 import org.junit.Test;
-import top.ysqorz.demo.builder.TreeBuilder;
+import top.ysqorz.demo.builder.MultipleTree;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-public class TestTreeBuilder {
+public class TestMultipleTree {
     private Map<TreeNode<Integer>, List<TreeNode<Integer>>> childrenMap;
     private TreeNode<Integer> root1;
-    private TreeBuilder.DataLoader<Integer> dataLoader;
+    private MultipleTree.DataLoader<Integer> dataLoader;
 
     @Test
     public void testBuild() {
-        TreeBuilder<Integer> treeBuilder = new TreeBuilder<>(root1, dataLoader);
-        treeBuilder.build();
+        MultipleTree<Integer> tree = new MultipleTree.Builder<Integer>()
+                .root(root1)
+                .dataLoader(dataLoader)
+                .build();
+        tree.expand();
         System.out.println("树成功生成");
     }
 
@@ -23,8 +26,14 @@ public class TestTreeBuilder {
     public void testTrim() {
         Predicate<TreeNode<Integer>> retainPredicate = node -> node.getData().equals(7) || node.getData().equals(3);
         Comparator<TreeNode<Integer>> comparator = (o1, o2) -> Integer.compare(o2.getData(), o1.getData());
-        TreeBuilder<Integer> treeBuilder = new TreeBuilder<>(root1, dataLoader, 0, retainPredicate, comparator);
-        treeBuilder.build();
+        MultipleTree<Integer> tree = new MultipleTree.Builder<Integer>()
+                .root(root1)
+                .dataLoader(dataLoader)
+                .expandDepth(0)
+                .retainFilter(retainPredicate)
+                .childrenComparator(comparator)
+                .build();
+        tree.expand();
         System.out.println("树裁剪成功");
     }
 

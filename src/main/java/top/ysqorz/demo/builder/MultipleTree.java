@@ -3,22 +3,33 @@ package top.ysqorz.demo.builder;
 import top.ysqorz.demo.TreeNode;
 import top.ysqorz.demo.trim.impl.NonRecursionTrim;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Queue;
 import java.util.function.Predicate;
 
-public class TreeBuilder<T> {
+public class MultipleTree<T> {
     private TreeNode<T> root;
     private int depth;
     private Predicate<TreeNode<T>> retainFilter; // nullable
     private Comparator<TreeNode<T>> comparator; // nullable
     private DataLoader<T> dataLoader;
 
-    public TreeBuilder(TreeNode<T> root, DataLoader<T> dataLoader) {
+    private MultipleTree() {}
+
+    /**
+     * @deprecated
+     */
+    private MultipleTree(TreeNode<T> root, DataLoader<T> dataLoader) {
         this(root, dataLoader, 0, null, null);
     }
 
-    public TreeBuilder(TreeNode<T> root, DataLoader<T> dataLoader, int depth,
-                       Predicate<TreeNode<T>> retainFilter, Comparator<TreeNode<T>> comparator) {
+    /**
+     * @deprecated
+     */
+    private MultipleTree(TreeNode<T> root, DataLoader<T> dataLoader, int depth,
+                        Predicate<TreeNode<T>> retainFilter, Comparator<TreeNode<T>> comparator) {
         assert root != null;
         assert dataLoader != null;
         this.root = root;
@@ -28,7 +39,7 @@ public class TreeBuilder<T> {
         this.dataLoader = dataLoader;
     }
 
-    public void build() {
+    public void expand() {
         Queue<TreeNode<T>> queue = new ArrayDeque<>();
         queue.offer(root);
         if (depth > 0) {
@@ -76,5 +87,40 @@ public class TreeBuilder<T> {
 
     public interface DataLoader<T> {
         List<TreeNode<T>> loadChildren(TreeNode<T> parent);
+    }
+
+    public static class Builder<T> {
+        private final MultipleTree<T> tree = new MultipleTree<>();
+
+        public Builder<T> root(TreeNode<T> root) {
+            tree.root = root;
+            return this;
+        }
+
+        public Builder<T> expandDepth(int depth) {
+            tree.depth = depth;
+            return this;
+        }
+
+        public Builder<T> dataLoader(DataLoader<T> dataLoader) {
+            tree.dataLoader = dataLoader;
+            return this;
+        }
+
+        public Builder<T> retainFilter(Predicate<TreeNode<T>> retainFilter) {
+            tree.retainFilter = retainFilter;
+            return this;
+        }
+
+        public Builder<T> childrenComparator(Comparator<TreeNode<T>> comparator) {
+            tree.comparator = comparator;
+            return this;
+        }
+
+        public MultipleTree<T> build() {
+            assert tree.root != null;
+            assert tree.dataLoader != null;
+            return tree;
+        }
     }
 }

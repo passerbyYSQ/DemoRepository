@@ -2,6 +2,7 @@ package top.ysqorz.demo;
 
 import org.junit.Before;
 import org.junit.Test;
+import top.ysqorz.demo.trim.TrimTreeAlgorithm;
 import top.ysqorz.demo.trim.impl.NonRecursionTrim;
 import top.ysqorz.demo.trim.impl.RecursionTrim;
 
@@ -16,14 +17,14 @@ public class TestTrimTree {
 
     @Test
     public void testRecursionTrim() {
-        RecursionTrim<Integer> recursionTrim = new RecursionTrim<>();
+        TrimTreeAlgorithm<Integer> recursionTrim = new RecursionTrim<>();
         recursionTrim.trim(root1, node -> node.getData().equals(7) || node.getData().equals(3));
         System.out.println("裁剪成功");
     }
 
     @Test
     public void testNonRecursionTrim() {
-        NonRecursionTrim<Integer> nonRecursionTrim = new NonRecursionTrim<>();
+        TrimTreeAlgorithm<Integer> nonRecursionTrim = new NonRecursionTrim<>();
         nonRecursionTrim.trim(root1, node -> node.getData().equals(7) || node.getData().equals(3));
         System.out.println("裁剪成功");
     }

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * 不要重写equals()和hashCode()
+ *
  * @author passerbyYSQ
  * @create 2022-07-30 14:40
  */
