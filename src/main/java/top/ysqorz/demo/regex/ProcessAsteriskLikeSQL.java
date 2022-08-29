@@ -10,6 +10,16 @@ import java.util.stream.Collectors;
  * 通过正则表达式实现SQL中*的作用
  */
 public class ProcessAsteriskLikeSQL {
+    @Test
+    public void testTrim() {
+        System.out.println(trim("*", '*').equals(""));
+        System.out.println(trim("****", '*').equals(""));
+        System.out.println(trim("**abc**", '*').equals("abc"));
+        System.out.println(trim("abc**", '*').equals("abc"));
+        System.out.println(trim("**abc", '*').equals("abc"));
+        System.out.println(trim("*abc", '*').equals("abc"));
+        System.out.println(trim("abc*", '*').equals("abc"));
+    }
 
     @Test
     public void test() {
@@ -22,8 +32,19 @@ public class ProcessAsteriskLikeSQL {
         match("ABC***123***", "ABC123", true);
         match("ABC***123***", "1234ABC123", false);
         match("+", "+", true);
+        match("*", "badkg", true);
+        match("**", "badkg", true);
+        match("abc", "abcd", false);
+        match("b", "ba", false);
+        match("b*", "ba", true);
+        match("b*", "aba", false);
+        match("*b*", "aba", true);
+        match("", "badkg", false);
+        match("", "", true);
         match("+*+", "++", true);
-        match("***A\\QBC12\\E3***", "A\\QBC12\\E3", true);
+        match("***A\\QBC12\\E3***", "1111A\\QBC12\\E3", true);
+        match("A\\QBC12\\E3***", "1111A\\QBC12\\E3", false);
+        match("A\\QBC12\\E3", "A\\QBC12\\E3", true);
         match("***A\\QBC12\\E3***", "A\\QBC123", false);
         match("*b*", "1111bbb", true);
     }
@@ -31,37 +52,35 @@ public class ProcessAsteriskLikeSQL {
     public void match(String pattern, String word, boolean expected) {
         String regex = processAsteriskLikeSQL(pattern);
         boolean res = word.matches(regex);
-        System.out.println(pattern + "\t" + word + "" + regex + "\t" + res);
+        System.out.printf("[%s]\t[%s]\t[%s]\t[%b]%n", pattern, regex, word, res);
         assert res == expected;
     }
 
     public String processAsteriskLikeSQL(String pattern) {
-        // "" => ".*"
-        if (pattern.isEmpty()) {
-            return ".*";
+        if (pattern == null || pattern.isEmpty()) {
+            return pattern;
         }
-        String[] parts = trim(pattern, '*').split("(\\*)+");
-        // "********" => ".*"
-        if (parts.length == 0) {
-            return ".*";
+        final String POINT_ASTERISK = ".*";
+        String trim = trim(pattern, '*');
+        if (trim.isEmpty()) {
+            return POINT_ASTERISK;
         }
-        String prefix = pattern.charAt(0) == '*' ? ".*" : "";
-        String suffix = pattern.charAt(pattern.length() - 1) == '*' ? ".*" : "";
-        // ***ABC***123*** => [ABC, 123] => .*\QABC\E.*\Q123\E.*
-        return Arrays.stream(parts).map(Pattern::quote).collect(Collectors.joining(".*", prefix, suffix));
+        String prefix = pattern.charAt(0) == '*' ? POINT_ASTERISK : "";
+        String suffix = pattern.charAt(pattern.length() - 1) == '*' ? POINT_ASTERISK : "";
+        return Arrays.stream(trim.split("(\\*)+"))
+                .map(Pattern::quote)
+                .collect(Collectors.joining(POINT_ASTERISK, prefix, suffix));
     }
 
     public String trim(String str, char c) {
         char[] chs = str.toCharArray();
-        int len = chs.length;
-        int st = 0, end = len;
-        while (st < len && chs[st] == c) {
+        int st = 0, end = chs.length;
+        while (st < end && chs[st] == c) {
             st++;
         }
         while (st < end && chs[end - 1] == c) {
             end--;
         }
-        return st > 0 && end < len ? str.substring(st, end) : str;
+        return str.substring(st, end); // st <= end
     }
-
 }
