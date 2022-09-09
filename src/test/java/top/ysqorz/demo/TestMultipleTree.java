@@ -2,7 +2,8 @@ package top.ysqorz.demo;
 
 import org.junit.Before;
 import org.junit.Test;
-import top.ysqorz.demo.builder.MultipleTree;
+import top.ysqorz.demo.tree.MultipleTree;
+import top.ysqorz.demo.tree.TreeNode;
 
 import java.util.*;
 import java.util.function.Predicate;

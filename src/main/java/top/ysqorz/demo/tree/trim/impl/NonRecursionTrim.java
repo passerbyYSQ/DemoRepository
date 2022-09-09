@@ -1,7 +1,7 @@
-package top.ysqorz.demo.trim.impl;
+package top.ysqorz.demo.tree.trim.impl;
 
-import top.ysqorz.demo.TreeNode;
-import top.ysqorz.demo.trim.TrimTreeAlgorithm;
+import top.ysqorz.demo.tree.TreeNode;
+import top.ysqorz.demo.tree.trim.TrimTreeAlgorithm;
 
 import java.util.*;
 import java.util.function.Predicate;

@@ -1,7 +1,6 @@
-package top.ysqorz.demo.builder;
+package top.ysqorz.demo.tree;
 
-import top.ysqorz.demo.TreeNode;
-import top.ysqorz.demo.trim.impl.NonRecursionTrim;
+import top.ysqorz.demo.tree.trim.impl.NonRecursionTrim;
 
 import java.util.ArrayDeque;
 import java.util.Comparator;

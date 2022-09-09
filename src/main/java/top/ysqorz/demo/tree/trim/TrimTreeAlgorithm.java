@@ -1,6 +1,6 @@
-package top.ysqorz.demo.trim;
+package top.ysqorz.demo.tree.trim;
 
-import top.ysqorz.demo.TreeNode;
+import top.ysqorz.demo.tree.TreeNode;
 
 import java.util.function.Predicate;
 

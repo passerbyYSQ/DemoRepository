@@ -2,9 +2,10 @@ package top.ysqorz.demo;
 
 import org.junit.Before;
 import org.junit.Test;
-import top.ysqorz.demo.trim.TrimTreeAlgorithm;
-import top.ysqorz.demo.trim.impl.NonRecursionTrim;
-import top.ysqorz.demo.trim.impl.RecursionTrim;
+import top.ysqorz.demo.tree.TreeNode;
+import top.ysqorz.demo.tree.trim.TrimTreeAlgorithm;
+import top.ysqorz.demo.tree.trim.impl.NonRecursionTrim;
+import top.ysqorz.demo.tree.trim.impl.RecursionTrim;
 
 import java.util.Arrays;
 

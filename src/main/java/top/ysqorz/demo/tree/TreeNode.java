@@ -1,4 +1,4 @@
-package top.ysqorz.demo;
+package top.ysqorz.demo.tree;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
