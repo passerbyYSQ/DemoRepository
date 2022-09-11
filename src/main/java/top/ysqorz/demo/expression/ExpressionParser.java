@@ -17,7 +17,7 @@ public class ExpressionParser {
 
     @Test
     public void test() {
-        List<ExpressionEntity> entityList = parse("1 + 2 * ( 3 + 4 )");
+        List<ExpressionEntity> entityList = parse("1 + 2 * ( -3 + 4 )");
         Value result = calculateELOV(entityList);
         System.out.println(result.getBigDecimal());
     }
@@ -310,7 +310,7 @@ public class ExpressionParser {
         boolean isInBracket = false;
         int minPriority = Integer.MAX_VALUE;
         int operatorIdx = -1;
-        // 对于相同优先级的，取最左那个运算符
+        // 对于相同优先级的，取最右侧那个运算符
         for (int i = tmpSource.size() - 1; i >= 0; i--) {
             ExpressionEntity entity = tmpSource.get(i);
             if (entity instanceof Bracket) {
@@ -332,7 +332,7 @@ public class ExpressionParser {
                 }
                 Operator operator = (Operator) entity;
                 int curPriority = operator.getPriority().getPriority();
-                if (curPriority <= minPriority) {
+                if (curPriority < minPriority) { // 不能取等号
                     minPriority = curPriority;
                     operatorIdx = i;
                 }
