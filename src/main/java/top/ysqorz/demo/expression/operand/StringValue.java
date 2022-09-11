@@ -5,8 +5,4 @@ public class StringValue extends Value {
         super(operand);
     }
 
-    @Override
-    public String getString() {
-        return operand;
-    }
 }

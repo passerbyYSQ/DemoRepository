@@ -1,12 +1,12 @@
 package top.ysqorz.demo.expression;
 
+import org.junit.Test;
 import top.ysqorz.demo.expression.operand.NumericValue;
 import top.ysqorz.demo.expression.operand.Operand;
 import top.ysqorz.demo.expression.operand.StringValue;
 import top.ysqorz.demo.expression.operand.Value;
 import top.ysqorz.demo.expression.operator.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -14,6 +14,13 @@ import java.util.List;
 
 public class ExpressionParser {
     private static final String OPERATOR_CHARSET = "+-*/%><=!&|";
+
+    @Test
+    public void test() {
+        List<ExpressionEntity> entityList = parse("1 + 2 * ( 3 + 4 )");
+        Value result = calculateELOV(entityList);
+        System.out.println(result.getBigDecimal());
+    }
 
     public List<ExpressionEntity> parse(String expr) {
         List<ExpressionEntity> entities = new ArrayList<>();
@@ -40,6 +47,7 @@ public class ExpressionParser {
                         throw new ExpressionException("缺少右侧的字符串限定符：" + expr.substring(curIdx - 1, p));
                     }
                     entities.add(new StringValue(expr.substring(curIdx, p)));
+                    curIdx = p + 1;
                     break;
                 }
                 case '+': {
@@ -89,12 +97,10 @@ public class ExpressionParser {
                     // TODO 暂时当值处理，后续考虑支持变量引用、表达式引用
                     if (Character.isDigit(expr.charAt(curIdx))) { // 数字开头，当作数值处理。
                         int p = curIdx;
-                        boolean valid = true;
                         int digitPointCount = 0;
                         while (p < len) {
                             char c = expr.charAt(p);
-                            if (digitPointCount > 1 || !(Character.isDigit(c) || c == '.')) {
-                                valid = false;
+                            if (!Character.isDigit(c) && c != '.') {
                                 break;
                             }
                             p++;
@@ -102,10 +108,11 @@ public class ExpressionParser {
                                 digitPointCount++;
                             }
                         }
-                        if (!valid) {
+                        if (digitPointCount > 1) { // 存在多个小数点，非法数值
                             throw new ExpressionException("非法的数值：" + expr.substring(curIdx, p + 1));
                         }
                         entities.add(new NumericValue(expr.substring(curIdx, p)));
+                        curIdx = p;
                     } else {
                         throw new ExpressionException("非法的操作数，暂不支持解析：" + expr.substring(0, curIdx + 1));
                     }
@@ -180,7 +187,24 @@ public class ExpressionParser {
             }
             // TODO 支持逻辑表达式的时候，此处需要考虑非的情形
         }
-        // TODO
+        if (prev instanceof Bracket) {
+            Bracket bracket = (Bracket) prev;
+            if (bracket.isLeftBracket()) {
+                // TODO 非
+
+                if (follow instanceof Bracket && ((Bracket) follow).isRightBracket()) {
+                    throw new ExpressionException("左括号后不能直接跟右括号");
+                }
+            } else {
+                if (follow instanceof Operand) {
+                    throw new ExpressionException("右括号不能直接跟操作数");
+                }
+                // TODO 非
+                if (follow instanceof Bracket && ((Bracket) follow).isLeftBracket()) {
+                    throw new ExpressionException("右括号后不能直接跟左括号");
+                }
+            }
+        }
     }
 
     protected void checkExpressionFirstEntity(ExpressionEntity entity, int total) {
@@ -224,7 +248,7 @@ public class ExpressionParser {
         Deque<CalcStep> steps = new ArrayDeque<>();
         steps.push(buildNextCalcStep(CalcStep.ROOT, entities));
         while (!steps.isEmpty()) {
-            CalcStep curStep = steps.pop();
+            CalcStep curStep = steps.peek();
             if (curStep.isUnary()) {
                 throw new ExpressionException("暂不支持单目运算符"); // TODO
             } else {
@@ -240,8 +264,8 @@ public class ExpressionParser {
                     curStep.resolveSource(CalcStep.RIGHT);
                     isRightResolved = true;
                 }
-                if (isLeftResolved && isRightResolved) {
-                    // 分解的计算任务回溯
+                if (isLeftResolved && isRightResolved) { // 分解的计算任务回溯
+                    steps.pop(); // 当前计算任务已经解算完成，弹出
                     curStep.doCalculate();
                     Value curValue = curStep.getResultValue();
                     if (steps.isEmpty()) { // 无剩余计算任务
@@ -259,13 +283,11 @@ public class ExpressionParser {
                     if (!isLeftResolved) {
                         List<ExpressionEntity> leftSource = curStep.getSourceByType(CalcStep.LEFT);
                         CalcStep nextStep = buildNextCalcStep(CalcStep.LEFT, leftSource);
-                        steps.push(curStep); // 当前计算任务还需要进一步处理，重新入栈
                         steps.push(nextStep); // 当前计算任务分解出来的子任务，随后入站
                     }
                     if (!isRightResolved) {
                         List<ExpressionEntity> rightSource = curStep.getSourceByType(CalcStep.RIGHT);
                         CalcStep nextStep = buildNextCalcStep(CalcStep.RIGHT, rightSource);
-                        steps.push(curStep);
                         steps.push(nextStep);
                     }
                 }
@@ -320,7 +342,7 @@ public class ExpressionParser {
             throw new ExpressionException("找不到优先级最低的运算符");
         }
         // TODO 待处理单目运算符
-        Operator operator = (Operator) source.get(operatorIdx);
+        Operator operator = (Operator) tmpSource.get(operatorIdx);
         List<ExpressionEntity> leftSource = getLeftEntities(tmpSource, operatorIdx);
         List<ExpressionEntity> rightSource = getRightEntities(tmpSource, operatorIdx);
         return new CalcStep(lastStepType, operator, leftSource, rightSource);
@@ -349,31 +371,23 @@ public class ExpressionParser {
         return result;
     }
 
-    protected List<ExpressionEntity> trimBracket(List<ExpressionEntity> source) {
-        int size = source.size();
-        List<ExpressionEntity> res = new ArrayList<>();
-        int staIdx = 0; // 第一个非左括号的元素
-        while (staIdx < size) {
-            ExpressionEntity entity = source.get(staIdx);
-            if (entity instanceof Bracket && ((Bracket) entity).isLeftBracket()) {
-                staIdx++; // 跳过左括号
+    protected static List<ExpressionEntity> trimBracket(List<ExpressionEntity> source) {
+        int prev = 0, tail = source.size();
+        while (prev < tail) {
+            ExpressionEntity prevEntity = source.get(prev);
+            ExpressionEntity tailEntity = source.get(tail - 1);
+            if (prevEntity instanceof Bracket && ((Bracket) prevEntity).isLeftBracket() &&
+                    tailEntity instanceof Bracket && ((Bracket) tailEntity).isRightBracket()) {
+                prev++;
+                tail--;
             } else {
                 break;
             }
         }
-        int endIdx = size;
-        while (endIdx > 0) {
-            ExpressionEntity entity = source.get(endIdx - 1);
-            if (entity instanceof Bracket && ((Bracket) entity).isRightBracket()) {
-                endIdx--;
-            } else {
-                break;
-            }
-        }
-        if (staIdx <= endIdx) {
+        if (prev >= tail) {
             throw new ExpressionException("括号中无操作数");
         }
-        return source.subList(staIdx, endIdx);
+        return source.subList(prev, tail);
     }
 
     private static class CalcStep {
@@ -413,7 +427,7 @@ public class ExpressionParser {
         }
 
         public boolean checkSourceResolved() {
-            return checkSourceResolved(LEFT) && checkSourceResolved(RIGHT) && result != null;
+            return checkSourceResolved(LEFT) && checkSourceResolved(RIGHT);
         }
 
         public boolean checkSourceResolved(int sourceType) {
@@ -432,7 +446,9 @@ public class ExpressionParser {
         }
 
         public boolean checkSourceResolvable(List<ExpressionEntity> source) {
-            // TODO
+            // TODO 待处理单目运算符
+            List<ExpressionEntity> tmpSource = trimBracket(source);
+            return tmpSource.size() == 1 && tmpSource.get(0) instanceof Operand;
         }
 
         // 只有一个操作数的时候才能解算

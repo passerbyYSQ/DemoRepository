@@ -13,4 +13,6 @@ public interface Operand extends ExpressionEntity {
     Boolean getBoolean();
 
     BigDecimal getBigDecimal();
+
+    String getString();
 }

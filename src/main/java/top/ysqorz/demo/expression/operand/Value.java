@@ -18,4 +18,9 @@ public abstract class Value implements Operand {
     public BigDecimal getBigDecimal() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String getString() {
+        return operand;
+    }
 }
