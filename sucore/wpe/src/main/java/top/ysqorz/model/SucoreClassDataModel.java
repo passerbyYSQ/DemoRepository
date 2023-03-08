@@ -1,8 +1,10 @@
 package top.ysqorz.model;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.beans.Introspector;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,11 +40,12 @@ public class SucoreClassDataModel {
     }
 
     @Data
+    @Accessors(chain = true)
     public static class Attribute {
         private Class<?> typeClazz;
         private String type;
         private String name;
-
+        private String formattedName;
         private String comment;
 
         public Attribute(String name) {
@@ -61,7 +64,16 @@ public class SucoreClassDataModel {
             this.typeClazz = typeClazz;
             this.type = typeClazz.getSimpleName();
             this.name = name;
+            this.formattedName = formatAttrName(name);
             this.comment = comment;
+        }
+
+        private String formatAttrName(String attrName) {
+            if ("Class".equalsIgnoreCase(attrName)) {
+                return "Clazz";
+            }
+            // https://zhuanlan.zhihu.com/p/383518075
+            return Introspector.decapitalize(StrUtil.toCamelCase(attrName));
         }
     }
 }

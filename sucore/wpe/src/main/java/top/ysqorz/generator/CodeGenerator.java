@@ -3,7 +3,6 @@ package top.ysqorz.generator;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import freemarker.template.Configuration;
@@ -12,21 +11,22 @@ import freemarker.template.TemplateException;
 import org.springframework.util.ResourceUtils;
 import top.ysqorz.model.SucoreClassDataModel;
 
-import java.beans.Introspector;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
+ * sucore的持久化类代码生成器
  */
 public class CodeGenerator {
+    private static final boolean withExtend = false;
+
     public static void main(String[] args) throws IOException, TemplateException {
         File classPath = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX);
         Configuration config = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         config.setDirectoryForTemplateLoading(new File(classPath, "template"));
-        Template javaBeanTemplate = config.getTemplate("JavaBean.ftl");
+        Template javaBeanTemplate = config.getTemplate("sucore_class.ftl");
 //        SucoreClassDataModel dataModel = new SucoreClassDataModel()
 //                .setClassName("User")
 //                .setClassComment("用户实体类")
@@ -60,17 +60,32 @@ public class CodeGenerator {
         JSONObject tree = loadClassTree();
         Queue<JSONObject> queue = new LinkedList<>();
         queue.offer(tree);
-        SucoreClassDataModel parent = null;
         List<SucoreClassDataModel> modelList = new ArrayList<>();
         while (!queue.isEmpty()) {
             JSONObject current = queue.poll();
-            SucoreClassDataModel dataModel = transformDataModel(current, parent);
+            if (current.getBool("isDynamic", Boolean.FALSE)) { // 过滤动态类
+                continue;
+            }
+            SucoreClassDataModel dataModel = transformDataModel(current);
             modelList.add(dataModel);
-            parent = dataModel;
 
             List<JSONObject> children = current.getBeanList("children", JSONObject.class);
             if (ObjectUtil.isNotEmpty(children)) {
                 for (JSONObject child : children) {
+                    if (withExtend) {
+                        child.set("ParentDataModel", dataModel);
+                    } else {
+                        List<JSONObject> fullAttaches = current.getBeanList("normalAttaches", JSONObject.class); // 新的List引用
+                        if (fullAttaches == null) {
+                            fullAttaches = new ArrayList<>();
+                        }
+                        List<JSONObject> normalAttaches = child.getBeanList("normalAttaches", JSONObject.class);
+                        if (normalAttaches == null) {
+                            normalAttaches = new ArrayList<>();
+                        }
+                        fullAttaches.addAll(normalAttaches);
+                        child.set("normalAttaches", fullAttaches);
+                    }
                     queue.offer(child);
                 }
             }
@@ -78,7 +93,7 @@ public class CodeGenerator {
         return modelList;
     }
 
-    public static SucoreClassDataModel transformDataModel(JSONObject current, SucoreClassDataModel parent) {
+    public static SucoreClassDataModel transformDataModel(JSONObject current) {
         String module = current.getStr("module");
         String packageName = CodeGenerator.class.getPackage().getName() + "." + module;
         SucoreClassDataModel dataModel = new SucoreClassDataModel()
@@ -87,23 +102,44 @@ public class CodeGenerator {
                 .setClassName(current.getStr("className"))
                 .setClassComment(current.getStr("classDisplayLabel"))
                 .setIsAbstract(current.getBool("isAbstract"))
-                .setParent(parent);
+                .setParent(current.get("ParentDataModel", SucoreClassDataModel.class));
         List<JSONObject> normalAttaches = current.getBeanList("normalAttaches", JSONObject.class);
+        List<JSONObject> constants = current.getBeanList("constants", JSONObject.class);
         if (ObjectUtil.isNotEmpty(normalAttaches)) {
             List<SucoreClassDataModel.Attribute> attrList = normalAttaches.stream()
+                    .filter(attr -> {
+                        return "PERSISTENT".equalsIgnoreCase(attr.getStr("storageType")); // 过滤动态属性，只保留持久属性
+                    })
                     .map(attr -> {
+                        StringBuilder comment = new StringBuilder(attr.getStr("displayName"));
                         String attrName = attr.getStr("attrName");
-                        if ("Class".equalsIgnoreCase(attrName)) {
-                            attrName = "Clazz";
+                        // 补充关系左右侧UUID的注释信息
+                        if (attr.getBool("isRelation", Boolean.TRUE) && ObjectUtil.isNotEmpty(constants)) {
+                            String constValue = null;
+                            if ("UUID_L".equals(attrName)) {
+                                constValue = getConstantValue(constants, "ClassLeft");
+                            } else if ("UUID_R".equals(attrName)) {
+                                constValue = getConstantValue(constants, "ClassRight");
+                            }
+                            if (ObjectUtil.isNotEmpty(constValue)) {
+                                comment.append("，").append(constValue).append("对象的UUID");
+                            }
                         }
-                        // https://zhuanlan.zhihu.com/p/383518075
-                        attrName = Introspector.decapitalize(StrUtil.toCamelCase(attrName));
-                        return new SucoreClassDataModel.Attribute(attrName, attr.getStr("displayName"));
+                        return new SucoreClassDataModel.Attribute(attrName, comment.toString());
                     })
                     .collect(Collectors.toList());
             dataModel.setAttrs(attrList);
         }
         return dataModel;
+    }
+
+    public static String getConstantValue(List<JSONObject> constants, String name) {
+        if (ObjectUtil.isEmpty(constants)) {
+            return null;
+        }
+        return constants.stream().filter(object -> object.getStr("constName").equals(name))
+                .map(object -> object.getStr("constValue"))
+                .findFirst().orElse(null);
     }
 
     public static JSONObject loadClassTree() throws FileNotFoundException {
