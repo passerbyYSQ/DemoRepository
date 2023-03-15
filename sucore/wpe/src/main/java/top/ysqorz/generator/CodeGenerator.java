@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * sucore的持久化类代码生成器
+ * TODO 抽象类不需要加上@TableName注解
  */
 public class CodeGenerator {
     private static final boolean withExtend = false;

@@ -1,13 +1,15 @@
 package top.ysqorz;
 
+import cn.hutool.json.JSONUtil;
+
 /**
  * Hello world!
- *
  */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+public class App {
+    public static void main(String[] args) {
+        System.out.println(DataProps.instance().getUsername());
+        DataProps.instance().setUsername("tianyu").setPassword("tianyu123");
+        String json = JSONUtil.toJsonStr(DataProps.instance());
+        System.out.println(json);
     }
 }
