@@ -16,8 +16,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit test for simple App.
  */
-@SpringBootTest //获取启动类，加载配置，寻找主配置启动类 （被 @SpringBootApplication 注解的）
-@RunWith(SpringRunner.class) //让JUnit运行Spring的测试环境,获得Spring环境的上下文的支持
+@SpringBootTest // 获取启动类，加载配置，寻找主配置启动类 （被 @SpringBootApplication 注解的）
+@RunWith(SpringRunner.class) // 让JUnit运行Spring的测试环境,获得Spring环境的上下文的支持
 @Slf4j
 public class OssApplicationTest {
     @Autowired

@@ -30,20 +30,15 @@ public interface IOSSStrategy {
 
     ObjectMetadata simpleDownloadFileByAccessKey(String path, OutputStream outputStream);
 
-    /**
-     * <a href="https://help.aliyun.com/document_detail/31862.html">...</a>
-     */
+
     void deleteFileByAccessKey(String path);
 
-    /**
-     * <a href="https://help.aliyun.com/document_detail/31862.html">...</a>
-     */
     void moveFileByAccessKey(String srcPath, String destPath, Boolean isDeleteSrcFile);
 
+    /**
+     * 也可以用于重命名
+     */
     void moveFileByAccessKey(String srcPath, String destPath);
 
-    /**
-     * 生成分享链接，用于前端预览，例如图片预览
-     */
     String generateSharedURL(String path, Duration duration);
 }

@@ -147,8 +147,11 @@ public class AliyunOSSStrategy implements IOSSStrategy {
         return executeByAccessKey(buildDownloadExecutor(path, outputStream));
     }
 
+    /**
+     * <a href="https://help.aliyun.com/document_detail/31862.html">...</a>
+     */
     @Override
-    public void moveFileByAccessKey(String srcPath, String destPath, Boolean isDeleteSrcFile) { // 也可以用于重命名
+    public void moveFileByAccessKey(String srcPath, String destPath, Boolean isDeleteSrcFile) {
         executeByAccessKey((ClientExecutor<Void>) ossClient -> {
             ossClient.copyObject(aliyunOSSProps.getBucketName(), srcPath, aliyunOSSProps.getBucketName(), destPath);
             if (isDeleteSrcFile) {
@@ -163,11 +166,17 @@ public class AliyunOSSStrategy implements IOSSStrategy {
         moveFileByAccessKey(srcPath, destPath, Boolean.TRUE); // 默认移动之后删除源文件
     }
 
+    /**
+     * <a href="https://help.aliyun.com/document_detail/31862.html">...</a>
+     */
     @Override
     public void deleteFileByAccessKey(String path) {
         executeByAccessKey(ossClient -> ossClient.deleteObject(aliyunOSSProps.getBucketName(), path));
     }
 
+    /**
+     * 生成分享链接，用于前端预览，例如图片预览
+     */
     @Override
     public String generateSharedURL(String path, Duration duration) {
         return executeByAccessKey(ossClient -> {
