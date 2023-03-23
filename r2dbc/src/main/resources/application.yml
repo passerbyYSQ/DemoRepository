@@ -1,0 +1,8 @@
+spring:
+  r2dbc:
+    url: r2dbcs:mysql://localhost:3306/test01
+    username: root
+    password: ysqJYKL2010
+    pool:
+      enabled: true
+      validation-query: SELECT 1

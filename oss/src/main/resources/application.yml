@@ -1,0 +1,27 @@
+oss:
+  aliyun:
+    accessKeyId: LTAI5tQiYrgW4EbQw9v3xnqA
+    accessKeySecret: Zl1GXTeC9drfZcjBo0EthnN3HrBplY
+    bucketName: zwt-edu
+    bucketEndpoint: oss-cn-guangzhou.aliyuncs.com
+    sts:
+      endpoint: sts.cn-shenzhen.aliyuncs.com
+  #    regionId: ''
+      roleArn: acs:ram::1404574390867132:role/ramosstest
+      roleSessionName: SessionTest
+      durationSeconds: 1800 # 半小时
+      proxyJSON: '{
+                "Version": "1",
+                "Statement": [
+                 {
+                       "Effect": "Allow",
+                       "Action": [
+                         "oss:PutObject"
+                       ],
+                       "Resource": [
+                         "acs:oss:*:*:examplebucket/exampledir",
+                         "acs:oss:*:*:examplebucket/exampledir/*"
+                       ]
+                 }
+                ]
+            }'
