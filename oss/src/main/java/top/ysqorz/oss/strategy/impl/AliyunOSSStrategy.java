@@ -116,7 +116,7 @@ public class AliyunOSSStrategy implements IOSSStrategy {
             //ossClient.getObject(getObjectRequest, destFile);
             OSSObject ossObject = ossClient.getObject(aliyunOSSProps.getBucketName(), path);
             IoUtil.copy(ossObject.getObjectContent(), outputStream);
-            IoUtil.close(ossObject);
+            IoUtil.close(ossObject); // 不关闭会导致内存泄露
             return ossObject.getObjectMetadata();
         };
     }
