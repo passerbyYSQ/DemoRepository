@@ -19,6 +19,7 @@
         <module>transmittable-thread-local</module>
         <module>r2dbc</module>
         <module>oss</module>
+        <module>redis</module>
     </modules>
 
     <properties>
@@ -55,4 +56,13 @@
         </dependency>
     </dependencies>
 
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
