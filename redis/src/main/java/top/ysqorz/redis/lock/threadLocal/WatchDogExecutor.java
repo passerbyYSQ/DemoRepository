@@ -1,10 +1,11 @@
-package top.ysqorz.redis.lock;
+package top.ysqorz.redis.lock.threadLocal;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import top.ysqorz.redis.lock.RenewExpirationTaskContext;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
@@ -49,27 +50,27 @@ public class WatchDogExecutor {
         taskQueue.remove(taskContext);
     }
 
-    public static boolean isReentrant(String lockIdentifier) {
-        return reentrantLocal.get().getOrDefault(lockIdentifier, 0) > 0;
+    public static boolean isReentrant(String lockKey) {
+        return reentrantLocal.get().getOrDefault(lockKey, 0) > 0;
     }
 
-    public static void increaseReentrantCount(String lockIdentifier) {
+    public static void increaseReentrantCount(String lockKey) {
         Map<String, Integer> reentrantMap = reentrantLocal.get();
-        reentrantMap.put(lockIdentifier, reentrantMap.getOrDefault(lockIdentifier, 0) + 1);
+        reentrantMap.put(lockKey, reentrantMap.getOrDefault(lockKey, 0) + 1);
     }
 
-    public static void decreaseReentrantCount(String lockIdentifier) {
+    public static void decreaseReentrantCount(String lockKey) {
         Map<String, Integer> reentrantMap = reentrantLocal.get();
-        int remainedCount = reentrantMap.getOrDefault(lockIdentifier, 0) - 1;
+        int remainedCount = reentrantMap.getOrDefault(lockKey, 0) - 1;
         if (remainedCount > 0) {
-            reentrantMap.put(lockIdentifier, remainedCount);
+            reentrantMap.put(lockKey, remainedCount);
         } else {
-            reentrantMap.remove(lockIdentifier);
+            reentrantMap.remove(lockKey);
         }
     }
 
-    public static int getReentrantCount(String lockIdentifier) {
-        return reentrantLocal.get().getOrDefault(lockIdentifier, -1);
+    public static int getReentrantCount(String lockKey) {
+        return reentrantLocal.get().getOrDefault(lockKey, -1);
     }
 
     /**

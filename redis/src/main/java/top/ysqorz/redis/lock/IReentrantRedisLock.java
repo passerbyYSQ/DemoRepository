@@ -10,4 +10,6 @@ public interface IReentrantRedisLock {
     boolean tryLock();
 
     boolean tryLock(int tryCount);
+
+    void unlock();
 }

@@ -1,8 +1,11 @@
-package top.ysqorz.redis.lock;
+package top.ysqorz.redis.lock.threadLocal;
 
 import lombok.Getter;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
+import top.ysqorz.redis.lock.IReentrantRedisLock;
+import top.ysqorz.redis.lock.RedisLockFactory;
+import top.ysqorz.redis.lock.RenewExpirationTaskContext;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -18,7 +21,7 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
     private StringRedisTemplate redisTemplate;
     private Duration duration;
     private String lockKey;
-    private String lockIdentifier;
+    private String threadIdentifier;
     private RenewExpirationTaskContext taskContext;
 
     public ReentrantRedisLock(StringRedisTemplate redisTemplate, String businessKey, Duration duration) {
@@ -28,7 +31,7 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
         this.redisTemplate = redisTemplate;
         this.duration = duration; // 锁的有效期
         this.lockKey = REDIS_LOCK_KEY + businessKey; // 加上前缀以便分组
-        this.lockIdentifier = RedisLockFactory.generateLockIdentifier();
+        this.threadIdentifier = RedisLockFactory.generateThreadIdentifier();
     }
 
     @Override
@@ -57,8 +60,8 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
      */
     public boolean tryLock(Duration timout, int tryCount) {
         // 如果是重入已经获得的锁，计数后直接返回
-        if (WatchDogExecutor.isReentrant(lockIdentifier)) {
-            WatchDogExecutor.increaseReentrantCount(lockIdentifier);
+        if (WatchDogExecutor.isReentrant(lockKey)) {
+            WatchDogExecutor.increaseReentrantCount(lockKey);
             return true;
         }
         long startTime = System.currentTimeMillis();
@@ -68,7 +71,7 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
         for (int triedCount = 0;
                 (System.currentTimeMillis() - startTime) < timoutMillis
                 && (triedCount < totalTryCount)
-                && !Boolean.TRUE.equals(lockSucceed = redisTemplate.opsForValue().setIfAbsent(lockKey, lockIdentifier, duration));
+                && !Boolean.TRUE.equals(lockSucceed = redisTemplate.opsForValue().setIfAbsent(lockKey, threadIdentifier, duration));
                 triedCount++) {
             Thread.yield();
 //            try {
@@ -84,17 +87,18 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
         long lockExpireTime = System.currentTimeMillis() + duration.toMillis(); // 比锁在Redis上的过期时间大一点点
         taskContext = new RenewExpirationTaskContext(Thread.currentThread(), lockKey, duration, lockExpireTime);
         WatchDogExecutor.pushTask(taskContext);
-        WatchDogExecutor.increaseReentrantCount(lockIdentifier);
+        WatchDogExecutor.increaseReentrantCount(lockKey);
         return true;
     }
 
+    @Override
     public void unlock() {
         // 自己的锁才释放
         String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-        redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(lockKey), lockIdentifier);
+        redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(lockKey), threadIdentifier);
         if (taskContext != null) {
             WatchDogExecutor.removeTask(taskContext);
         }
-        WatchDogExecutor.decreaseReentrantCount(lockIdentifier);
+        WatchDogExecutor.decreaseReentrantCount(lockKey);
     }
 }

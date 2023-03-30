@@ -2,6 +2,7 @@ package top.ysqorz.redis.lock;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import top.ysqorz.redis.lock.threadLocal.ReentrantRedisLock;
 
 import javax.annotation.Resource;
 import java.lang.management.ManagementFactory;
@@ -24,7 +25,7 @@ public class RedisLockFactory {
     /**
      * 为分布式锁生成标识符：JVM进程名称_线程ID_线程名称
      */
-    public static String generateLockIdentifier() {
+    public static String generateThreadIdentifier() {
         return ManagementFactory.getRuntimeMXBean().getName() + "_" + Thread.currentThread().getId() + "_" +Thread.currentThread().getName();
     }
 }
