@@ -9,6 +9,7 @@ import top.ysqorz.redis.lock.RenewExpirationTaskContext;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 看门狗简要实现：https://mp.weixin.qq.com/s/ndO9prpTtGa8eAYCQAYTMA
@@ -17,9 +18,9 @@ import java.util.Collections;
  */
 @Getter
 public class ReentrantRedisLock implements IReentrantRedisLock {
-    public static final String REDIS_LOCK_KEY = "RedisLock:"; // :用于key分组
+    public static final String REDIS_LOCK_KEY = "ReentrantRedisLock:"; // :用于key分组
     private StringRedisTemplate redisTemplate;
-    private Duration duration;
+    private Long lockDuration; // 锁的有效期，毫秒
     private String lockKey;
     private String threadIdentifier;
     private RenewExpirationTaskContext taskContext;
@@ -29,7 +30,7 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
             throw new RuntimeException("锁的有效期不能小于看门狗看护的时间间隔");
         }
         this.redisTemplate = redisTemplate;
-        this.duration = duration; // 锁的有效期
+        this.lockDuration = duration.toMillis(); // 锁的有效期
         this.lockKey = REDIS_LOCK_KEY + businessKey; // 加上前缀以便分组
         this.threadIdentifier = RedisLockFactory.generateThreadIdentifier();
     }
@@ -71,7 +72,8 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
         for (int triedCount = 0;
                 (System.currentTimeMillis() - startTime) < timoutMillis
                 && (triedCount < totalTryCount)
-                && !Boolean.TRUE.equals(lockSucceed = redisTemplate.opsForValue().setIfAbsent(lockKey, threadIdentifier, duration));
+                && !Boolean.TRUE.equals(lockSucceed =
+                        redisTemplate.opsForValue().setIfAbsent(lockKey, threadIdentifier, lockDuration, TimeUnit.MILLISECONDS));
                 triedCount++) {
             Thread.yield();
 //            try {
@@ -84,8 +86,8 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
             return false;
         }
         // 上锁成功，委托给看门狗看护
-        long lockExpireTime = System.currentTimeMillis() + duration.toMillis(); // 比锁在Redis上的过期时间大一点点
-        taskContext = new RenewExpirationTaskContext(Thread.currentThread(), lockKey, duration, lockExpireTime);
+        taskContext = new RenewExpirationTaskContext(Thread.currentThread(), lockKey, threadIdentifier,
+                lockDuration, System.currentTimeMillis() + lockDuration);
         WatchDogExecutor.pushTask(taskContext);
         WatchDogExecutor.increaseReentrantCount(lockKey);
         return true;

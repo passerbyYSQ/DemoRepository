@@ -1,17 +1,19 @@
-package top.ysqorz.redis.lock.threadLocal;
+package top.ysqorz.redis.lock.lua;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ClassPathResource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 import top.ysqorz.redis.lock.RenewExpirationTaskContext;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -20,21 +22,22 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class WatchDogExecutor {
-    private static StringRedisTemplate redisTemplate;
+public class WatchDogExecutor1 {
+    private static RedisTemplate<String, Object> redisTemplate;
 
     private static final Queue<RenewExpirationTaskContext> taskQueue = new ConcurrentLinkedQueue<>();
     // TODO daemon Thread
     private static final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-    /**
-     * 每个线程自己重入的锁
-     */
-    private static final ThreadLocal<Map<String, Integer>> reentrantLocal = ThreadLocal.withInitial(HashMap::new);
     public static final Long watchInterval = Duration.ofSeconds(2).toMillis(); // 看护的时间间隔
+    public static final String REENTRANT_RENEWAL_LUA;
+
+    static {
+        REENTRANT_RENEWAL_LUA = FileUtil.readUtf8String(new ClassPathResource("lua/reentrant_renewal.lua").getFile());
+    }
 
     @Autowired
-    public WatchDogExecutor(StringRedisTemplate redisTemplate) {
-        WatchDogExecutor.redisTemplate = redisTemplate;
+    public WatchDogExecutor1(RedisTemplate<String, Object> redisTemplate) {
+        WatchDogExecutor1.redisTemplate = redisTemplate;
     }
 
     @PostConstruct
@@ -48,36 +51,6 @@ public class WatchDogExecutor {
 
     public static void removeTask(RenewExpirationTaskContext taskContext) {
         taskQueue.remove(taskContext);
-    }
-
-    public static boolean isReentrant(String lockKey) {
-        return reentrantLocal.get().getOrDefault(lockKey, 0) > 0;
-    }
-
-    public static void increaseReentrantCount(String lockKey) {
-        Map<String, Integer> reentrantMap = reentrantLocal.get();
-        reentrantMap.put(lockKey, reentrantMap.getOrDefault(lockKey, 0) + 1);
-    }
-
-    public static void decreaseReentrantCount(String lockKey) {
-        Map<String, Integer> reentrantMap = reentrantLocal.get();
-        int remainedCount = reentrantMap.getOrDefault(lockKey, 0) - 1;
-        if (remainedCount > 0) {
-            reentrantMap.put(lockKey, remainedCount);
-        } else {
-            reentrantMap.remove(lockKey);
-        }
-    }
-
-    public static int getReentrantCount(String lockKey) {
-        return reentrantLocal.get().getOrDefault(lockKey, -1);
-    }
-
-    /**
-     * 可用于请求结束后清空，防止内存泄露
-     */
-    public static void clearReentrantLocal() {
-        reentrantLocal.remove();
     }
 
     @AllArgsConstructor
@@ -103,8 +76,10 @@ public class WatchDogExecutor {
                     if (remainedMillis >= watchInterval) {
                         continue;
                     }
-                    // 尝试续期，将锁的过期时间重置为一个有效周期之后
-                    Boolean expiredSucceed = redisTemplate.expire(taskContext.getLockKey(), taskContext.getLockDuration(), TimeUnit.MILLISECONDS);
+                    // 尝试续期，将锁和重入次数的过期时间重置为一个有效周期之后
+                    DefaultRedisScript<Boolean> luaScript = new DefaultRedisScript<>(REENTRANT_RENEWAL_LUA, Boolean.class);
+                    Boolean expiredSucceed = redisTemplate.execute(luaScript, Arrays.asList(taskContext.getLockKey(),
+                            taskContext.getThreadIdentifier()), taskContext.getLockDuration());
                     // 续期失败，有可能是Redis上的锁实际上已经过期不存在了
                     if (!Boolean.TRUE.equals(expiredSucceed)) {
                         iterator.remove();
