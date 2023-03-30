@@ -31,7 +31,6 @@ public class WatchDogExecutor {
     private static final ThreadLocal<Map<String, Integer>> reentrantLocal = ThreadLocal.withInitial(HashMap::new);
     public static final Long watchInterval = Duration.ofSeconds(2).toMillis(); // 看护的时间间隔
 
-
     @Autowired
     public WatchDogExecutor(StringRedisTemplate redisTemplate) {
         WatchDogExecutor.redisTemplate = redisTemplate;
@@ -50,27 +49,27 @@ public class WatchDogExecutor {
         taskQueue.remove(taskContext);
     }
 
-    public static boolean isReentrant(String lockUUID) {
-        return reentrantLocal.get().getOrDefault(lockUUID, 0) > 0;
+    public static boolean isReentrant(String lockIdentifier) {
+        return reentrantLocal.get().getOrDefault(lockIdentifier, 0) > 0;
     }
 
-    public static void increaseReentrantCount(String lockUUID) {
+    public static void increaseReentrantCount(String lockIdentifier) {
         Map<String, Integer> reentrantMap = reentrantLocal.get();
-        reentrantMap.put(lockUUID, reentrantMap.getOrDefault(lockUUID, 0) + 1);
+        reentrantMap.put(lockIdentifier, reentrantMap.getOrDefault(lockIdentifier, 0) + 1);
     }
 
-    public static void decreaseReentrantCount(String lockUUID) {
+    public static void decreaseReentrantCount(String lockIdentifier) {
         Map<String, Integer> reentrantMap = reentrantLocal.get();
-        int remainedCount = reentrantMap.getOrDefault(lockUUID, 0) - 1;
+        int remainedCount = reentrantMap.getOrDefault(lockIdentifier, 0) - 1;
         if (remainedCount > 0) {
-            reentrantMap.put(lockUUID, remainedCount);
+            reentrantMap.put(lockIdentifier, remainedCount);
         } else {
-            reentrantMap.remove(lockUUID);
+            reentrantMap.remove(lockIdentifier);
         }
     }
 
-    public static int getReentrantCount(String lockUUID) {
-        return reentrantLocal.get().getOrDefault(lockUUID, -1);
+    public static int getReentrantCount(String lockIdentifier) {
+        return reentrantLocal.get().getOrDefault(lockIdentifier, -1);
     }
 
     /**

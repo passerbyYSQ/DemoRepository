@@ -2,7 +2,7 @@ package top.ysqorz.redis.lock;
 
 import java.time.Duration;
 
-public interface IRedisLock {
+public interface IReentrantRedisLock {
     void lock();
 
     boolean lock(Duration timout);

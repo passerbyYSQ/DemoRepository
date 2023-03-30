@@ -6,7 +6,6 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.UUID;
 
 /**
  * 看门狗简要实现：https://mp.weixin.qq.com/s/ndO9prpTtGa8eAYCQAYTMA
@@ -14,22 +13,22 @@ import java.util.UUID;
  * 可重入的分布式锁：https://juejin.cn/post/6844904191219990535
  */
 @Getter
-public class RedisLock implements IRedisLock {
+public class ReentrantRedisLock implements IReentrantRedisLock {
     public static final String REDIS_LOCK_KEY = "RedisLock:"; // :用于key分组
     private StringRedisTemplate redisTemplate;
     private Duration duration;
     private String lockKey;
-    private String lockUUID;
+    private String lockIdentifier;
     private RenewExpirationTaskContext taskContext;
 
-    public RedisLock(StringRedisTemplate redisTemplate, String businessKey, Duration duration) {
+    public ReentrantRedisLock(StringRedisTemplate redisTemplate, String businessKey, Duration duration) {
         if (duration == null || duration.toMillis() < WatchDogExecutor.watchInterval) {
             throw new RuntimeException("锁的有效期不能小于看门狗看护的时间间隔");
         }
         this.redisTemplate = redisTemplate;
         this.duration = duration; // 锁的有效期
         this.lockKey = REDIS_LOCK_KEY + businessKey; // 加上前缀以便分组
-        this.lockUUID = UUID.randomUUID().toString(); // 锁的唯一标识
+        this.lockIdentifier = RedisLockFactory.generateLockIdentifier();
     }
 
     @Override
@@ -58,8 +57,8 @@ public class RedisLock implements IRedisLock {
      */
     public boolean tryLock(Duration timout, int tryCount) {
         // 如果是重入已经获得的锁，计数后直接返回
-        if (WatchDogExecutor.isReentrant(lockUUID)) {
-            WatchDogExecutor.increaseReentrantCount(lockUUID);
+        if (WatchDogExecutor.isReentrant(lockIdentifier)) {
+            WatchDogExecutor.increaseReentrantCount(lockIdentifier);
             return true;
         }
         long startTime = System.currentTimeMillis();
@@ -69,7 +68,7 @@ public class RedisLock implements IRedisLock {
         for (int triedCount = 0;
                 (System.currentTimeMillis() - startTime) < timoutMillis
                 && (triedCount < totalTryCount)
-                && !Boolean.TRUE.equals(lockSucceed = redisTemplate.opsForValue().setIfAbsent(lockKey, lockUUID, duration));
+                && !Boolean.TRUE.equals(lockSucceed = redisTemplate.opsForValue().setIfAbsent(lockKey, lockIdentifier, duration));
                 triedCount++) {
             Thread.yield();
 //            try {
@@ -85,17 +84,17 @@ public class RedisLock implements IRedisLock {
         long lockExpireTime = System.currentTimeMillis() + duration.toMillis(); // 比锁在Redis上的过期时间大一点点
         taskContext = new RenewExpirationTaskContext(Thread.currentThread(), lockKey, duration, lockExpireTime);
         WatchDogExecutor.pushTask(taskContext);
-        WatchDogExecutor.increaseReentrantCount(lockUUID);
+        WatchDogExecutor.increaseReentrantCount(lockIdentifier);
         return true;
     }
 
     public void unlock() {
         // 自己的锁才释放
         String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-        redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(lockKey), lockUUID);
+        redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(lockKey), lockIdentifier);
         if (taskContext != null) {
             WatchDogExecutor.removeTask(taskContext);
         }
-        WatchDogExecutor.decreaseReentrantCount(lockUUID);
+        WatchDogExecutor.decreaseReentrantCount(lockIdentifier);
     }
 }

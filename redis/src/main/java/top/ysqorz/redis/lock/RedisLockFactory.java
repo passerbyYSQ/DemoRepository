@@ -4,6 +4,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.lang.management.ManagementFactory;
 import java.time.Duration;
 
 @Component
@@ -12,11 +13,18 @@ public class RedisLockFactory {
     @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate redisTemplate;
 
-    public RedisLock createRedisLock(String businessKey, Duration duration) {
-        return new RedisLock(redisTemplate, businessKey, duration);
+    public ReentrantRedisLock createRedisLock(String businessKey, Duration duration) {
+        return new ReentrantRedisLock(redisTemplate, businessKey, duration);
     }
 
-    public RedisLock createRedisLock(String businessKey) {
-        return new RedisLock(redisTemplate, businessKey, Duration.ofSeconds(5)); // 比看门狗看护间隔大。第二次看护会续期
+    public ReentrantRedisLock createRedisLock(String businessKey) {
+        return new ReentrantRedisLock(redisTemplate, businessKey, Duration.ofSeconds(5)); // 比看门狗看护间隔大。第二次看护会续期
+    }
+
+    /**
+     * 为分布式锁生成标识符：JVM进程名称_线程ID_线程名称
+     */
+    public static String generateLockIdentifier() {
+        return ManagementFactory.getRuntimeMXBean().getName() + "_" + Thread.currentThread().getId() + "_" +Thread.currentThread().getName();
     }
 }

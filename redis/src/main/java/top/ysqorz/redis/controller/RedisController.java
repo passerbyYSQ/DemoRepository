@@ -4,7 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import top.ysqorz.redis.lock.RedisLock;
+import top.ysqorz.redis.lock.ReentrantRedisLock;
 import top.ysqorz.redis.lock.RedisLockFactory;
 import top.ysqorz.redis.lock.WatchDogExecutor;
 
@@ -18,7 +18,7 @@ public class RedisController {
 
     @GetMapping("/testWatchDog")
     public void testWatchDog() throws Exception {
-        RedisLock redisLock = redisLockFactory.createRedisLock("testWatchDog");
+        ReentrantRedisLock redisLock = redisLockFactory.createRedisLock("testWatchDog");
         try {
             redisLock.lock();
             System.out.println("【获取】：" + Thread.currentThread().getName());
@@ -33,7 +33,7 @@ public class RedisController {
 
     @GetMapping("/testConcurrency")
     public void testConcurrency() throws Exception {
-        RedisLock redisLock = redisLockFactory.createRedisLock("testConcurrency");
+        ReentrantRedisLock redisLock = redisLockFactory.createRedisLock("testConcurrency");
         try {
             redisLock.lock();
             System.out.println("【获取】：" + Thread.currentThread().getName());
@@ -48,36 +48,36 @@ public class RedisController {
 
     @GetMapping("/testReentrant")
     public void testReentrant() {
-        RedisLock redisLock = redisLockFactory.createRedisLock("testReentrant");
+        ReentrantRedisLock redisLock = redisLockFactory.createRedisLock("testReentrant");
         try {
             // 重入次数 1
             redisLock.lock();
-            System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockUUID())); // 1
+            System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockIdentifier())); // 1
 
             try {
                 // 重入次数 2
                 redisLock.lock();
-                System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockUUID())); // 2
+                System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockIdentifier())); // 2
 
                 try {
                     // 重入次数 3
                     redisLock.lock();
-                    System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockUUID())); // 3
+                    System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockIdentifier())); // 3
 
                 } finally {
                     redisLock.unlock();
-                    System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockUUID())); // 2
+                    System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockIdentifier())); // 2
                 }
 
 
             } finally {
                 redisLock.unlock();
-                System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockUUID())); // 1
+                System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockIdentifier())); // 1
             }
 
         } finally {
             redisLock.unlock();
-            System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockUUID())); // -1 计数被清除了
+            System.out.println(WatchDogExecutor.getReentrantCount(redisLock.getLockIdentifier())); // -1 计数被清除了
         }
     }
 }
