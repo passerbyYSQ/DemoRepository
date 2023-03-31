@@ -12,6 +12,7 @@ import top.ysqorz.redis.lock.threadLocal.WatchDogExecutor;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.function.Function;
 
 @Getter
 public class ReentrantRedisLock1 implements IReentrantRedisLock {
@@ -67,9 +68,10 @@ public class ReentrantRedisLock1 implements IReentrantRedisLock {
 
     @Override
     public void unlock() {
-        DefaultRedisScript<Boolean> luaScript = new DefaultRedisScript<>(REENTRANT_UNLOCK_LUA, Boolean.class);
-        redisTemplate.execute(luaScript, Arrays.asList(lockKey, threadIdentifier));
-        if (taskContext != null) {
+        DefaultRedisScript<Long> luaScript = new DefaultRedisScript<>(REENTRANT_UNLOCK_LUA, Long.class);
+        Long reentrantCount = redisTemplate.execute(luaScript, Arrays.asList(lockKey, threadIdentifier));
+        // 锁的持有者是当前线程，且是最后一次释放锁，从队列中移除看护任务
+        if (reentrantCount != null && reentrantCount == 0) {
             WatchDogExecutor1.removeTask(taskContext);
         }
     }
@@ -78,24 +80,46 @@ public class ReentrantRedisLock1 implements IReentrantRedisLock {
         long startTime = System.currentTimeMillis();
         long timoutMillis = timout == null ? Long.MAX_VALUE : timout.toMillis(); // timout为null则超时无限制
         int totalTryCount = tryCount <= 0 ? Integer.MAX_VALUE : tryCount; // tryCount为负数则无限制
-        DefaultRedisScript<Boolean> luaScript = new DefaultRedisScript<>(REENTRANT_LOCK_LUA, Boolean.class);
-        Boolean lockSucceed = Boolean.FALSE;
+        DefaultRedisScript<Long> luaScript = new DefaultRedisScript<>(REENTRANT_LOCK_LUA, Long.class);
+        Function<Integer, Long> tryLockByLua = triedCount -> {
+            // 超时
+            if (System.currentTimeMillis() - startTime > timoutMillis) {
+                return Long.valueOf(-1);
+            }
+            // 超出重试次数
+            if (triedCount >= totalTryCount) {
+                return Long.valueOf(-1);
+            }
+            // 锁已经被其他线程抢占了
+            Long reentrantCount = redisTemplate.execute(luaScript, Arrays.asList(lockKey, threadIdentifier), String.valueOf(lockDuration));
+            if (reentrantCount == null || reentrantCount < 0) {
+                return Long.valueOf(-1);
+            }
+            // 当前线程成功抢占锁，返回重入次数
+            return reentrantCount;
+        };
+        Long reentrantCount;
         for (int triedCount = 0;
-             (System.currentTimeMillis() - startTime) < timoutMillis
-                     && (triedCount < totalTryCount)
-                     // 注意lockSucceed有可能为null，此时认为上锁失败
-                     && !Boolean.TRUE.equals(
-                     lockSucceed = redisTemplate.execute(luaScript, Arrays.asList(lockKey, threadIdentifier), String.valueOf(lockDuration)));
+             (reentrantCount = tryLockByLua.apply(triedCount)) < 0;
              triedCount++) {
-            Thread.yield();
+            try {
+                //noinspection BusyWait
+                Thread.sleep(10);
+            } catch (InterruptedException ignored) {
+            }
         }
-        if (!Boolean.TRUE.equals(lockSucceed)) {
-            return false;
+        // 第一次成功抢占锁，将守护任务放入队列
+        if (reentrantCount == 1) {
+            taskContext = new RenewExpirationTaskContext(Thread.currentThread(), lockKey, threadIdentifier,
+                    lockDuration, System.currentTimeMillis() + lockDuration);
+            WatchDogExecutor1.pushTask(taskContext);
         }
-        // 上锁成功，委托给看门狗看护
-        taskContext = new RenewExpirationTaskContext(Thread.currentThread(), lockKey, threadIdentifier,
-                lockDuration, System.currentTimeMillis() + lockDuration);
-        WatchDogExecutor1.pushTask(taskContext);
         return true;
+        // 此时当前线程已经获取到lockKey这把锁，换言之不可能存在其他线程并发添加这把锁的TaskContext，只可能是自己在重入这把锁的时候添加重复的TaskContext
+        // 所以这里的contain和push不需要再做同步处理
+//        if (!WatchDogExecutor1.containTask(taskContext)) {
+//            // 上锁成功，委托给看门狗看护
+//            WatchDogExecutor1.pushTask(taskContext);
+//        }
     }
 }

@@ -7,13 +7,12 @@ if tid and tid == threadIdentifier then
     local reentrantCount = tonumber(redis.call('GET', reentrantKey))
     if reentrantCount and reentrantCount > 1 then
         -- 重入次数减1
-        redis.call('DECR', reentrantKey)
+        return redis.call('DECR', reentrantKey)
     else
         -- 重入次数减为0后，清除两个key
-        redis.call('DEL', lockKey)
-        redis.call('DEL', reentrantKey)
+        redis.call('DEL', lockKey, reentrantKey)
+        return 0
     end
-    return true
 else
-    return false
+    return -1
 end

@@ -22,7 +22,7 @@ public class RedisController {
         try {
             System.out.println("【获取】：" + Thread.currentThread().getName());
             long startTime = System.currentTimeMillis();
-            Thread.sleep(9000); // 模拟业务处理
+            Thread.sleep(15000); // 模拟业务处理
             System.out.println("耗时：" + (System.currentTimeMillis() - startTime) + " ms");
         } finally {
             System.out.println("【释放】：" + Thread.currentThread().getName());
@@ -88,22 +88,24 @@ public class RedisController {
     public void dfsReentrant() {
         ReentrantRedisLock1 redisLock = redisLockFactory.createRedisLock1("testReentrant1");
         dfsReentrant(redisLock, 0, 100);
+        System.out.println("【解锁】重入次数：" + redisLock.getReentrantCount());
     }
 
     public void dfsReentrant(ReentrantRedisLock1 redisLock, int count, int total) {
         if (count >= total) {
             try {
-                Thread.sleep(RandomUtil.randomInt(2000)); // 模拟完全上锁之后的业务操作
+                Thread.sleep(RandomUtil.randomInt(5000)); // 模拟完全上锁之后的业务操作
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         } else {
             redisLock.lock();
-            System.out.println("重入次数：" + redisLock.getReentrantCount());
+            System.out.println("【加锁】重入次数：" + redisLock.getReentrantCount());
             try {
                 // 递归重入
                 dfsReentrant(redisLock, count + 1, total);
             } finally {
+                System.out.println("【解锁】重入次数：" + redisLock.getReentrantCount());
                 redisLock.unlock();
             }
         }

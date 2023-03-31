@@ -80,12 +80,11 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
                 && !Boolean.TRUE.equals(lockSucceed =
                         redisTemplate.opsForValue().setIfAbsent(lockKey, threadIdentifier, lockDuration, TimeUnit.MILLISECONDS));
                 triedCount++) {
-            Thread.yield();
-//            try {
-//                //noinspection BusyWait
-//                //Thread.sleep(100);
-//            } catch (InterruptedException ignored) {
-//            }
+            try {
+                //noinspection BusyWait
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+            }
         }
         if (!Boolean.TRUE.equals(lockSucceed)) {
             return false;

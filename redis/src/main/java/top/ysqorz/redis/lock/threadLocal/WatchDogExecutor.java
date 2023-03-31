@@ -24,8 +24,12 @@ public class WatchDogExecutor {
     private static StringRedisTemplate redisTemplate;
 
     private static final Queue<RenewExpirationTaskContext> taskQueue = new ConcurrentLinkedQueue<>();
-    // TODO daemon Thread
-    private static final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1,
+            runnable -> {
+                Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+                thread.setDaemon(true); // 设置守护线程
+                return thread;
+            });
     /**
      * 每个线程自己重入的锁
      */
@@ -109,13 +113,16 @@ public class WatchDogExecutor {
                     // 尝试续期，将锁的过期时间重置为一个有效周期之后
                     Boolean expiredSucceed = redisTemplate.expire(taskContext.getLockKey(), taskContext.getLockDuration(), TimeUnit.MILLISECONDS);
                     // 续期失败，有可能是Redis上的锁实际上已经过期不存在了
-                    if (!Boolean.TRUE.equals(expiredSucceed)) {
-                        iterator.remove();
-                    } else {
+                    if (Boolean.TRUE.equals(expiredSucceed)) {
+                        // 续期之后更新过期时间
+                        taskContext.setLockExpireTime(System.currentTimeMillis() + taskContext.getLockDuration());
                         log.info("续期成功，lockKey: {}", taskContext.getLockKey());
+                    } else {
+                        iterator.remove();
                     }
                 }
             } catch (Exception ex) {
+                ex.printStackTrace();
                 // 直接包裹整块处理代码，防止单次处理异常导致看门狗线程挂掉
                 if (taskContext != null) {
                     taskContext.getWorkerThread().interrupt(); // 设置工作线程的中断标记
