@@ -55,6 +55,11 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
         return tryLock(null, tryCount);
     }
 
+    @Override
+    public int getReentrantCount() {
+        return WatchDogExecutor.getReentrantCount(lockKey);
+    }
+
     /**
      * @param timout       获取锁的超时时间
      * @param tryCount     允许重试获取锁的次数
@@ -95,12 +100,14 @@ public class ReentrantRedisLock implements IReentrantRedisLock {
 
     @Override
     public void unlock() {
-        // 自己的锁才释放
-        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-        redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(lockKey), threadIdentifier);
-        if (taskContext != null) {
-            WatchDogExecutor.removeTask(taskContext);
+        int remainedCount = WatchDogExecutor.decreaseReentrantCount(lockKey);
+        if (remainedCount <= 0) {
+            // 自己的锁才释放
+            String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+            redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(lockKey), threadIdentifier);
+            if (taskContext != null) {
+                WatchDogExecutor.removeTask(taskContext);
+            }
         }
-        WatchDogExecutor.decreaseReentrantCount(lockKey);
     }
 }

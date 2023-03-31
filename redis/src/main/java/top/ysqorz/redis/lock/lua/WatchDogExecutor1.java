@@ -5,7 +5,7 @@ import cn.hutool.core.io.resource.ClassPathResource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 import top.ysqorz.redis.lock.RenewExpirationTaskContext;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class WatchDogExecutor1 {
-    private static RedisTemplate<String, Object> redisTemplate;
+    private static StringRedisTemplate redisTemplate;
 
     private static final Queue<RenewExpirationTaskContext> taskQueue = new ConcurrentLinkedQueue<>();
     // TODO daemon Thread
@@ -36,7 +36,7 @@ public class WatchDogExecutor1 {
     }
 
     @Autowired
-    public WatchDogExecutor1(RedisTemplate<String, Object> redisTemplate) {
+    public WatchDogExecutor1(StringRedisTemplate redisTemplate) {
         WatchDogExecutor1.redisTemplate = redisTemplate;
     }
 
@@ -79,7 +79,7 @@ public class WatchDogExecutor1 {
                     // 尝试续期，将锁和重入次数的过期时间重置为一个有效周期之后
                     DefaultRedisScript<Boolean> luaScript = new DefaultRedisScript<>(REENTRANT_RENEWAL_LUA, Boolean.class);
                     Boolean expiredSucceed = redisTemplate.execute(luaScript, Arrays.asList(taskContext.getLockKey(),
-                            taskContext.getThreadIdentifier()), taskContext.getLockDuration());
+                            taskContext.getThreadIdentifier()), String.valueOf(taskContext.getLockDuration()));
                     // 续期失败，有可能是Redis上的锁实际上已经过期不存在了
                     if (!Boolean.TRUE.equals(expiredSucceed)) {
                         iterator.remove();

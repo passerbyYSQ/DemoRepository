@@ -15,6 +15,7 @@ public class RedisLockFactory {
     // 先通过bean的名字(不配置name参数，则变量名即为bean的名字)找，再通过bean的类型找。如果通过名字找到了，则不通过类型找了，类型不对直接报错
     @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate stringRedisTemplate;
+    // 使用这个RedisTemplate，自增操作和ARGV的序列化会报错
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -27,11 +28,11 @@ public class RedisLockFactory {
     }
 
     public ReentrantRedisLock1 createRedisLock1(String businessKey, Duration duration) {
-        return new ReentrantRedisLock1(redisTemplate, businessKey, duration);
+        return new ReentrantRedisLock1(stringRedisTemplate, businessKey, duration);
     }
 
     public ReentrantRedisLock1 createRedisLock1(String businessKey) {
-        return new ReentrantRedisLock1(redisTemplate, businessKey, Duration.ofSeconds(5));
+        return new ReentrantRedisLock1(stringRedisTemplate, businessKey, Duration.ofSeconds(5));
     }
 
     /**

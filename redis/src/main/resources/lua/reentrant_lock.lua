@@ -8,12 +8,12 @@ if not tid then
     -- 成功抢到锁，占领锁的坑位
     redis.call('SET', lockKey, threadIdentifier, 'PX', expirationMillis)
     -- 同时设置重入次数为1，注意一个线程在执行过程中可能重入多把不同的锁
-    redis.call('SET', threadIdentifier..':'.. lockKey, 'PX', expirationMillis)
+    redis.call('SET', threadIdentifier..':'..lockKey, 1, 'PX', expirationMillis)
     return true
 else
     -- 如果锁的持有者是当前线程，则直接重入
     if tid == threadIdentifier then
-        redis.call('INCR', threadIdentifier..':'.. lockKey)
+        redis.call('INCR', threadIdentifier..':'..lockKey)
         return true
     end
         return false

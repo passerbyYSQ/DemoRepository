@@ -11,5 +11,7 @@ public interface IReentrantRedisLock {
 
     boolean tryLock(int tryCount);
 
+    int getReentrantCount();
+
     void unlock();
 }

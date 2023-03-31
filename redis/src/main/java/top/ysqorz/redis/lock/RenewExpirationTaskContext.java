@@ -1,10 +1,10 @@
 package top.ysqorz.redis.lock;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 @AllArgsConstructor
-@Data
+@Getter
 public class RenewExpirationTaskContext {
     private Thread workerThread;
     private String lockKey;

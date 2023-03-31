@@ -54,12 +54,14 @@ public class WatchDogExecutor {
         return reentrantLocal.get().getOrDefault(lockKey, 0) > 0;
     }
 
-    public static void increaseReentrantCount(String lockKey) {
+    public static int increaseReentrantCount(String lockKey) {
         Map<String, Integer> reentrantMap = reentrantLocal.get();
-        reentrantMap.put(lockKey, reentrantMap.getOrDefault(lockKey, 0) + 1);
+        int count = reentrantMap.getOrDefault(lockKey, 0) + 1;
+        reentrantMap.put(lockKey, count);
+        return count;
     }
 
-    public static void decreaseReentrantCount(String lockKey) {
+    public static int decreaseReentrantCount(String lockKey) {
         Map<String, Integer> reentrantMap = reentrantLocal.get();
         int remainedCount = reentrantMap.getOrDefault(lockKey, 0) - 1;
         if (remainedCount > 0) {
@@ -67,10 +69,11 @@ public class WatchDogExecutor {
         } else {
             reentrantMap.remove(lockKey);
         }
+        return remainedCount;
     }
 
     public static int getReentrantCount(String lockKey) {
-        return reentrantLocal.get().getOrDefault(lockKey, -1);
+        return reentrantLocal.get().getOrDefault(lockKey, 0);
     }
 
     /**

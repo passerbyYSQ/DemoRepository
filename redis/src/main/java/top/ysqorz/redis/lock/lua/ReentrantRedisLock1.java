@@ -2,7 +2,8 @@ package top.ysqorz.redis.lock.lua;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
-import org.springframework.data.redis.core.RedisTemplate;
+import lombok.Getter;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import top.ysqorz.redis.lock.IReentrantRedisLock;
 import top.ysqorz.redis.lock.RedisLockFactory;
@@ -12,9 +13,10 @@ import top.ysqorz.redis.lock.threadLocal.WatchDogExecutor;
 import java.time.Duration;
 import java.util.Arrays;
 
+@Getter
 public class ReentrantRedisLock1 implements IReentrantRedisLock {
     public static final String REDIS_LOCK_KEY = "ReentrantRedisLock1:"; // :用于key分组
-    private RedisTemplate<String, Object> redisTemplate;
+    private StringRedisTemplate redisTemplate;
     private String lockKey;
     private String threadIdentifier;
     private long lockDuration;
@@ -27,7 +29,7 @@ public class ReentrantRedisLock1 implements IReentrantRedisLock {
         REENTRANT_UNLOCK_LUA = FileUtil.readUtf8String(new ClassPathResource("lua/reentrant_unlock.lua").getFile());
     }
 
-    public ReentrantRedisLock1(RedisTemplate<String, Object> redisTemplate, String businessKey, Duration duration) {
+    public ReentrantRedisLock1(StringRedisTemplate redisTemplate, String businessKey, Duration duration) {
         if (duration == null || duration.toMillis() < WatchDogExecutor.watchInterval) {
             throw new RuntimeException("锁的有效期不能小于看门狗看护的时间间隔");
         }
@@ -58,6 +60,12 @@ public class ReentrantRedisLock1 implements IReentrantRedisLock {
     }
 
     @Override
+    public int getReentrantCount() {
+        String count = redisTemplate.opsForValue().get(threadIdentifier + ":" + lockKey);
+        return count == null ? 0 : Integer.parseInt(count);
+    }
+
+    @Override
     public void unlock() {
         DefaultRedisScript<Boolean> luaScript = new DefaultRedisScript<>(REENTRANT_UNLOCK_LUA, Boolean.class);
         redisTemplate.execute(luaScript, Arrays.asList(lockKey, threadIdentifier));
@@ -76,7 +84,8 @@ public class ReentrantRedisLock1 implements IReentrantRedisLock {
              (System.currentTimeMillis() - startTime) < timoutMillis
                      && (triedCount < totalTryCount)
                      // 注意lockSucceed有可能为null，此时认为上锁失败
-                     && !Boolean.TRUE.equals(lockSucceed = redisTemplate.execute(luaScript, Arrays.asList(lockKey, threadIdentifier), lockDuration));
+                     && !Boolean.TRUE.equals(
+                     lockSucceed = redisTemplate.execute(luaScript, Arrays.asList(lockKey, threadIdentifier), String.valueOf(lockDuration)));
              triedCount++) {
             Thread.yield();
         }
