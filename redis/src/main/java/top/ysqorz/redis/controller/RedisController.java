@@ -19,13 +19,13 @@ public class RedisController {
     public void testWatchDog() throws Exception {
         ReentrantRedisLock1 redisLock = redisLockFactory.createRedisLock1("testWatchDog");
         redisLock.lock();
+        System.out.println("【获取】：" + Thread.currentThread().getName());
+        long startTime = System.currentTimeMillis();
         try {
-            System.out.println("【获取】：" + Thread.currentThread().getName());
-            long startTime = System.currentTimeMillis();
             Thread.sleep(15000); // 模拟业务处理
-            System.out.println("耗时：" + (System.currentTimeMillis() - startTime) + " ms");
         } finally {
             System.out.println("【释放】：" + Thread.currentThread().getName());
+            System.out.println("耗时：" + (System.currentTimeMillis() - startTime) + " ms");
             redisLock.unlock();
         }
     }
@@ -34,13 +34,13 @@ public class RedisController {
     public void testConcurrency() throws Exception {
         ReentrantRedisLock1 redisLock = redisLockFactory.createRedisLock1("testConcurrency");
         redisLock.lock();
+        System.out.println("【获取】：" + Thread.currentThread().getName());
+        long startTime = System.currentTimeMillis();
         try {
-            System.out.println("【获取】：" + Thread.currentThread().getName());
-            long startTime = System.currentTimeMillis();
             Thread.sleep(RandomUtil.randomInt(2000));
-            System.out.println("耗时：" + (System.currentTimeMillis() - startTime) + " ms");
         } finally {
             System.out.println("【释放】：" + Thread.currentThread().getName());
+            System.out.println("耗时：" + (System.currentTimeMillis() - startTime) + " ms");
             redisLock.unlock();
         }
     }
