@@ -1,4 +1,4 @@
-package top.ysqorz.TransmittableThreadLocal.demo.expression;
+package top.ysqorz.expression;
 
 public interface ExpressionEntity {
     int OPERAND = 0; // 操作数

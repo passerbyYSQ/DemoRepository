@@ -1,6 +1,6 @@
-package top.ysqorz.TransmittableThreadLocal.demo.tree;
+package top.ysqorz.tree;
 
-import top.ysqorz.TransmittableThreadLocal.demo.tree.trim.impl.NonRecursionTrim;
+import top.ysqorz.tree.trim.impl.NonRecursionTrim;
 
 import java.util.ArrayDeque;
 import java.util.Comparator;

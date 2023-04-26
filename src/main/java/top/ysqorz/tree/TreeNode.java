@@ -1,4 +1,4 @@
-package top.ysqorz.TransmittableThreadLocal.demo.tree;
+package top.ysqorz.tree;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

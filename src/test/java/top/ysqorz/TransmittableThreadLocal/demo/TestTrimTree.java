@@ -2,10 +2,10 @@ package top.ysqorz.TransmittableThreadLocal.demo;
 
 import org.junit.Before;
 import org.junit.Test;
-import top.ysqorz.TransmittableThreadLocal.demo.tree.trim.impl.NonRecursionTrim;
-import top.ysqorz.TransmittableThreadLocal.demo.tree.TreeNode;
-import top.ysqorz.TransmittableThreadLocal.demo.tree.trim.TrimTreeAlgorithm;
-import top.ysqorz.TransmittableThreadLocal.demo.tree.trim.impl.RecursionTrim;
+import top.ysqorz.tree.trim.impl.NonRecursionTrim;
+import top.ysqorz.tree.TreeNode;
+import top.ysqorz.tree.trim.TrimTreeAlgorithm;
+import top.ysqorz.tree.trim.impl.RecursionTrim;
 
 import java.util.Arrays;
 

@@ -1,6 +1,6 @@
-package top.ysqorz.TransmittableThreadLocal.demo.expression.operand;
+package top.ysqorz.expression.operand;
 
-import top.ysqorz.TransmittableThreadLocal.demo.expression.ExpressionEntity;
+import top.ysqorz.expression.ExpressionEntity;
 
 import java.math.BigDecimal;
 

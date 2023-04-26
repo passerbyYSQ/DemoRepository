@@ -1,6 +1,6 @@
-package top.ysqorz.TransmittableThreadLocal.demo.tree.trim;
+package top.ysqorz.tree.trim;
 
-import top.ysqorz.TransmittableThreadLocal.demo.tree.TreeNode;
+import top.ysqorz.tree.TreeNode;
 
 import java.util.function.Predicate;
 

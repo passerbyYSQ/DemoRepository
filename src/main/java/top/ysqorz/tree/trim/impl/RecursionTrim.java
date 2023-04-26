@@ -1,7 +1,7 @@
-package top.ysqorz.TransmittableThreadLocal.demo.tree.trim.impl;
+package top.ysqorz.tree.trim.impl;
 
-import top.ysqorz.TransmittableThreadLocal.demo.tree.TreeNode;
-import top.ysqorz.TransmittableThreadLocal.demo.tree.trim.TrimTreeAlgorithm;
+import top.ysqorz.tree.TreeNode;
+import top.ysqorz.tree.trim.TrimTreeAlgorithm;
 
 import java.util.Iterator;
 import java.util.List;

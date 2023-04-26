@@ -1,13 +1,11 @@
-package top.ysqorz.TransmittableThreadLocal.demo.expression;
+package top.ysqorz.expression;
 
 import org.junit.Test;
-import top.ysqorz.TransmittableThreadLocal.demo.expression.operand.NumericValue;
-import top.ysqorz.TransmittableThreadLocal.demo.expression.operand.Operand;
-import top.ysqorz.TransmittableThreadLocal.demo.expression.operand.StringValue;
-import top.ysqorz.TransmittableThreadLocal.demo.expression.operand.Value;
-import top.ysqorz.TransmittableThreadLocal.demo.expression.operator.*;
-import top.ysqorz.demo.expression.operator.*;
-import top.ysqorz.r2dbc.TransmittableThreadLocal.demo.expression.operator.*;
+import top.ysqorz.expression.operand.NumericValue;
+import top.ysqorz.expression.operand.Operand;
+import top.ysqorz.expression.operand.StringValue;
+import top.ysqorz.expression.operand.Value;
+import top.ysqorz.expression.operator.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
-package top.ysqorz.TransmittableThreadLocal.demo.expression.operator;
+package top.ysqorz.expression.operator;
 
-import top.ysqorz.TransmittableThreadLocal.demo.expression.ExpressionEntity;
+import top.ysqorz.expression.ExpressionEntity;
 
 /**
  * 双目运算符

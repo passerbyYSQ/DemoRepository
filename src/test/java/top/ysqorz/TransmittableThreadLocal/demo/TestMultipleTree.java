@@ -2,8 +2,8 @@ package top.ysqorz.TransmittableThreadLocal.demo;
 
 import org.junit.Before;
 import org.junit.Test;
-import top.ysqorz.TransmittableThreadLocal.demo.tree.MultipleTree;
-import top.ysqorz.TransmittableThreadLocal.demo.tree.TreeNode;
+import top.ysqorz.tree.MultipleTree;
+import top.ysqorz.tree.TreeNode;
 
 import java.util.*;
 import java.util.function.Predicate;

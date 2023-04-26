@@ -1,4 +1,4 @@
-package top.ysqorz.TransmittableThreadLocal.demo.expression;
+package top.ysqorz.expression;
 
 public class ExpressionException extends RuntimeException {
     public ExpressionException(String message) {

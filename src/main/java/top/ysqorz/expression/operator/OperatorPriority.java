@@ -1,4 +1,4 @@
-package top.ysqorz.TransmittableThreadLocal.demo.expression.operator;
+package top.ysqorz.expression.operator;
 
 /**
  * 运算符优先级

@@ -1,4 +1,4 @@
-package top.ysqorz.TransmittableThreadLocal.demo.expression.operand;
+package top.ysqorz.expression.operand;
 
 public class LogicalValue extends Value {
     private Boolean value;
