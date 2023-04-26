@@ -20,6 +20,7 @@
         <module>r2dbc</module>
         <module>oss</module>
         <module>redis</module>
+        <module>file</module>
     </modules>
 
     <properties>

@@ -16,6 +16,7 @@ public class SucoreClassDataModel {
     private String className;
     private String classComment;
     private Boolean isAbstract;
+    private Boolean isDynamic;
     private List<Attribute> attrs;
     private SucoreClassDataModel parent; // 父类
 

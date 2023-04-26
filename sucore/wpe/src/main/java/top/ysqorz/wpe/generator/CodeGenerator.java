@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * TODO 抽象类不需要加上@TableName注解
  */
 public class CodeGenerator {
-    private static final boolean withExtend = false;
+    private static final boolean withExtend = true;
 
     public static void main(String[] args) throws IOException, TemplateException {
         File classPath = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX);
@@ -64,9 +64,9 @@ public class CodeGenerator {
         List<SucoreClassDataModel> modelList = new ArrayList<>();
         while (!queue.isEmpty()) {
             JSONObject current = queue.poll();
-            if (current.getBool("isDynamic", Boolean.FALSE)) { // 过滤动态类
-                continue;
-            }
+//            if (current.getBool("isDynamic", Boolean.FALSE)) { // 过滤动态类
+//                continue;
+//            }
             SucoreClassDataModel dataModel = transformDataModel(current);
             modelList.add(dataModel);
 
@@ -102,15 +102,16 @@ public class CodeGenerator {
                 .setPackageName(packageName)
                 .setClassName(current.getStr("className"))
                 .setClassComment(current.getStr("classDisplayLabel"))
-                .setIsAbstract(current.getBool("isAbstract"))
+                .setIsAbstract(current.getBool("isAbstract", Boolean.FALSE))
+                .setIsDynamic(current.getBool("isDynamic", Boolean.FALSE))
                 .setParent(current.get("ParentDataModel", SucoreClassDataModel.class));
         List<JSONObject> normalAttaches = current.getBeanList("normalAttaches", JSONObject.class);
         List<JSONObject> constants = current.getBeanList("constants", JSONObject.class);
         if (ObjectUtil.isNotEmpty(normalAttaches)) {
             List<SucoreClassDataModel.Attribute> attrList = normalAttaches.stream()
-                    .filter(attr -> {
-                        return "PERSISTENT".equalsIgnoreCase(attr.getStr("storageType")); // 过滤动态属性，只保留持久属性
-                    })
+//                    .filter(attr -> {
+//                        return "PERSISTENT".equalsIgnoreCase(attr.getStr("storageType")); // 过滤动态属性，只保留持久属性
+//                    })
                     .map(attr -> {
                         StringBuilder comment = new StringBuilder(attr.getStr("displayName"));
                         String attrName = attr.getStr("attrName");

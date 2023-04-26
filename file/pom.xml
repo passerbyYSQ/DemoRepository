@@ -9,16 +9,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>oss</artifactId>
+    <artifactId>file</artifactId>
 
-    <name>oss</name>
+    <name>file</name>
 
+    <properties>
+        <easyexcel.version>3.1.1</easyexcel.version>
+        <commons.csv.version>1.9.0</commons.csv.version>
+    </properties>
     <dependencies>
         <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-            <version>3.16.1</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${commons.csv.version}</version>
         </dependency>
     </dependencies>
-
 </project>
