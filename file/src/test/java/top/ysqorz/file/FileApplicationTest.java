@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Unit test for simple App.
@@ -32,7 +34,7 @@ public class FileApplicationTest {
     }
 
     /**
-     * AES加密和解密文件
+     * 测试AES加密和解密文件
      */
     @Test
     public void aesEncryptFile() throws IOException {
@@ -59,11 +61,55 @@ public class FileApplicationTest {
         inputStream.close();
     }
 
+    /**
+     * 测试URL编码
+     */
     @Test
     public void testEncodeFilename() {
         // 原本：ysq-1,A,1:ysq-1
         // 错误：ysq-12C1%3Aysq-1
         // 正确：ysq-1%2CA%2C1%3Aysq-1
         System.out.println(URLUtil.encodeAll("ysq-1,A,1:ysq-1"));
+    }
+
+    /**
+     * 测试String的joiner，只有一个元素时是否追加分隔符
+     */
+    @Test
+    public void testJoiner() {
+        System.out.println("[" + String.join(System.lineSeparator(), "哈哈") + "]");
+    }
+
+    /**
+     * 测试不定长参数
+     */
+    @Test
+    public void testFunc() {
+        func1("123", "哈哈");
+    }
+
+    private void func1(Object... objs) {
+        func(objs);
+    }
+
+//    private void func2(String... strs) {
+//        func(strs); // warning
+//    }
+
+    private void func(Object... objs) {
+        System.out.println(Arrays.toString(objs));
+    }
+
+    @Test
+    public void testAssert() {
+        String abc = null;
+        assert abc != null : "abc must be not null";
+    }
+
+    @Test
+    public void testHashMap() {
+        Map<Object, Object> map = new HashMap<>();
+        map.put(null, "123");
+        System.out.println(123);
     }
 }
