@@ -2,6 +2,7 @@ package top.ysqorz.license.core.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import top.ysqorz.license.utils.SystemUtils;
 
 import java.time.Duration;
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * 授权文本中要包含的内容信息
  */
+@Slf4j
 @Data
 @Accessors(chain = true)
 public class TrialLicense {
@@ -41,6 +43,7 @@ public class TrialLicense {
 
     public TrialLicense markFirstStartup() {
         monitor.setFirstStartup(java.lang.System.currentTimeMillis());
+        log.info("首次启动时间：" + java.lang.System.currentTimeMillis());
         return this;
     }
 

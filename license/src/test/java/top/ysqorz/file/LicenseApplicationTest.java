@@ -19,7 +19,11 @@ import java.util.Map;
 /**
  * Unit test for simple App.
  */
-public class FileApplicationTest {
+public class LicenseApplicationTest {
+    @Test
+    public void testPrinciple() {
+        System.out.println(System.getProperty("user.name"));
+    }
     /**
      * Rigorous Test :-)
      */

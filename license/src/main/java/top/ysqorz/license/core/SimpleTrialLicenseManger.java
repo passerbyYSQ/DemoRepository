@@ -11,7 +11,7 @@ import java.io.File;
 import java.time.Duration;
 
 public class SimpleTrialLicenseManger implements TrailLicenseManager {
-    public static final Duration daemonDuration = Duration.ofMinutes(1);
+    public static final Duration daemonDuration = Duration.ofSeconds(10); // 10000 ms
     private TrialLicenseCipherStrategy cipherStrategy;
     private TrialLicenseDaemon licenseDaemon;
     @Getter
@@ -36,7 +36,7 @@ public class SimpleTrialLicenseManger implements TrailLicenseManager {
             FileUtils.createHiddenFile(licenseFile); // 隐藏文件
             license.markFirstStartup().markLastCheckTime(); // 填充额外的监控信息
             cipherStrategy.encrypt(license, licenseFile); // 写入加密后的字节
-            FileUtils.setStrictPermission(licenseFile); // 初始化文件之后，设置严格权限
+            //FileUtils.setStrictPermission(licenseFile); // 初始化文件之后，设置严格权限
         } else {
             license = cipherStrategy.decrypt(licenseFile); // 将授权文本解密成内存上的数据对象，如果文本被篡改，此处会抛出异常 TODO
         }
@@ -48,6 +48,9 @@ public class SimpleTrialLicenseManger implements TrailLicenseManager {
         licenseDaemon.startDaemon(callback);
     }
 
+    public Long getRemainedLicenseMillis() {
+        return licenseDaemon.getRemainedLicenseMillis();
+    }
     /**
      * 绝对不能让用户破译看到此段代码，知道试用授权文本的存放位置，否则用户每次强制将文件删除之后程序每次都是首次启动
      * <p>

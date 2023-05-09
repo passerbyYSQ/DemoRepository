@@ -5,10 +5,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.attribute.*;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.DosFileAttributeView;
+import java.nio.file.attribute.FileTime;
 
 public class FileUtils {
     @Test
@@ -70,38 +69,6 @@ public class FileUtils {
         }
     }
 
-    /**
-     * 必须文件已存在才生效
-     */
-    public static void setStrictPermission(File file) {
-//        file.setReadable(false);
-//        file.setWritable(false);
-//        file.setExecutable(false);
-//        file.setReadable(false, true);
-//        file.setWritable(false, true);
-//        file.setExecutable(false, true);
-        try {
-            UserPrincipalLookupService lookupService = file.toPath().getFileSystem().getUserPrincipalLookupService();
-            UserPrincipal owner = lookupService.lookupPrincipalByName(SystemUtils.isWindows() ? "Administrators" : "root");
-            // 构造只允许管理员删除的权限
-            Set<AclEntryPermission> deleteOnlyPermissions = EnumSet.of(
-                    AclEntryPermission.DELETE,
-                    AclEntryPermission.DELETE_CHILD
-            );
-            AclEntry deleteOnlyEntry = AclEntry.newBuilder()
-                    .setType(AclEntryType.ALLOW)
-                    .setPrincipal(owner)
-                    .setPermissions(deleteOnlyPermissions)
-                    .build();
-
-            // 设置文件的ACL权限
-            AclFileAttributeView aclView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
-            aclView.setAcl(Collections.singletonList(deleteOnlyEntry));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static boolean createHiddenFile(File file) {
         if (file.exists()) { // 已存在
             return false;
@@ -121,6 +88,7 @@ public class FileUtils {
                 if (SystemUtils.isWindows()) {
                     DosFileAttributeView view = Files.getFileAttributeView(file.toPath(), DosFileAttributeView.class);
                     //DosFileAttributes attrs = view.readAttributes();
+                    view.setSystem(true); // 设置true之后，Windows文件管理器勾选显示隐藏文件都无法显示
                     view.setHidden(true);
                 }
                 return true;

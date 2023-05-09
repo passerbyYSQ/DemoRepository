@@ -34,7 +34,7 @@ public class TrialLicenseDaemon {
     private boolean notFirst;
 
     public TrialLicenseDaemon(Duration daemonDuration, File licenseFile, TrialLicense license,
-            TrialLicenseCipherStrategy cipherStrategy) {
+                              TrialLicenseCipherStrategy cipherStrategy) {
         this.daemonDuration = daemonDuration;
         this.licenseFile = licenseFile;
         this.license = license;
@@ -64,7 +64,7 @@ public class TrialLicenseDaemon {
     /**
      * 校验授权时间
      *
-     * @return  是否已经过期，true：已过期
+     * @return 是否已经过期，true：已过期
      */
     public boolean validateExpiration() {
         // 校验当前设备信息
@@ -87,22 +87,21 @@ public class TrialLicenseDaemon {
         }
 
         // 防君子：防止用户篡改操作系统时间，将操作系统调成一个很早的时间
-        if (currentTime <= firstStartupTime) {
+        if (currentTime <= firstStartupTime) { // 1683615238361
             log.error("当前时间早于首次启动时间，操作系统时间可能已经被篡改");
             return true;
         }
         // 防小人
-        if (notFirst) { // 本轮监控非首次检查，需要检查上一次打点时间
+        if (notFirst) { // 本轮启动非首次监控才存在上一次打点时间，此时才需要检查上一次打点时间
             // 当前时间 - 上一次打点时间 <= 守护间隔，否则就是守护线程出现异常
             // 防止用户首次启动之后，程序运行了一段时间，用户又把操作系统的时间调味首次启动之后
             // 这样之后用户只能将操作系统时间调成上一次打点时间之后的一个守护间隔内(比如10分钟)，如果守护间隔比较大，那么用户可以慢慢薅羊毛
-            // 长时间监控，定时器可能有延迟误差，导致currentTime - lastCheckTime 偏大，故允许有500ms的误差
+            // 定时器可能有延迟误差，导致currentTime - lastCheckTime 偏大，故允许有500ms的误差
             if (currentTime - lastCheckTime > daemonDuration.toMillis() + 500) {
                 log.error("操作系统时间可能已经被篡改");
                 return true;
             }
         }
-        notFirst = true;
         // 防奸人
         return runningDuration > licenseDuration;
     }
@@ -110,19 +109,22 @@ public class TrialLicenseDaemon {
     public class DaemonTask implements Runnable {
         @Override
         public void run() {
-            if (validateExpiration()) { // 已经过期
+            boolean expired = validateExpiration(); // 已经过期
+            Long lastCheckTime = license.getMonitor().getLastCheckTime();
+            license.markLastCheckTime(); // 更新上一次打点时间
+            license.addRunningDuration(daemonDuration); // 加上累计运行的时间
+            cipherStrategy.encrypt(license, licenseFile); // 持久化到磁盘，覆盖更新，即使已经检查到期，在停止之前也要更新一遍
+            // 重置修改时间，防止用户查找最近修改的文件来猜出试用授权文件
+            FileUtils.setLastModifiedTime(licenseFile, FileUtils.getCreateTime(licenseFile));
+            log.info("授权监控: 打点, LastCheckTime {}, RunningDuration {}, RemainedDuration {}, DifDuration {}",
+                    DateUtils.format(license.getMonitor().getLastCheckTime()),
+                    license.getMonitor().getRunningDuration() + " ms",
+                    getRemainedLicenseMillis() + " ms",
+                    (license.getMonitor().getLastCheckTime() - lastCheckTime) + " ms");
+            notFirst = true; // 不能写在validateExpiration()里面，否则外部手动调用validateExpiration()之后，会造成守护线程误判
+
+            if (expired) { // 通知过期
                 callback.licenseExpired(license); // 过期时的具体行为必须由调用方来提供
-                scheduledExecutor.shutdownNow(); // 停止守护线程，自己停止自己，是否死循环？？？TODO
-            } else {
-                license.markLastCheckTime(); // 更新上一次打点时间
-                license.addRunningDuration(daemonDuration); // 加上累计运行的时间
-                cipherStrategy.encrypt(license, licenseFile); // 持久化到磁盘，覆盖更新
-                // 重置修改时间，防止用户查找最近修改的文件来猜出试用授权文件
-                FileUtils.setLastModifiedTime(licenseFile, FileUtils.getCreateTime(licenseFile));
-                log.info("授权监控: 打点, LastCheckTime {}, RunningDuration {}, RemainedDuration {}",
-                        DateUtils.format(license.getMonitor().getLastCheckTime()),
-                        Duration.ofMillis(license.getMonitor().getRunningDuration()).toMinutes() + " min",
-                        Duration.ofMillis(getRemainedLicenseMillis()).toMinutes() + " min");
             }
         }
     }
