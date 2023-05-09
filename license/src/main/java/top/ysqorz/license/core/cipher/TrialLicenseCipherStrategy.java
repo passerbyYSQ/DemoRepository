@@ -1,4 +1,6 @@
-package top.ysqorz.file.license;
+package top.ysqorz.license.core.cipher;
+
+import top.ysqorz.license.core.model.TrialLicense;
 
 import java.io.File;
 

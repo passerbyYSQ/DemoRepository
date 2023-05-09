@@ -1,4 +1,6 @@
-package top.ysqorz.file.license;
+package top.ysqorz.license.core;
+
+import top.ysqorz.license.core.model.TrialLicense;
 
 public interface LicenseCallback {
     /**

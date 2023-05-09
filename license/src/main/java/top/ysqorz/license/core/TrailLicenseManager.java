@@ -1,11 +1,9 @@
-package top.ysqorz.file.license;
+package top.ysqorz.license.core;
 
 import java.io.File;
 
 public interface TrailLicenseManager {
     File getTrialLicenseFile();
-
-    TrialLicense generateInitialLicense();
 
     boolean validateExpiration();
 }

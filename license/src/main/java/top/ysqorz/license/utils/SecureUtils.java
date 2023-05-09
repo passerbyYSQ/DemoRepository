@@ -1,4 +1,4 @@
-package top.ysqorz.file.utils;
+package top.ysqorz.license.utils;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.junit.Test;
@@ -55,11 +55,11 @@ public class SecureUtils {
 
     public static String decryptByAES(String keyStr, File cipherFile) {
         try (FileInputStream cipherInputStream = new FileInputStream(cipherFile);
-             ByteOutputStream byteOutputStream = new ByteOutputStream()) {
+            ByteOutputStream byteOutputStream = new ByteOutputStream()) {
             decryptByAES(keyStr, cipherInputStream, byteOutputStream);
             return new String(byteOutputStream.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // 弱化异常
         }
     }
 

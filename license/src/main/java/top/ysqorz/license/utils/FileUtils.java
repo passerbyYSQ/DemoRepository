@@ -1,13 +1,14 @@
-package top.ysqorz.file.utils;
+package top.ysqorz.license.utils;
 
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.DosFileAttributeView;
-import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.*;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class FileUtils {
     @Test
@@ -19,10 +20,9 @@ public class FileUtils {
      * Windows:
      * C:\ProgramData 是隐藏的
      * C:\\ProgramData\\{MAC地址}\\加密文件.cipher
-     *
+     * <p>
      * Linux:
      * /var/lib/{MAC地址}\\加密文件.cipher
-     *
      */
     @Test
     public void testProgramDataDir() {
@@ -46,7 +46,7 @@ public class FileUtils {
     /**
      * UTC时间
      */
-    public FileTime getCreateTime(File file) {
+    public static FileTime getCreateTime(File file) {
         if (!file.exists()) {
             return null;
         }
@@ -59,12 +59,44 @@ public class FileUtils {
         return null;
     }
 
-    public void setLastModifiedTime(File file, FileTime fileTime) {
+    public static void setLastModifiedTime(File file, FileTime fileTime) {
         if (!file.exists()) {
             return;
         }
         try {
             Files.setLastModifiedTime(file.toPath(), fileTime);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 必须文件已存在才生效
+     */
+    public static void setStrictPermission(File file) {
+//        file.setReadable(false);
+//        file.setWritable(false);
+//        file.setExecutable(false);
+//        file.setReadable(false, true);
+//        file.setWritable(false, true);
+//        file.setExecutable(false, true);
+        try {
+            UserPrincipalLookupService lookupService = file.toPath().getFileSystem().getUserPrincipalLookupService();
+            UserPrincipal owner = lookupService.lookupPrincipalByName(SystemUtils.isWindows() ? "Administrators" : "root");
+            // 构造只允许管理员删除的权限
+            Set<AclEntryPermission> deleteOnlyPermissions = EnumSet.of(
+                    AclEntryPermission.DELETE,
+                    AclEntryPermission.DELETE_CHILD
+            );
+            AclEntry deleteOnlyEntry = AclEntry.newBuilder()
+                    .setType(AclEntryType.ALLOW)
+                    .setPrincipal(owner)
+                    .setPermissions(deleteOnlyPermissions)
+                    .build();
+
+            // 设置文件的ACL权限
+            AclFileAttributeView aclView = Files.getFileAttributeView(file.toPath(), AclFileAttributeView.class);
+            aclView.setAcl(Collections.singletonList(deleteOnlyEntry));
         } catch (IOException e) {
             e.printStackTrace();
         }

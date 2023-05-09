@@ -1,4 +1,6 @@
-package top.ysqorz.file.license;
+package top.ysqorz.license.core.translator;
+
+import top.ysqorz.license.core.model.TrialLicense;
 
 /**
  * 试用授权文本解析器，将来扩展Json，XML，或者Properties或者其他的数据格式

@@ -1,4 +1,4 @@
-package top.ysqorz.file.utils;
+package top.ysqorz.license.utils;
 
 import org.junit.Test;
 

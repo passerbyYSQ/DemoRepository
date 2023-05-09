@@ -1,8 +1,8 @@
-package top.ysqorz.file.license;
+package top.ysqorz.license.core.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import top.ysqorz.file.utils.SystemUtils;
+import top.ysqorz.license.utils.SystemUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
