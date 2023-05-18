@@ -25,14 +25,14 @@ public class LicenseApplication {
         TrialLicense initialLicense = new TrialLicense()
                 .setDuration(Duration.ofMinutes(5)) // 授权试用时长
                 .addModule("*"); // 授权所有模块
-        SimpleTrialLicenseManger licenseManger = new SimpleTrialLicenseManger(cipherStrategy, initialLicense);
-        if (licenseManger.validateExpiration()) {
+        SimpleTrialLicenseManger licenseManager = new SimpleTrialLicenseManger(cipherStrategy, initialLicense);
+        if (licenseManager.validateExpiration()) {
             return;
         }
 
         ConfigurableApplicationContext applicationContext = SpringApplication.run(LicenseApplication.class, args);
         // 启动成功之后开启守护
-        licenseManger.startDaemon(license -> {
+        licenseManager.startDaemon(license -> {
             if (license.containModule("*")) {
                 applicationContext.close();
             }

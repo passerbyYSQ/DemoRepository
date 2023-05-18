@@ -21,6 +21,7 @@
         <module>oss</module>
         <module>redis</module>
         <module>license</module>
+        <module>expression</module>
     </modules>
 
     <properties>
@@ -44,6 +45,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,0 +1,31 @@
+{
+  "$s": {
+    "user": {
+      "name": "张三",
+      "email": "passerbyOrz@proton.me",
+      "projects": [
+        {},
+        {
+          "name": "张三项目组",
+          "member": [
+            "张三",
+            "李四",
+            "王五"
+          ]
+        }
+      ]
+    }
+  },
+  "$o": {
+    "participants": {
+      "owners": [
+        "张三"
+      ]
+    }
+  },
+  "keys": {
+    "hello": {
+      "haha": "projects"
+    }
+  }
+}

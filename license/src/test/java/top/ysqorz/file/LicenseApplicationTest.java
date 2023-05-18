@@ -4,7 +4,10 @@ import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
+import cn.hutool.json.JSONObject;
 import org.junit.Test;
+import tech.sucore.runtime.Bootstrap;
+import top.ysqorz.license.utils.SystemUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -15,15 +18,103 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Unit test for simple App.
  */
 public class LicenseApplicationTest {
+    /**
+     * 验证sucore并发加载不同的类时会出现阻塞
+     */
+    @Test
+    public void testLoader1() throws Exception {
+        Bootstrap globalDaemon = new Bootstrap();
+        globalDaemon.initGlobalServer(this.getClass().getClassLoader());
+        int count = 100;
+        CountDownLatch countDownLatch = new CountDownLatch(count * 2);
+        for (int i = 0; i < count; i++) {
+            new Thread(() -> {
+                try {
+                    Object rulesEngineFactory = createInstance("tech.sucore.rules.engine.ImRulesEngineFactory");
+                    System.out.println(rulesEngineFactory);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    countDownLatch.countDown();
+                }
+            }, "ImRulesEngineFactory-" + i).start();
+            new Thread(() -> {
+                try {
+                    Object syncLicenseFile = createInstance("tech.sucore.trial.reducer.SYNCLicenseFile");
+                    System.out.println(syncLicenseFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    countDownLatch.countDown();
+                }
+            }, "SYNCLicenseFile-" + i).start();
+        }
+        countDownLatch.await();
+        System.out.println(123);
+    }
+
+    private Object createInstance(String fullName) {
+        try {
+            return Bootstrap.getCurrentClassLoader()
+                    .loadClass(fullName).getConstructor()
+                    .newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Test
+    public void testLoader2() {
+        Bootstrap globalDaemon = new Bootstrap();
+        globalDaemon.initGlobalServer(this.getClass().getClassLoader());
+        Object rulesEngineFactory = createInstance("tech.sucore.rules.engine.ImRulesEngineFactory");
+        System.out.println(rulesEngineFactory);
+        Object syncLicenseFile = createInstance("tech.sucore.trial.reducer.SYNCLicenseFile");
+        System.out.println(syncLicenseFile);
+        System.out.println(123);
+    }
+
+    @Test
+    public void testMac() throws InterruptedException {
+        CountDownLatch countDownLatch = new CountDownLatch(100);
+        for (int i = 0; i < 100; i++) {
+            new Thread(() -> {
+                System.out.println(SystemUtils.getMacAddress());
+                countDownLatch.countDown();
+            }).start();
+        }
+        System.out.println(SystemUtils.getMacAddress());
+        countDownLatch.await();
+        System.out.println(123);
+    }
+
+    @Test
+    public void testPattern() {
+        String text = "Module:   PDM  ,    Max=   3456";
+        Pattern pattern = Pattern.compile("^Module:\\s*([A-Z]+)\\s*,\\s*Max=\\s*([0-9]+)\\s*$");
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.matches()) {
+            String moduleName = matcher.group(1); // 获取模块名称，即 PDM
+            String numberPart = matcher.group(2); // 获取数字部分，即 3456
+            System.out.println("Module name: " + moduleName);
+            System.out.println("Number part: " + numberPart);
+        }
+    }
+
     @Test
     public void testPrinciple() {
         System.out.println(System.getProperty("user.name"));
     }
+
     /**
      * Rigorous Test :-)
      */
