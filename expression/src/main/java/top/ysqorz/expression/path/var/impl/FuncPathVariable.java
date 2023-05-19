@@ -1,4 +1,4 @@
-package top.ysqorz.expression.path;
+package top.ysqorz.expression.path.var.impl;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import org.springframework.util.ObjectUtils;
 import top.ysqorz.expression.model.PatternConstant;
+import top.ysqorz.expression.path.BeanPath;
 
 import java.util.Arrays;
 import java.util.List;

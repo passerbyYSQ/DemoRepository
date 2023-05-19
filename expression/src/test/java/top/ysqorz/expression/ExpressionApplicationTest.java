@@ -9,10 +9,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 import top.ysqorz.expression.path.BeanPath;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,5 +99,39 @@ public class ExpressionApplicationTest {
         Object source = objectMapper.readValue(jsonFile, Object.class);
         BeanPath beanPath = new BeanPath(path, source);
         System.out.println(beanPath.getValue());
+    }
+
+    @Test
+    public void testCMeta() throws Exception {
+        System.out.println(executeCmd("cmeta", "-c", "-v"));
+        // zwplm01是实例名
+//        System.out.println(executeCmd("cmeta", "-i", "default"));
+    }
+
+    public int executeCmd(String cmd, String... args) throws Exception {
+        String[] completedCmd = new String[args.length + 1];
+        completedCmd[0] = cmd;
+        System.arraycopy(args, 0, completedCmd, 1, args.length);
+        ProcessBuilder processBuilder = new ProcessBuilder(completedCmd);
+        Map<String, String> environment = processBuilder.environment();
+        // 模拟core_env指令设置进程的环境变量 -1073741819
+        String oreRoot = environment.get("ORE_ROOT");
+        environment.put("ORE_JAVA_HOME", environment.get("JAVA_HOME"));
+        environment.put("ORE_JLIB_PATH", oreRoot + File.separator + "jlib");
+        environment.put("ORE_VAR_ROOT", oreRoot + File.separator + "var");
+        environment.put("ORE_INSTALL_ROOT", oreRoot + File.separator + "installations");
+        Process process = processBuilder.start();
+        println(process.getInputStream());
+        System.out.println("---------------------------");
+        println(process.getErrorStream());
+        return process.waitFor(); // 进程正常退出时返回值为0
+    }
+
+    public void println(InputStream inputStream) throws IOException {
+        BufferedReader bufReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = bufReader.readLine()) != null) {
+            System.out.println(line);
+        }
     }
 }

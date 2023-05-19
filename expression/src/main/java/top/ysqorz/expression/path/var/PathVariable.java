@@ -1,4 +1,4 @@
-package top.ysqorz.expression.path;
+package top.ysqorz.expression.path.var;
 
 public interface PathVariable {
     boolean match();

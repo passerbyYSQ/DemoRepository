@@ -1,4 +1,4 @@
-package top.ysqorz.expression.path;
+package top.ysqorz.expression.path.var.impl;
 
 import lombok.Getter;
 import top.ysqorz.expression.model.PatternConstant;

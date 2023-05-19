@@ -1,7 +1,8 @@
-package top.ysqorz.expression.path;
+package top.ysqorz.expression.path.var.impl;
 
 import cn.hutool.core.util.ReflectUtil;
 import lombok.Getter;
+import top.ysqorz.expression.path.var.PathVariable;
 
 import java.util.Map;
 import java.util.Objects;

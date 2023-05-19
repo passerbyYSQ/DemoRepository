@@ -2,6 +2,10 @@ package top.ysqorz.expression.path;
 
 import lombok.Data;
 import org.springframework.util.ObjectUtils;
+import top.ysqorz.expression.path.var.PathVariable;
+import top.ysqorz.expression.path.var.impl.ArrayElementPathVariable;
+import top.ysqorz.expression.path.var.impl.FuncPathVariable;
+import top.ysqorz.expression.path.var.impl.PropsPathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
