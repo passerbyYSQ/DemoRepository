@@ -1,5 +1,9 @@
 package top.ysqorz.expression;
 
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,10 +14,9 @@ import org.springframework.util.ResourceUtils;
 import top.ysqorz.expression.path.BeanPath;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,5 +136,132 @@ public class ExpressionApplicationTest {
         while ((line = bufReader.readLine()) != null) {
             System.out.println(line);
         }
+    }
+
+    @Test
+    public void test113() {
+        String jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJBY2NvdW50IjoiYWRtaW4iLCJVc2VyTmFtZSI6ImFkbWluIiwiVXNlcklEIjoiYWRtaW4iLCJpc3MiOiJaV1RlYW13b3JrcyIsImV4cCI6MTY4NDQ5ODE3NiwiaWF0IjoxNjg0NDk2Mzc2fQ.F6JOJkpmy4ROUR44lQ9vF-Nf-VSVvcQY-it9vQ5u8pY";
+        Map<String, String> userMap = getUserNameMapping(jwt);
+        //System.out.println(userMap);
+        Set<String> CADModel = getCADCreator("CADModel", jwt);// 40s
+        System.out.println("CADModel");
+//        Set<String> CADDrafting = getCADCreator("CADDrafting", jwt);
+        System.out.println("CADDrafting");
+        Set<String> CADDrawing = getCADCreator("CADDrawing", jwt);
+        Set<String> total = new HashSet<>();
+        total.addAll(CADModel);
+//        total.addAll(CADDrafting);
+        total.addAll(CADDrawing); // ui
+        System.out.println(total.size());
+        for (String id : total) {
+            String cname = userMap.get(id);
+            System.out.println(id + ": " + cname);
+        }
+    }
+
+
+    public Set<String> getCADCreator(String clsName, String jwt) {
+        String json = HttpUtil.createPost("https://zwteamworks-ct-api.zwsoft.cn/core/message/dispatch")
+                .body("{\n" +
+                        "  \"message\": \"QueryColumn\",\n" +
+                        "  \"data\": \"clsName\",\n" +
+                        "  \"params\": {\n" +
+                        "    \"clsName\": \"" + clsName + "\",\n" +
+                        "    \"filter\": {},\n" +
+                        "    \"columns\": [\"Creator\"]\n" +
+                        "  }\n" +
+                        "}")
+                .header("Authorization", jwt)
+                .execute().body();
+        JSONObject res = JSONUtil.parseObj(json);
+        JSONArray table = res.getByPath("data.params.matrix.table", JSONArray.class);
+        Set<String> set = new HashSet<>();
+        for (int i = 0; i < table.size(); i++) {
+            JSONArray row = table.getJSONArray(i);
+            set.add(row.getStr(0));
+        }
+        return set;
+    }
+
+    public Map<String, String> getUserNameMapping(String jwt) {
+        String json = HttpUtil.createPost("https://zwteamworks-ct-api.zwsoft.cn/core/message/dispatch")
+                .body("{\n" +
+                        "  \"message\": \"QueryColumn\",\n" +
+                        "  \"data\": \"clsName\",\n" +
+                        "  \"params\": {\n" +
+                        "    \"clsName\": \"CoreUser\",\n" +
+                        "    \"filter\": {},\n" +
+                        "    \"columns\": [\"Name\", \"CName\"]\n" +
+                        "  }\n" +
+                        "}")
+                .header("Authorization", jwt)
+                .execute().body();
+        JSONObject res = JSONUtil.parseObj(json);
+        JSONArray table = res.getByPath("data.params.matrix.table", JSONArray.class);
+        Map<String, String> map = new HashMap<>();
+        for (int i = 0; i < table.size(); i++) {
+            JSONArray user = table.getJSONArray(i);
+            map.put(user.getStr(0), user.getStr(1));
+        }
+        return map;
+    }
+
+    /**
+     * 已登录用户
+     */
+    @Test
+    public void testAccount() {
+        String jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJBY2NvdW50IjoiYWRtaW4iLCJVc2VyTmFtZSI6ImFkbWluIiwiVXNlcklEIjoiYWRtaW4iLCJpc3MiOiJaV1RlYW13b3JrcyIsImV4cCI6MTY4NDQ5ODE3NiwiaWF0IjoxNjg0NDk2Mzc2fQ.F6JOJkpmy4ROUR44lQ9vF-Nf-VSVvcQY-it9vQ5u8pY";
+        Map<String, String> userMap = getUserNameMapping(jwt);
+        Map<String, String> accountMap = getLoginAccount(jwt);
+        System.out.println(userMap.size());
+        System.out.println(accountMap.size()); // 登录过用户
+        accountMap.forEach((id, time) -> {
+            String cname = userMap.get(id);
+            System.out.println(id + ": " + cname + ": " + time);
+        });
+    }
+
+    /**
+     * 未登录用户
+     */
+    @Test
+    public void testAccount1() {
+        String jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJBY2NvdW50IjoiYWRtaW4iLCJVc2VyTmFtZSI6ImFkbWluIiwiVXNlcklEIjoiYWRtaW4iLCJpc3MiOiJaV1RlYW13b3JrcyIsImV4cCI6MTY4NDQ5ODE3NiwiaWF0IjoxNjg0NDk2Mzc2fQ.F6JOJkpmy4ROUR44lQ9vF-Nf-VSVvcQY-it9vQ5u8pY";
+        Map<String, String> userMap = getUserNameMapping(jwt);
+        Map<String, String> accountMap = getLoginAccount(jwt);
+        AtomicInteger count = new AtomicInteger();
+        userMap.forEach((id, cname) -> {
+            if (!accountMap.containsKey(id)) {
+                System.out.println(id + ": " + cname);
+                count.getAndIncrement();
+            }
+        });
+        System.out.println(count.get());
+    }
+
+    public Map<String, String> getLoginAccount(String jwt) {
+        String json = HttpUtil.createPost("https://zwteamworks-ct-api.zwsoft.cn/core/message/dispatch")
+                .body("{\n" +
+                        "  \"message\": \"QueryColumn\",\n" +
+                        "  \"data\": \"clsName\",\n" +
+                        "  \"params\": {\n" +
+                        "    \"clsName\": \"LoginAccount\",\n" +
+                        "    \"filter\": {\n" +
+                        "      \"LastLoginTime\": \"1*\"\n" +
+                        "    },\n" +
+                        "    \"columns\": [\"UserName\", \"LastLoginTime\"]\n" +
+                        "  }\n" +
+                        "}")
+                .header("Authorization", jwt)
+                .execute().body();
+        JSONObject res = JSONUtil.parseObj(json);
+        JSONArray table = res.getByPath("data.params.matrix.table", JSONArray.class);
+        Map<String, String> map = new HashMap<>();
+        for (int i = 0; i < table.size(); i++) {
+            JSONArray row = table.getJSONArray(i);
+            map.put(row.getStr(0), new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(Long.parseLong(row.getStr(1)))));
+        }
+        return map;
     }
 }
