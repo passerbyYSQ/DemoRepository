@@ -1,0 +1,35 @@
+/*
+transition: 过渡，只针对数值类型的属性有效
+例如：transition: 0.2s
+
+transfrom：变形
+*/
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background: #000;
+    color: #666;
+    text-align: center;
+}
+audio {
+    width: 450px;
+    margin: 30px auto;
+}
+.container {
+    height: 420px;
+    overflow: hidden;
+}
+.container li {
+    height: 30px;
+    line-height: 30px;
+    transition: 0.6s;
+    list-style: none;
+}
+.container li.active {
+    color: #fff;
+    /* 会导致重新reflow，效率不够高 */
+    /* font-size: 2em; */
+    transform: scale(1.2);
+}
