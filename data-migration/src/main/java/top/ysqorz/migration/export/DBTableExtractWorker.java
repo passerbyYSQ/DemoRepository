@@ -36,10 +36,11 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
+ * 数据源是数据库
  * <a href="https://blog.csdn.net/qq_42413011/article/details/118640420">...</a>
  */
 @Slf4j
-public class SimpleExportWorker implements IExportWorker {
+public class DBTableExtractWorker implements IExtractWorker {
     private ExecutorService exportExecutor = Executors.newFixedThreadPool(16);
     private List<String> tableNames = new ArrayList<>(); // 要导出的表名，与@TableName注解的一致。有顺序
     private SqlSessionFactory sqlSessionFactory;
@@ -49,7 +50,7 @@ public class SimpleExportWorker implements IExportWorker {
     /**
      * 私有化构造方法，使用建造者模式创建实例
      */
-    private SimpleExportWorker() {
+    private DBTableExtractWorker() {
     }
 
     public static ExportHandlerBuilder builder() {
@@ -60,7 +61,7 @@ public class SimpleExportWorker implements IExportWorker {
      * 开始执行导出
      */
     @Override
-    public void asyncExport(ExportCallback callback) {
+    public void asyncExtract(ExportCallback callback) {
         // 遍历所有的表
         SqlSession defaultSqlSession = sqlSessionFactory.openSession();
         List<Runnable> taskList = new ArrayList<>();
@@ -143,7 +144,7 @@ public class SimpleExportWorker implements IExportWorker {
     }
 
     public static class ExportHandlerBuilder {
-        private final SimpleExportWorker exportHandler = new SimpleExportWorker();
+        private final DBTableExtractWorker exportHandler = new DBTableExtractWorker();
         private final MybatisConfiguration mybatisConfig = new MybatisConfiguration(); // plus的增强配置
 
         /**
@@ -213,7 +214,7 @@ public class SimpleExportWorker implements IExportWorker {
             globalConfig.setSuperMapperClass(BaseMapper.class);
         }
 
-        public SimpleExportWorker build() {
+        public DBTableExtractWorker build() {
             assert !ObjectUtils.isEmpty(exportHandler.tableNames) : "没有要导出的表";
             initOtherProps();
             exportHandler.sqlSessionFactory = new SqlSessionFactoryBuilder().build(mybatisConfig);

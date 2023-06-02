@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
 import top.ysqorz.migration.backup.IBackupWorker;
 import top.ysqorz.migration.export.ExportCallback;
-import top.ysqorz.migration.export.IExportWorker;
+import top.ysqorz.migration.export.IExtractWorker;
 import top.ysqorz.migration.model.PageData;
 
 import java.util.Queue;
@@ -17,11 +17,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Slf4j
 public class SimpleDataCollector implements IDataCollector, ExportCallback {
     private final Queue<PageData<?>> pageDataQueue = new ConcurrentLinkedQueue<>();
-    private final IExportWorker exportWorker; // 生产者线程
+    private final IExtractWorker extractWorker; // 生产者线程
     private final IBackupWorker backupWorker; // 消费者线程
 
-    public SimpleDataCollector(IExportWorker exportWorker, IBackupWorker backupWorker) {
-        this.exportWorker = exportWorker;
+    public SimpleDataCollector(IExtractWorker extractWorker, IBackupWorker backupWorker) {
+        this.extractWorker = extractWorker;
         this.backupWorker = backupWorker;
     }
 
@@ -29,8 +29,8 @@ public class SimpleDataCollector implements IDataCollector, ExportCallback {
      * 阻塞进行数据采集
      */
     public void collect() {
-        exportWorker.asyncExport(this);
-        while (!isQueueEmpty() || !isProduceCompleted()) {
+        extractWorker.asyncExtract(this);
+        while (!isQueueEmpty() || !isExtractCompleted()) {
             PageData<?> pageData = pageDataQueue.poll();
             // 如果队列为空，但是导出尚未结束时，获取队首元素为null。这说明导出线程生产数据不及时，此时主线程自旋等待
             if (ObjectUtils.isEmpty(pageData)) {
@@ -49,8 +49,18 @@ public class SimpleDataCollector implements IDataCollector, ExportCallback {
     }
 
     @Override
-    public boolean isProduceCompleted() {
-        return exportWorker.isAllCompleted();
+    public IExtractWorker getExtractWorker() {
+        return extractWorker;
+    }
+
+    @Override
+    public IBackupWorker getBackupWorker() {
+        return backupWorker;
+    }
+
+    @Override
+    public boolean isExtractCompleted() {
+        return extractWorker.isAllCompleted();
     }
 
     /**
@@ -63,7 +73,7 @@ public class SimpleDataCollector implements IDataCollector, ExportCallback {
 
     @Override
     public void close() throws Exception {
-        exportWorker.close();
+        extractWorker.close();
         backupWorker.close();
         pageDataQueue.clear();
     }
