@@ -98,7 +98,7 @@ public class TrialLicense {
         private String macAddress;
 
         public System() {
-            macAddress = SystemUtils.getMacAddress();
+            macAddress = SystemUtils.getLocalMacAddress();
         }
     }
 }

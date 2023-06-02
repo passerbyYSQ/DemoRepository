@@ -116,13 +116,17 @@ public class SecureUtils {
         return null;
     }
 
+    public static String bytesToHex(byte[] bytes) {
+        return bytesToHex(bytes, true);
+    }
+
     /**
      * 将字节数组转换为十六进制字符串
      */
-    public static String bytesToHex(byte[] bytes) {
+    public static String bytesToHex(byte[] bytes, boolean lowerCase) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : bytes) {
-            String hex = String.format("%02x", b);
+            String hex = String.format("%02" + (lowerCase ? 'x' : 'X'), b);
             hexString.append(hex);
         }
         return hexString.toString();

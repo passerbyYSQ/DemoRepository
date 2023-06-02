@@ -69,7 +69,7 @@ public class TrialLicenseDaemon {
     public boolean validateExpiration() {
         // 校验当前设备信息
         String macAddress = license.getSystem().getMacAddress();
-        if (!macAddress.equals(SystemUtils.getMacAddress())) {
+        if (!macAddress.equals(SystemUtils.getLocalMacAddress())) {
             log.error("当前设备信息与首次安装启动的设备信息不符，程序安装之后可能又被迁移至其他设备");
             return false;
         }

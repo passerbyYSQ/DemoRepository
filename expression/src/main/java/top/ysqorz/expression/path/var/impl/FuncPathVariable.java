@@ -5,7 +5,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import org.springframework.util.ObjectUtils;
-import top.ysqorz.expression.model.PatternConstant;
+import top.ysqorz.expression.path.model.PatternConstant;
 import top.ysqorz.expression.path.BeanPath;
 
 import java.util.Arrays;

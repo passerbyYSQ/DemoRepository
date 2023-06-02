@@ -1,4 +1,4 @@
-package top.ysqorz.expression.model;
+package top.ysqorz.expression.path.model;
 
 public interface PatternConstant {
     /**

@@ -65,7 +65,7 @@ public class SimpleTrialLicenseManger implements TrailLicenseManager {
      */
     @Override
     public File getTrialLicenseFile() {
-        String macAddress = SystemUtils.getMacAddress();
+        String macAddress = SystemUtils.getLocalMacAddress();
         String cipherFilename = SecureUtils.md5(macAddress, this.getClass().getSimpleName()) + ".cipher"; // Linux下隐藏文件
         String subPath = String.join(File.separator, macAddress, cipherFilename);
         String parentPath;

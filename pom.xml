@@ -22,6 +22,7 @@
         <module>redis</module>
         <module>license</module>
         <module>expression</module>
+        <module>data-migration</module>
     </modules>
 
     <properties>

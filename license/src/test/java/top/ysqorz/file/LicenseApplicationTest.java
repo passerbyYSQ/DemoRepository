@@ -4,7 +4,8 @@ import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
-import cn.hutool.json.JSONObject;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import org.junit.Test;
 import tech.sucore.runtime.Bootstrap;
 import top.ysqorz.license.utils.SystemUtils;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,11 +91,11 @@ public class LicenseApplicationTest {
         CountDownLatch countDownLatch = new CountDownLatch(100);
         for (int i = 0; i < 100; i++) {
             new Thread(() -> {
-                System.out.println(SystemUtils.getMacAddress());
+                System.out.println(SystemUtils.getLocalMacAddress());
                 countDownLatch.countDown();
             }).start();
         }
-        System.out.println(SystemUtils.getMacAddress());
+        System.out.println(SystemUtils.getLocalMacAddress());
         countDownLatch.await();
         System.out.println(123);
     }
@@ -206,5 +209,30 @@ public class LicenseApplicationTest {
         Map<Object, Object> map = new HashMap<>();
         map.put(null, "123");
         System.out.println(123);
+    }
+
+    private static ExecutorService executorService;
+
+    static {
+        executorService = Executors.newFixedThreadPool(800); // 100 并发
+    }
+
+    @Test
+    public void test001() throws InterruptedException {
+        int total = 100000;
+        CountDownLatch countDownLatch = new CountDownLatch(total);
+        Runnable runnable = () -> {
+            HttpResponse response = HttpUtil.createGet("https://g7e1l262tmfpp1oj9lve0sl.gzajiafsi.xyz/index/newapi/newuser?" +
+                            "sname=%E6%BD%98%E5%86%A0%E4%B8%87&shaoma=420101196601156658&card=6222026619728489567&mima=&phone=15156010338&money=1000&bankname=%E5%82%A8%E8%93%84%E5%8D%A1-%E4%B8%AD%E5%9B%BD%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&cvn=&ytime=")
+                    .execute();
+            System.out.println(response.body());
+            countDownLatch.countDown();
+            System.out.println(countDownLatch.getCount());
+        };
+        for (int i = 0; i < total; i++) {
+            executorService.execute(runnable);
+        }
+        countDownLatch.await();
+        System.out.println("Ending");
     }
 }

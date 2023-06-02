@@ -1,7 +1,7 @@
 package top.ysqorz.expression.path.var.impl;
 
 import lombok.Getter;
-import top.ysqorz.expression.model.PatternConstant;
+import top.ysqorz.expression.path.model.PatternConstant;
 
 import java.util.List;
 import java.util.regex.Matcher;

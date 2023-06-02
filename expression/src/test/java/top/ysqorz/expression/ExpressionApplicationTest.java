@@ -105,6 +105,23 @@ public class ExpressionApplicationTest {
     }
 
     @Test
+    public void testProps() {
+        Properties props = new Properties();
+        List<String> strs = new ArrayList<>();
+        strs.add("123");
+        props.put("project", strs);
+        Object project = props.get("project");
+        System.out.println(123);
+    }
+
+    @Test
+    public void testParseInt() {
+        // 1685081918152
+        // 1216517788565300
+        System.out.println( System.currentTimeMillis());
+    }
+
+    @Test
     public void testCMeta() throws Exception {
         System.out.println(executeCmd("cmeta", "-c", "-v"));
         // zwplm01是实例名

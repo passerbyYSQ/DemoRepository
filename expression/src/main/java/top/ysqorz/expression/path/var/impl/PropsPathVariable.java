@@ -1,7 +1,6 @@
 package top.ysqorz.expression.path.var.impl;
 
-import top.ysqorz.expression.model.PatternConstant;
-import top.ysqorz.expression.path.var.impl.GeneralPathVariable;
+import top.ysqorz.expression.path.model.PatternConstant;
 
 public class PropsPathVariable extends GeneralPathVariable {
     public PropsPathVariable(String syntax) {
