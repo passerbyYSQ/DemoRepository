@@ -24,7 +24,9 @@ spring:
       schema-locations: classpath:org/springframework/batch/core/schema-mysql.sql
       #mode: alwaysy
       mode: never
-
+#  batch:
+#    job:
+#      enabled: false   #false表示不启动
 mybatis-plus:
   type-aliases-package: top.ysqorz.batch.springbatch.model
   mapper-locations: classpath*:/mapper/**/*.xml
