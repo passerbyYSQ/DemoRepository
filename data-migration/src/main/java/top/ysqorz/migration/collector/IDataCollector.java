@@ -1,7 +1,7 @@
 package top.ysqorz.migration.collector;
 
 import top.ysqorz.migration.backup.IBackupWorker;
-import top.ysqorz.migration.export.IExtractWorker;
+import top.ysqorz.migration.extract.IExtractWorker;
 
 public interface IDataCollector extends AutoCloseable {
     void collect();

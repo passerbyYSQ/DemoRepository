@@ -1,4 +1,4 @@
-package top.ysqorz.migration.export;
+package top.ysqorz.migration.extract;
 
 /**
  * 数据抽取的Worker

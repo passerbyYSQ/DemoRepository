@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.ResourceUtils;
 import top.ysqorz.migration.backup.SimpleBackupWorker;
 import top.ysqorz.migration.collector.SimpleDataCollector;
-import top.ysqorz.migration.export.DBTableExtractWorker;
+import top.ysqorz.migration.extract.DBTableExtractWorker;
 import top.ysqorz.migration.repos.zwt.mapper.ICoreUserMapper;
 
 import javax.sql.DataSource;

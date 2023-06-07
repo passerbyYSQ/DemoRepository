@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    # batch的使用的数据源
+    spring-batch:
+      username: root
+      password: ysqJYKL2010
+      url: jdbc:mysql://127.0.0.1:3306/spring_batch?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    # 源数据源
+    origin-data:
+      username: root
+      password: ysqJYKL2010
+      url: jdbc:mysql://127.0.0.1:3306/defaut_default?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    # 目标数据源
+    target-data:
+      username: root
+      password: ysqJYKL2010
+      url: jdbc:mysql://127.0.0.1:3306/spring_batch?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  # 当有多个DataSource时，如果不指定主数据源，sql.nit不会执行:
+  sql:
+    init:
+      schema-locations: classpath:org/springframework/batch/core/schema-mysql.sql
+      #mode: always
+      mode: never
