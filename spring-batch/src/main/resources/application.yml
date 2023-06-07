@@ -10,17 +10,25 @@ spring:
     origin-data:
       username: root
       password: ysqJYKL2010
-      url: jdbc:mysql://127.0.0.1:3306/defaut_default?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
+      url: jdbc:mysql://127.0.0.1:3306/default_default?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
       driver-class-name: com.mysql.cj.jdbc.Driver
     # 目标数据源
     target-data:
       username: root
-      password: ysqJYKL2010
-      url: jdbc:mysql://127.0.0.1:3306/spring_batch?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
+      password: zwplm2022
+      url: jdbc:mysql://192.168.9.162:3306/default_default?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
       driver-class-name: com.mysql.cj.jdbc.Driver
   # 当有多个DataSource时，如果不指定主数据源，sql.nit不会执行:
   sql:
     init:
       schema-locations: classpath:org/springframework/batch/core/schema-mysql.sql
-      #mode: always
+      #mode: alwaysy
       mode: never
+
+mybatis-plus:
+  type-aliases-package: top.ysqorz.batch.springbatch.model
+  mapper-locations: classpath*:/mapper/**/*.xml
+  global-config:
+    super-mapper-class: com.baomidou.mybatisplus.core.mapper.BaseMapper
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
