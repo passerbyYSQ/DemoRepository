@@ -109,21 +109,21 @@ public class SecureUtils {
             // 计算 SHA-256 值
             byte[] digest = md.digest((origin + salt).getBytes(StandardCharsets.UTF_8));
             // 将盐值和 SHA-256 值一起转换为十六进制字符串
-            return bytesToHex(digest);
+            return bytes2Hex(digest);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static String bytesToHex(byte[] bytes) {
-        return bytesToHex(bytes, true);
+    public static String bytes2Hex(byte[] bytes) {
+        return bytes2Hex(bytes, true);
     }
 
     /**
      * 将字节数组转换为十六进制字符串
      */
-    public static String bytesToHex(byte[] bytes, boolean lowerCase) {
+    public static String bytes2Hex(byte[] bytes, boolean lowerCase) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : bytes) {
             String hex = String.format("%02" + (lowerCase ? 'x' : 'X'), b);

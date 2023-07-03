@@ -1,20 +1,30 @@
 package top.ysqorz.license.utils;
 
 import org.junit.Test;
-import org.springframework.util.ObjectUtils;
 
 import java.net.*;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.function.Predicate;
 
 public class SystemUtils {
     @Test
-    public void testMac() {
-        // 默认：50EBF6BA52CF
-        System.out.println(getLocalMacAddress());
-        System.out.println(getLoopbackMacAddress());
-//        System.out.println(getMacAddresses());
+    public void testMac() throws SocketException {
+        System.out.println("test: " + null);
+        Map<String, Integer> map = new HashMap<>();
+        map.put("a", 3);
+        System.out.println(map);
+        map.replaceAll((key, value) -> 0);
+        System.out.println(map);
+
+        InetAddress ip = getLocalhost();
+        System.out.println("InetAddress ip: " + ip);
+        NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+        System.out.println("NetworkInterface network: " + network.toString());
+        byte[] mac = network.getHardwareAddress();
+        System.out.println(SecureUtils.bytes2Hex(mac));
     }
 
     public static boolean isWindows() {
@@ -27,96 +37,82 @@ public class SystemUtils {
         return osName.contains("linux");
     }
 
+    /**
+     * 获取MAC地址，支持多网卡情况
+     */
     public String getMacAddress() {
-        String mac = getLocalMacAddress();
-        if (ObjectUtils.isEmpty(mac)) {
-            mac = getLoopbackMacAddress();
-        }
-        return mac;
-    }
-
-    public static String getLocalMacAddress() {
         try {
-            NetworkInterface network = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-            return SecureUtils.bytesToHex(network.getHardwareAddress(), false);
-        } catch (UnknownHostException | SocketException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static String getLoopbackMacAddress() {
-        try {
-            Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (netInterfaces.hasMoreElements()) {
-                NetworkInterface netInterface = netInterfaces.nextElement();
-                if (netInterface.isLoopback() ) {
-                    byte[] macBytes = netInterface.getHardwareAddress();
-                    if (!ObjectUtils.isEmpty(macBytes)) {
-                        return SecureUtils.bytesToHex(macBytes, false);
-                    }
-                }
-            }
+            NetworkInterface network = NetworkInterface.getByInetAddress(getLocalhost());
+            return SecureUtils.bytes2Hex(network.getHardwareAddress());
         } catch (SocketException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
-
 
     /**
-     * 一台机器可能存在多个网卡, 故返回数组
-     * 网络接口地址(NetworkInterface) ----> 接口地址(InterfaceAddress) ----> IP地址(InetAddress)
-     * ----> 网络接口地址(NetworkInterface)
+     * 获取本机网卡IP地址
      */
-    public static List<String> getMacAddresses() {
-        List<String> macList = new ArrayList<>();
+    public static InetAddress getLocalhost() {
+        final LinkedHashSet<InetAddress> localAddressList = getLocalAddressList(address -> {
+            // 非loopback地址，指127.*.*.*的地址
+            return !address.isLoopbackAddress()
+                    // 需为IPV4地址
+                    && address instanceof Inet4Address;
+        });
+
+        InetAddress address2 = null;
+        for (InetAddress inetAddress : localAddressList) {
+            if (!inetAddress.isSiteLocalAddress()) {
+                // 非地区本地地址，指10.0.0.0 ~ 10.255.255.255、172.16.0.0 ~ 172.31.255.255、192.168.0.0 ~ 192.168.255.255
+                return inetAddress;
+            } else if (null == address2) {
+                // 取第一个匹配的地址
+                address2 = inetAddress;
+            }
+        }
+
+        if (null != address2) {
+            return address2;
+        }
+
         try {
-            // 获取机器上的所有网络接口, 返回结果至少包含一项(即, loopback本地环回测试)
-            // getNetworkInterfaces() + getInetAddresses()可以获取到所有IP地址
-            Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-            // 使用标签, 跳出多重循环
-            while (netInterfaces.hasMoreElements()) {
-                NetworkInterface netInterface = netInterfaces.nextElement();
-                // 获取对应网络接口的所有接口地址(InterfaceAddress)
-                List<InterfaceAddress> interfaceAddrList = netInterface.getInterfaceAddresses();
-                for (InterfaceAddress addr : interfaceAddrList) {
-                    // InetAddress: Internet Protocol (IP) address: IP地址
-                    // 返回网络接口地址对应的IP地址
-                    InetAddress ip = addr.getAddress();
-                    // 由IP地址获取网络接口(NetworkInterface)
-                    // 方便方法搜索到绑定到其的具体IP地址的网络接口(NetworkInterface)
-                    NetworkInterface netInterface1 = NetworkInterface.getByInetAddress(ip);
-                    // 若为空, 跳过
-                    if (netInterface1 == null) {
-                        continue;
+            return InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-                    }
-                    // 获取以太网等名称, 如：eth0, eth1, wlan1
-                    String name = netInterface1.getName();
-                    // 获取描述
-                    String displayName = netInterface1.getDisplayName();
-                    // 当网络接口有权限连接, 并且其具有MAC地址时, 返回二进制MAC硬件地址
-                    byte[] mac = netInterface1.getHardwareAddress();
-                    // 是否为虚拟网络接口
-                    boolean virtual = netInterface1.isVirtual();
-                    // 网络接口是否启动
-                    boolean up = netInterface1.isUp();
-                    if (mac == null) {
-                        continue;
+    /**
+     * 获取所有满足过滤条件的本地IP地址对象
+     *
+     * @param addressFilter 过滤器，null表示不过滤，获取所有地址
+     * @return 过滤后的地址对象列表
+     */
+    public static LinkedHashSet<InetAddress> getLocalAddressList(Predicate<InetAddress> addressFilter) {
+        Enumeration<NetworkInterface> networkInterfaces;
+        try {
+            networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
 
-                    }
-                    StringBuilder sb = new StringBuilder();
-                    for (byte b : mac) {
-                        sb.append(String.format("%02X", b));
-                    }
-                    macList.add(sb.toString());
-                    System.out.println(name + "---" + displayName + "---" + sb + "---isUp" + up + "---isVirtual" + virtual);
+        if (networkInterfaces == null) {
+            throw new RuntimeException("Get network interface error!");
+        }
+
+        final LinkedHashSet<InetAddress> ipSet = new LinkedHashSet<>();
+
+        while (networkInterfaces.hasMoreElements()) {
+            final NetworkInterface networkInterface = networkInterfaces.nextElement();
+            final Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+            while (inetAddresses.hasMoreElements()) {
+                final InetAddress inetAddress = inetAddresses.nextElement();
+                if (inetAddress != null && (null == addressFilter || addressFilter.test(inetAddress))) {
+                    ipSet.add(inetAddress);
                 }
             }
-        } catch (SocketException ex) {
-            ex.printStackTrace();
         }
-        return macList;
+
+        return ipSet;
     }
 }
