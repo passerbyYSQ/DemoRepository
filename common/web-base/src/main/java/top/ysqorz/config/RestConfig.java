@@ -1,5 +1,6 @@
 package top.ysqorz.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.Header;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.Registry;
@@ -13,16 +14,19 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,6 +35,9 @@ import java.util.List;
  */
 @Configuration
 public class RestConfig {
+    @Value("${config.base.rest.enabled:true}")
+    private Boolean restLogEnable;
+
     @Bean
     public HttpClient httpClient() throws Exception {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
@@ -75,13 +82,18 @@ public class RestConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate(ClientHttpRequestFactory requestFactory) {
+    public RestTemplate restTemplate(ClientHttpRequestFactory clientHttpRequestFactory, RestTemplateLogger restLogger, ObjectMapper objectMapper) {
         RestTemplate restTemplate = new RestTemplate();
         // https://www.jianshu.com/p/96c1bef7856b
-        // 通过BufferingClientHttpRequestFactory对象包装现有的ResquestFactory，用来支持多次调用getBody()方法（增加了日志打印所引起）
-        restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(requestFactory));
+        // 通过BufferingClientHttpRequestFactory对象包装现有的RequestFactory，用来支持多次调用getBody()方法（增加了日志打印所引起）
+        restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(clientHttpRequestFactory));
         // 可以设置拦截器来打印日志
-        //restTemplate.setInterceptors(Collections.singletonList(restLogger));
+        if (restLogEnable) {
+            restTemplate.setInterceptors(Collections.singletonList(restLogger));
+        }
+        // 使用被我们定制过的的JSON转换器
+        restTemplate.getMessageConverters().removeIf(httpMessageConverter -> httpMessageConverter instanceof MappingJackson2HttpMessageConverter);
+        restTemplate.getMessageConverters().add(0, new MappingJackson2HttpMessageConverter(objectMapper));
         return restTemplate;
     }
 }

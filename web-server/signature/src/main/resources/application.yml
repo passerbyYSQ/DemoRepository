@@ -1,8 +1,8 @@
 secure:
   signature:
-    enable: true
+    enable: true # 是否开启验签功能，true才会注入相关的bean
     key-pair:
       test-caller: # 调用方平台id
         algorithm: SHA256withRSA # 签名算法
-        publicKeyPath: classpath:secure/edu-cloud/public.txt # 公钥文件的路径，支持类路径。公钥文件的内容必须是base64编码后的字符串
-        privateKeyPath: classpath:secure/edu-cloud/private.txt
+        publicKeyPath: classpath:secure/test-caller/public.txt # 公钥文件的路径，支持类路径。公钥文件的内容必须是base64编码后的字符串
+        privateKeyPath: classpath:secure/test-caller/private.txt # 私钥文件的路径

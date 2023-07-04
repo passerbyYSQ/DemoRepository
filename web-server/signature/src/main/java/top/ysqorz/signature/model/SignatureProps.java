@@ -14,7 +14,7 @@ import java.util.Map;
 @Data
 @ConditionalOnProperty(value = "secure.signature.enable", havingValue = "true")  // 根据条件注入bean
 @Component
-@ConfigurationProperties("core.secure.signature")
+@ConfigurationProperties("secure.signature")
 public class SignatureProps {
     private Boolean enable;
     private Map<String, KeyPairProps> keyPair;

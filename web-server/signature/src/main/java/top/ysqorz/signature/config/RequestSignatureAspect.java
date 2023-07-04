@@ -19,7 +19,7 @@ import top.ysqorz.exception.auth.AuthorizationException;
 import top.ysqorz.exception.param.ParamInvalidException;
 import top.ysqorz.signature.model.SignStatusCode;
 import top.ysqorz.signature.model.SignatureProps;
-import top.ysqorz.signature.util.CommonUtils;
+import top.ysqorz.util.CommonUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
