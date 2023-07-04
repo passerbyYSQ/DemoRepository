@@ -15,15 +15,8 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>sucore</module>
-        <module>transmittable-thread-local</module>
-        <module>r2dbc</module>
-        <module>oss</module>
-        <module>redis</module>
-        <module>license</module>
-        <module>expression</module>
-        <module>data-migration</module>
-        <module>spring-batch</module>
+        <module>common</module>
+        <module>web-server</module>
     </modules>
 
     <properties>
@@ -31,46 +24,12 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <!-- 只在本模块中引入，不会传递到子模块中，除非显示引入 -->
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.8.1</version>
-        </dependency>
-    </dependencies>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <repositories>
+        <!--  配置部门私有仓库   -->
+        <repository>
+            <id>zwplm-maven-public</id>
+            <name>zwplm-maven-public</name>
+            <url>http://192.168.17.200:8088/repository/zwplm-maven-public/</url>
+        </repository>
+    </repositories>
 </project>

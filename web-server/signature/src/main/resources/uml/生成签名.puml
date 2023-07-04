@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+start
+-> 所有的请求参数
+（路径参数、请求体等）;
+:1. 按规则对请求参数进行排序和拼接;
+-> 请求参数摘要（原始数据）;
+:2. 使用sha256算法生成数据摘要;
+-> 数据摘要;
+:3. 使用私钥和RSA算法生成签名;
+-> 数据签名（十六进制字符串）;
+:4. （1）路径参数携带callerID
+（2）将签名放入请求头X-Request-Signature;
+if (5. HTTP调用) then (调用成功)
+    :6. 处理响应数据;
+else (调用失败)
+endif
+stop
+@enduml
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/sequence-diagram'
+skinparam sequenceMessageAlign center
+autonumber
+
+actor User
+participant EduCloud
+participant ZWTeamworks
+
+User -> EduCloud ++ #FFBBBB : 登录
+EduCloud --> User -- : 登录成功
+note left of User : 已登录教育云
+
+User -> EduCloud ++ #FFBBBB : 申请ZWTeamworks账号
+EduCloud -> ZWTeamworks ++ #FFBBBB : 调用创建账号的接口(需要验签)
+ZWTeamworks -> ZWTeamworks : 创建账号
+ZWTeamworks --> EduCloud -- : 返回账号信息
+EduCloud --> User -- : 账号申请成功
+
+newpage
+
+User -> EduCloud ++ #FFBBBB : 登录ZWTeamworks
+EduCloud --> User -- : 重定向到ZWTeamworks登录页面
+User -> ZWTeamworks ++ #FFBBBB : 输入账号密码
+ZWTeamworks --> User -- : 登录成功，跳转到首页
+
+@enduml
