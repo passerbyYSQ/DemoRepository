@@ -115,10 +115,32 @@ public class ExpressionApplicationTest {
     }
 
     @Test
+    public void testForSwitch() {
+        int[] flags = new int[]{0, 1, 2, 3};
+        for (int flag : flags) {
+            switch (flag) {
+                case 0:
+                    System.out.println(flag);
+                    break; // 只会跳出switch，不会跳出for循环
+                case 1:
+                    System.out.println(flag);
+                    break;
+                case 2:
+                    System.out.println(flag);
+                    break;
+                default:
+                    System.out.println(flag);
+            }
+
+            System.out.println("123325432");
+        }
+    }
+
+    @Test
     public void testParseInt() {
         // 1685081918152
         // 1216517788565300
-        System.out.println( System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis());
     }
 
     @Test

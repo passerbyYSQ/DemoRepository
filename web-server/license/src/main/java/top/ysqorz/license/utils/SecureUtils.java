@@ -1,7 +1,5 @@
 package top.ysqorz.license.utils;
 
-import org.junit.Test;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
@@ -12,34 +10,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class SecureUtils {
-
-    @Test
-    public void testSha256() {
-        // 134563d4e440f0e418b0f382f23a2cf301af6d7f648ccfae9895018345d779a3
-        System.out.println(sha256("Hello", "123"));
-    }
-
-    @Test
-    public void testMd5() {
-        // d0aabe9a362cb2712ee90e04810902f3
-        System.out.println(md5("Hello", "123"));
-    }
-
-    @Test
-    public void testEncryptByAES() {
-        String keyStr = "1234567890123456"; // 16个字符，128位
-        String plainText = "Hello World!";
-        File cipherFile = new File("C:\\Users\\Administrator\\Desktop\\备份\\cipher\\cipher.txt");
-        encryptByAES(keyStr, plainText, cipherFile);
-    }
-
-    @Test
-    public void testDecryptByAES() {
-        String keyStr = "1234567890123456"; // 16个字符，128位，必须和加密是同一把密钥
-        File cipherFile = new File("C:\\Users\\Administrator\\Desktop\\备份\\cipher\\cipher.txt");
-        System.out.println(decryptByAES(keyStr, cipherFile));
-    }
-
     public static final int AES_BUFFER_LEN = 1024;
 
     public static void encryptByAES(String keyStr, String plainText, File cipherFile) {

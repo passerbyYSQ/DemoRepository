@@ -1,7 +1,5 @@
 package top.ysqorz.license.utils;
 
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,38 +8,6 @@ import java.nio.file.attribute.DosFileAttributeView;
 import java.nio.file.attribute.FileTime;
 
 public class FileUtils {
-    @Test
-    public void testHiddenFile() {
-        System.out.println(createHiddenFile(new File("C:\\Users\\Administrator\\Desktop\\备份\\hidden.txt")));
-    }
-
-    /**
-     * Windows:
-     * C:\ProgramData 是隐藏的
-     * C:\\ProgramData\\{MAC地址}\\加密文件.cipher
-     * <p>
-     * Linux:
-     * /var/lib/{MAC地址}\\加密文件.cipher
-     */
-    @Test
-    public void testProgramDataDir() {
-        String programDataDir = System.getenv("ProgramData");
-        System.out.println(programDataDir);
-    }
-
-    @Test
-    public void testCreateTime() {
-        FileTime createTime = getCreateTime(new File("C:\\Users\\Administrator\\Desktop\\备份\\.hidden.txt"));
-        System.out.println(createTime);
-    }
-
-    @Test
-    public void setLastModifiedTime() {
-        File file = new File("C:\\Users\\Administrator\\Desktop\\备份\\.hidden.txt");
-        FileTime createTime = getCreateTime(file);
-        setLastModifiedTime(file, createTime);
-    }
-
     /**
      * UTC时间
      */
@@ -98,5 +64,4 @@ public class FileUtils {
         }
         return false;
     }
-
 }

@@ -45,7 +45,7 @@ public class SystemUtils {
             NetworkInterface network = NetworkInterface.getByInetAddress(getLocalhost());
             return SecureUtils.bytes2Hex(network.getHardwareAddress());
         } catch (SocketException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // TODO 断网下无法获取网卡地址
         }
     }
 
