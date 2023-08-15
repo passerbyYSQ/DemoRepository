@@ -1,7 +1,8 @@
 package top.ysqorz.license.core;
 
-import top.ysqorz.license.core.cipher.TrialLicenseCipherStrategy;
-import top.ysqorz.license.core.model.TrialLicense;
+import top.ysqorz.license.api.TrialLicenseCallback;
+import top.ysqorz.license.api.TrialLicenseCipherStrategy;
+import top.ysqorz.license.api.TrialLicense;
 import top.ysqorz.license.utils.FileUtils;
 import top.ysqorz.license.utils.SystemUtils;
 

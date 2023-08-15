@@ -18,7 +18,7 @@ public class SecureUtils {
             OutputStream cipherOutputStream = Files.newOutputStream(cipherFile.toPath());
             encryptByAES(keyStr, plainInputStream, cipherOutputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e); // 弱化异常
+            throw new TrialLicenseException(e); // 弱化异常
         }
     }
 
@@ -28,7 +28,7 @@ public class SecureUtils {
             decryptByAES(keyStr, cipherInputStream, byteOutputStream);
             return byteOutputStream.toString(StandardCharsets.UTF_8.name());
         } catch (IOException e) {
-            throw new RuntimeException(e); // 弱化异常
+            throw new TrialLicenseException(e); // 弱化异常
         }
     }
 

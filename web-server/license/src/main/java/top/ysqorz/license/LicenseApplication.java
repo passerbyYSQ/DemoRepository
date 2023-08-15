@@ -5,9 +5,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import top.ysqorz.license.core.SimpleTrialLicenseManger;
-import top.ysqorz.license.core.cipher.impl.AESLicenseCipherStrategy;
-import top.ysqorz.license.core.model.TrialLicense;
-import top.ysqorz.license.core.translator.impl.JSONLicenseTranslator;
+import top.ysqorz.license.core.cipher.AESLicenseCipherStrategy;
+import top.ysqorz.license.api.TrialLicense;
+import top.ysqorz.license.core.translator.JSONLicenseTranslator;
 
 import java.time.Duration;
 

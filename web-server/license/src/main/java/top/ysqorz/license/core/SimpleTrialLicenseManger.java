@@ -1,12 +1,16 @@
 package top.ysqorz.license.core;
 
-import top.ysqorz.license.core.cipher.TrialLicenseCipherStrategy;
-import top.ysqorz.license.core.model.TrialLicense;
+import top.ysqorz.license.api.TrailLicenseManager;
+import top.ysqorz.license.api.TrialLicenseCallback;
+import top.ysqorz.license.api.TrialLicenseCipherStrategy;
+import top.ysqorz.license.api.TrialLicense;
 import top.ysqorz.license.utils.FileUtils;
 import top.ysqorz.license.utils.SecureUtils;
 import top.ysqorz.license.utils.SystemUtils;
+import top.ysqorz.license.utils.TrialLicenseException;
 
 import java.io.File;
+import java.util.Objects;
 
 public class SimpleTrialLicenseManger implements TrailLicenseManager {
     private final TrialLicenseCipherStrategy cipherStrategy;
@@ -17,8 +21,8 @@ public class SimpleTrialLicenseManger implements TrailLicenseManager {
     public SimpleTrialLicenseManger(TrialLicenseCipherStrategy cipherStrategy, TrialLicense initialLicense) {
         initialLicense.check();
         this.cipherStrategy = cipherStrategy;
-        this.licenseFile = getTrialLicenseFile();
         this.license = initialLicense;
+        this.licenseFile = getTrialLicenseFile();
 
         init();
     }
@@ -35,11 +39,15 @@ public class SimpleTrialLicenseManger implements TrailLicenseManager {
             //FileUtils.setStrictPermission(licenseFile); // 初始化文件之后，设置严格权限
         } else {
             license = cipherStrategy.decrypt(licenseFile); // TODO 将授权文本解密成内存上的数据对象，如果文本被篡改，此处会抛出异常
+            if (Objects.isNull(license)) {
+                throw new TrialLicenseException("试用授权许可解析异常，可能已被篡改");
+            }
         }
         // 创建守护者
         licenseDaemon = new TrialLicenseDaemon(licenseFile, license, cipherStrategy);
     }
 
+    @Override
     public void startDaemon(TrialLicenseCallback callback) {
         licenseDaemon.startDaemon(callback);
     }

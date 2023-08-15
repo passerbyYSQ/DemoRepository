@@ -10,22 +10,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class SystemUtils {
-    @Test
-    public void testMac() throws SocketException {
-        System.out.println("test: " + null);
-        Map<String, Integer> map = new HashMap<>();
-        map.put("a", 3);
-        System.out.println(map);
-        map.replaceAll((key, value) -> 0);
-        System.out.println(map);
-
-        InetAddress ip = getLocalhost();
-        System.out.println("InetAddress ip: " + ip);
-        NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-        System.out.println("NetworkInterface network: " + network.toString());
-        byte[] mac = network.getHardwareAddress();
-        System.out.println(SecureUtils.bytes2Hex(mac));
-    }
 
     public static boolean isWindows() {
         String osName = System.getProperty("os.name").toLowerCase();
@@ -45,7 +29,7 @@ public class SystemUtils {
             NetworkInterface network = NetworkInterface.getByInetAddress(getLocalhost());
             return SecureUtils.bytes2Hex(network.getHardwareAddress());
         } catch (SocketException e) {
-            throw new RuntimeException(e); // TODO 断网下无法获取网卡地址
+            throw new TrialLicenseException(e); // TODO 断网下无法获取网卡地址
         }
     }
 
@@ -78,7 +62,7 @@ public class SystemUtils {
         try {
             return InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new TrialLicenseException(e);
         }
     }
 
@@ -93,11 +77,11 @@ public class SystemUtils {
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
         } catch (SocketException e) {
-            throw new RuntimeException(e);
+            throw new TrialLicenseException(e);
         }
 
         if (networkInterfaces == null) {
-            throw new RuntimeException("Get network interface error!");
+            throw new TrialLicenseException("Get network interface error!");
         }
 
         final LinkedHashSet<InetAddress> ipSet = new LinkedHashSet<>();
