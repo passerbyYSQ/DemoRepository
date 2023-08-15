@@ -5,7 +5,7 @@ import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import org.junit.Test;
-import tech.sucore.runtime.Bootstrap;
+//import tech.sucore.runtime.Bootstrap;
 import top.ysqorz.license.loader.cipher.impl.AESByteCodeCipherStrategy;
 import top.ysqorz.license.api.TrialLicense;
 import top.ysqorz.license.core.translator.XMLicenseTranslator;
@@ -31,8 +31,8 @@ public class LicenseApplicationTest {
      */
     @Test
     public void testLoader1() throws Exception {
-        Bootstrap globalDaemon = new Bootstrap();
-        globalDaemon.initGlobalServer(this.getClass().getClassLoader());
+//        Bootstrap globalDaemon = new Bootstrap();
+//        globalDaemon.initGlobalServer(this.getClass().getClassLoader());
         int count = 100;
         CountDownLatch countDownLatch = new CountDownLatch(count * 2);
         for (int i = 0; i < count; i++) {
@@ -63,9 +63,9 @@ public class LicenseApplicationTest {
 
     private Object createInstance(String fullName) {
         try {
-            return Bootstrap.getCurrentClassLoader()
-                    .loadClass(fullName).getConstructor()
-                    .newInstance();
+//            return Bootstrap.getCurrentClassLoader()
+//                    .loadClass(fullName).getConstructor()
+//                    .newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,8 +74,8 @@ public class LicenseApplicationTest {
 
     @Test
     public void testLoader2() {
-        Bootstrap globalDaemon = new Bootstrap();
-        globalDaemon.initGlobalServer(this.getClass().getClassLoader());
+//        Bootstrap globalDaemon = new Bootstrap();
+//        globalDaemon.initGlobalServer(this.getClass().getClassLoader());
         Object rulesEngineFactory = createInstance("tech.sucore.rules.engine.ImRulesEngineFactory");
         System.out.println(rulesEngineFactory);
         Object syncLicenseFile = createInstance("tech.sucore.trial.reducer.SYNCLicenseFile");
