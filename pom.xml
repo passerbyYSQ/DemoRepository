@@ -17,6 +17,7 @@
     <modules>
         <module>common</module>
         <module>web-server</module>
+        <module>common/i18n</module>
     </modules>
 
     <properties>
