@@ -3,13 +3,13 @@ package top.ysqorz.i18n.api;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * ...
@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit;
  * @author yaoshiquan
  * @date 2023/8/19
  */
-public class FileEventMonitor implements AutoCloseable {
-    private final Queue<WatchKey> watchKeyQueue = new ConcurrentLinkedQueue<>(); // 并发非阻塞队列
+public class FileEventMonitor<T> implements AutoCloseable {
+    private final Queue<WatchContext> watchKeyQueue = new ConcurrentLinkedQueue<>(); // 并发非阻塞队列
     private final WatchService watchService;
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1, // 一个扫描线程
             runnable -> {
@@ -40,34 +40,39 @@ public class FileEventMonitor implements AutoCloseable {
         watchKeyQueue.clear();
     }
 
-    public void startWatch(FileEventCallback callback) {
-        scheduledExecutor.scheduleAtFixedRate(new WatchFileModifiedTask(callback), 0, watchInterval, TimeUnit.MILLISECONDS);
+    public void startWatch(FileEventCallback<T> callback) {
+        scheduledExecutor.scheduleAtFixedRate(new WatchTask(callback), 0, watchInterval, TimeUnit.MILLISECONDS);
     }
 
-    // TODO stopWatch
+    public void stopWatch() {
+        // TODO
+    }
 
-    public void watch(File file, WatchEvent.Kind<?>... eventKinds) throws IOException {
+    public void watch(File file, T extra, WatchEvent.Kind<?>... eventKinds) throws IOException {
+        if (Objects.isNull(eventKinds) || eventKinds.length == 0) {
+            throw new IOException("event kinds must not empty");
+        }
         WatchKey watchKey = file.toPath().register(watchService, eventKinds);
-        watchKeyQueue.add(watchKey);
+        watchKeyQueue.add(new WatchContext(watchKey, extra));
     }
 
     public void unWatch(File file) throws IOException {
-        Iterator<WatchKey> iterator = watchKeyQueue.iterator();
+        Iterator<WatchContext> iterator = watchKeyQueue.iterator();
+        Path path = file.toPath();
         while (iterator.hasNext()) {
-            WatchKey watchKey = iterator.next();
-            Path path = (Path) watchKey.watchable();
-            if (Files.isSameFile(path, file.toPath())) {
-                watchKey.cancel(); // 取消监听
+            WatchContext watchContext = iterator.next();
+            if (Files.isSameFile(watchContext.path, path)) {
+                watchContext.watchKey.cancel(); // 取消监听
                 iterator.remove(); // 从队列中移除掉
                 //break; // 可能对一个目录注册了多个监听，一并移除掉
             }
         }
     }
 
-    public class WatchFileModifiedTask implements Runnable {
-        private final FileEventCallback callback;
+    public class WatchTask implements Runnable {
+        private final FileEventCallback<T> callback;
 
-        public WatchFileModifiedTask(FileEventCallback callback) {
+        public WatchTask(FileEventCallback<T> callback) {
             this.callback = callback;
         }
 
@@ -77,14 +82,36 @@ public class FileEventMonitor implements AutoCloseable {
                 if (watchKeyQueue.isEmpty()) {
                     return;
                 }
-                for (WatchKey watchKey : watchKeyQueue) {
-                    Path path = (Path) watchKey.watchable();
-                    List<WatchEvent<?>> watchEvents = watchKey.pollEvents();
-                    callback.onEventOccurred(path.toFile(), watchEvents);
+                for (WatchContext watchContext : watchKeyQueue) {
+                    List<WatchEvent<?>> watchEvents = watchContext.watchKey.pollEvents();
+                    List<WatchEvent.Kind<?>> eventKinds = watchEvents.stream()
+                            .map((Function<WatchEvent<?>, WatchEvent.Kind<?>>) WatchEvent::kind)
+                            .collect(Collectors.toList());
+                    callback.onEventOccurred(watchContext.path.toFile(), watchContext.extra, eventKinds);
                 }
             } catch (Exception ex) {
                 // 防止抛出异常导致线程挂掉
+                ex.printStackTrace();
             }
         }
+    }
+
+    private class WatchContext {
+        private final WatchKey watchKey;
+        private final Path path;
+        private final T extra;
+
+        public WatchContext(WatchKey watchKey, T extra) {
+            this.watchKey = watchKey;
+            this.path = (Path) watchKey.watchable();
+            this.extra = extra;
+        }
+    }
+
+    public interface FileEventCallback<T> {
+        /**
+         * 注意不要在onEventOccurred执行耗时操作，否则影响FileEventMonitor的监听线程
+         */
+        void onEventOccurred(File file, T extra, List<WatchEvent.Kind<?>> eventKinds);
     }
 }

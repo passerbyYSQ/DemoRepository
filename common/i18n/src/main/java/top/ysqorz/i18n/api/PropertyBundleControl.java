@@ -1,12 +1,11 @@
 package top.ysqorz.i18n.api;
 
-import sun.misc.Resource;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
@@ -26,6 +25,7 @@ public class PropertyBundleControl extends ResourceBundle.Control {
      */
     private long cacheMillis = TTL_NO_EXPIRATION_CONTROL;
     private final ResourceLoader resourceLoader;
+    private BundleControlCallback callback;
 
     public PropertyBundleControl(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -35,6 +35,10 @@ public class PropertyBundleControl extends ResourceBundle.Control {
         this.resourceLoader = resourceLoader;
         this.encoding = encoding;
         this.cacheMillis = cacheMillis;
+    }
+
+    public void setControlCallback(BundleControlCallback callback) {
+        this.callback = callback;
     }
 
     public Charset getEncoding() {
@@ -60,13 +64,22 @@ public class PropertyBundleControl extends ResourceBundle.Control {
         String bundleName = toBundleName(baseName, locale);
         String resourceName = toResourceName(bundleName, "properties");
         File bundleFile = resourceLoader.getBundleFile(resourceName, format, loader);
+        ResourceBundle bundle;
         try (InputStream inputStream = Files.newInputStream(bundleFile.toPath())) {
-            return new PropertyResourceBundle(new InputStreamReader(inputStream, encoding));
+            bundle = new PropertyResourceBundle(new InputStreamReader(inputStream, encoding));
         }
+        if (Objects.nonNull(callback)) {
+            callback.onResourceBundleCreated(bundleFile, bundle);
+        }
+        return bundle;
     }
 
     @Override
     public long getTimeToLive(String baseName, Locale locale) {
         return cacheMillis;
+    }
+
+    public interface BundleControlCallback {
+        void onResourceBundleCreated(File bundleFile, ResourceBundle bundle);
     }
 }

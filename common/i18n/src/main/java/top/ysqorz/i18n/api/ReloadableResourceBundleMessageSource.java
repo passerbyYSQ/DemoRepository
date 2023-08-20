@@ -1,7 +1,11 @@
 package top.ysqorz.i18n.api;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,19 +17,28 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author yaoshiquan
  * @date 2023/8/18
  */
-public class ReloadableResourceBundleMessageSource extends ResourceBundleMessageSource {
+public class ReloadableResourceBundleMessageSource extends ResourceBundleMessageSource
+        implements PropertyBundleControl.BundleControlCallback,
+        FileEventMonitor.FileEventCallback<ReloadableResourceBundleMessageSource.ResourceBundleHolder> {
     // basename locale
     private final Map<String, Map<Locale, ResourceBundleHolder>> cachedResourceBundles = new ConcurrentHashMap<>();
     private final long cacheMillis;
+    private FileEventMonitor<ResourceBundleHolder> fileEventMonitor;
 
-    public ReloadableResourceBundleMessageSource(ResourceLoader resourceLoader) {
-        this(resourceLoader, StandardCharsets.UTF_8, PropertyBundleControl.TTL_NO_EXPIRATION_CONTROL);
+    public ReloadableResourceBundleMessageSource(ResourceLoader resourceLoader) throws IOException {
+        this(resourceLoader, StandardCharsets.UTF_8, PropertyBundleControl.TTL_NO_EXPIRATION_CONTROL, false);
     }
 
-    public ReloadableResourceBundleMessageSource(ResourceLoader resourceLoader, Charset encoding, long cacheMillis) {
+    public ReloadableResourceBundleMessageSource(ResourceLoader resourceLoader, Charset encoding, long cacheMillis,
+                                                 boolean enableMonitor) throws IOException {
         // 由于ResourceBundle没有提供API清除单个Bundle的缓存，因此禁用ResourceBundle内部缓存，由当前类来管理缓存
         super(new PropertyBundleControl(resourceLoader, encoding, PropertyBundleControl.TTL_DONT_CACHE));
         this.cacheMillis = cacheMillis;
+        if (enableMonitor) {
+            this.fileEventMonitor = new FileEventMonitor<>(500L); // 500ms 扫描监听的文件是否更新，如果发现更新则处理
+            this.control.setControlCallback(this);
+            this.fileEventMonitor.startWatch(this);
+        }
     }
 
     @Override
@@ -68,6 +81,37 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
     @Override
     public void setMessage(String code, String value, Locale local) {
 
+    }
+
+    private ResourceBundleHolder getResourceBundleHolder(ResourceBundle bundle) {
+        Map<Locale, ResourceBundleHolder> bundleMap = cachedResourceBundles.get(bundle.getBaseBundleName());
+        if (Objects.isNull(bundleMap)) {
+            return null;
+        }
+        return bundleMap.get(bundle.getLocale());
+    }
+
+    @Override
+    public void onResourceBundleCreated(File bundleFile, ResourceBundle bundle) {
+        if (Objects.isNull(fileEventMonitor)) {
+            return; // 未开启该功能
+        }
+        try {
+            // 1. 第一次载入 2. reload
+            fileEventMonitor.unWatch(bundleFile); // 如果是刷新，那么之前应该已经添加过监听，将监听先移除掉
+            ResourceBundleHolder bundleHolder = getResourceBundleHolder(bundle);
+            fileEventMonitor.watch(bundleFile, bundleHolder, StandardWatchEventKinds.ENTRY_MODIFY);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // 监听失败
+        }
+    }
+
+    @Override
+    public void onEventOccurred(File file, ResourceBundleHolder bundleHolder, List<WatchEvent.Kind<?>> eventKinds) {
+        if (eventKinds.stream().anyMatch(StandardWatchEventKinds.ENTRY_MODIFY::equals)) {
+            bundleHolder.refresh();
+        }
     }
 
     public class ResourceBundleHolder {
