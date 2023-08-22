@@ -1,7 +1,9 @@
 package top.ysqorz.i18n.api;
 
-import java.text.MessageFormat;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * ...
@@ -14,10 +16,10 @@ public abstract class ResourceBundleMessageSource extends AbstractMessageSource 
      * 多个资源包的前缀，确保顺序和唯一
      */
     protected Set<String> basenameSet = new LinkedHashSet<>();
-    protected PropertyBundleControl control;
+    protected ResourceBundle.Control control;
     protected ClassLoader classLoader;
 
-    public ResourceBundleMessageSource(PropertyBundleControl control) {
+    public ResourceBundleMessageSource(ResourceBundle.Control control) {
         this.control = control;
     }
 

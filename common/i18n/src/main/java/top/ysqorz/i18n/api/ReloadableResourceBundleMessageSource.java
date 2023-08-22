@@ -36,7 +36,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         this.cacheMillis = cacheMillis;
         if (enableMonitor) {
             this.fileEventMonitor = new FileEventMonitor<>(500L); // 500ms 扫描监听的文件是否更新，如果发现更新则处理
-            this.control.setControlCallback(this);
+            ((PropertyBundleControl) this.control).setControlCallback(this);
             this.fileEventMonitor.startWatch(this);
         }
     }
@@ -97,19 +97,16 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
             return; // 未开启该功能
         }
         try {
-            // 1. 第一次载入 2. reload
-            fileEventMonitor.unWatch(bundleFile); // 如果是刷新，那么之前应该已经添加过监听，将监听先移除掉
             ResourceBundleHolder bundleHolder = getResourceBundleHolder(bundle);
             fileEventMonitor.watch(bundleFile, bundleHolder, StandardWatchEventKinds.ENTRY_MODIFY);
         } catch (IOException e) {
             e.printStackTrace();
-            // 监听失败
         }
     }
 
     @Override
-    public void onEventOccurred(File file, ResourceBundleHolder bundleHolder, List<WatchEvent.Kind<?>> eventKinds) {
-        if (eventKinds.stream().anyMatch(StandardWatchEventKinds.ENTRY_MODIFY::equals)) {
+    public void onEventOccurred(File file, ResourceBundleHolder bundleHolder, WatchEvent.Kind<?> eventKind) {
+        if (StandardWatchEventKinds.ENTRY_MODIFY.equals(eventKind)) {
             bundleHolder.refresh();
         }
     }
@@ -124,7 +121,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
 
         public ResourceBundleHolder(String basename, Locale locale) {
             this.resourceBundle = getResourceBundle(basename, locale); // 禁用缓存，载入Bundle
-            updateLastRefreshTimestamp();
+            updateNextExpiredTimestamp();
         }
 
         public MessageFormat getMessageFormat(String code) {
@@ -165,7 +162,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
             }
         }
 
-        private void updateLastRefreshTimestamp() {
+        private void updateNextExpiredTimestamp() {
             if (cacheMillis >= 0) {
                 // 更新最后一次刷新的时间
                 expiredTimeStamp = System.currentTimeMillis() + cacheMillis;
@@ -184,7 +181,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
                 String pattern = resourceBundle.getString(key);
                 cachedMessageFormats.put(pattern, new MessageFormat(pattern, resourceBundle.getLocale()));
             }
-            updateLastRefreshTimestamp();
+            updateNextExpiredTimestamp();
         }
     }
 }
