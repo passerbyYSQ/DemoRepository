@@ -6,6 +6,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -25,8 +26,8 @@ public class FileEventMonitor<T> implements AutoCloseable {
                 thread.setDaemon(true); // 设置守护线程
                 return thread;
             });
+    private ScheduledFuture<?> scheduledFuture;
     private final Long watchInterval; // 不宜太短，但要比文件的缓存时长要短
-    private volatile boolean watching; // 是否正在监听
 
     public FileEventMonitor(Long watchInterval) throws IOException {
         this.watchInterval = watchInterval;
@@ -41,26 +42,25 @@ public class FileEventMonitor<T> implements AutoCloseable {
     }
 
     public void startWatch(FileEventCallback<T> callback) {
-        scheduledExecutor.scheduleAtFixedRate(new WatchTask(callback), 0, watchInterval, TimeUnit.MILLISECONDS);
-        this.watching = true;
+        scheduledFuture = scheduledExecutor.scheduleAtFixedRate(new WatchTask(callback), 0, watchInterval, TimeUnit.MILLISECONDS);
     }
 
     public void stopWatch() {
-        this.watching = false; // 定时线程不会停止，只是每次轮询时不扫描队列检查事件
+        scheduledFuture.cancel(true);
     }
 
     public void watch(File file, T extra, WatchEvent.Kind<?>... eventKinds) throws IOException {
         synchronized (watchContextQueue) {
             WatchContext watchContext = getWatchContext(file);
             if (Objects.isNull(watchContext)) {
-                watchContextQueue.add(new WatchContext(file, eventKinds, extra));
-            } else {
-                watchContext.addWatchedFile(file, eventKinds, extra);
+                watchContext = new WatchContext(file);
+                watchContextQueue.add(watchContext);
             }
+            watchContext.addWatchedFile(file, eventKinds, extra);
         }
     }
 
-    public void unWatch(File file) throws IOException {
+    public void unWatch(File file) {
         synchronized (watchContextQueue) {
             WatchContext watchContext = getWatchContext(file);
             if (Objects.isNull(watchContext)) {
@@ -92,7 +92,7 @@ public class FileEventMonitor<T> implements AutoCloseable {
         @Override
         public void run() {
             try {
-                if (!watching || watchContextQueue.isEmpty()) {
+                if (watchContextQueue.isEmpty()) {
                     return;
                 }
                 for (WatchContext watchContext : watchContextQueue) {
@@ -130,23 +130,18 @@ public class FileEventMonitor<T> implements AutoCloseable {
     }
 
     private class WatchContext {
-        private WatchKey watchKey; // 目录的监听句柄
-        private final Set<WatchEvent.Kind<?>> eventKinds = new HashSet<>(); // 注册的目录事件
+        private final WatchKey watchKey; // 目录的监听句柄
         private final Map<File, WatchedFileHolder> watchedFiles = new HashMap<>(); // 真正想监听的文件
 
-        public WatchContext(File file, WatchEvent.Kind<?>[] eventKinds, T extra) throws IOException {
-            addWatchedFile(file, eventKinds, extra);
+        public WatchContext(File file) throws IOException {
+            watchKey = file.getParentFile().toPath().register(watchService,
+                    StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_DELETE);
         }
 
-        public void addWatchedFile(File file, WatchEvent.Kind<?>[] eventKinds, T extra) throws IOException {
+        public void addWatchedFile(File file, WatchEvent.Kind<?>[] eventKinds, T extra) {
             watchedFiles.put(file, new WatchedFileHolder(file, Arrays.stream(eventKinds).collect(Collectors.toSet()), extra));
-            Collections.addAll(this.eventKinds, eventKinds); // 合并关注的事件
-            if (Objects.nonNull(watchKey)) {
-                //Path watchable = (Path) watchKey.watchable(); // file一定是watchable的下级条目
-                watchKey.cancel(); // 由于关注的事件变了，所以重新注册获取新的WatchKey
-
-            }
-            watchKey = file.getParentFile().toPath().register(watchService, this.eventKinds.toArray(new WatchEvent.Kind[0]));
         }
 
         public void removeWatchedFile(File file) {
