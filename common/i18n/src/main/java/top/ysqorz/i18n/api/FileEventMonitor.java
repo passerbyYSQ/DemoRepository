@@ -72,13 +72,13 @@ public class FileEventMonitor<T> implements AutoCloseable {
         }
     }
 
-    public void unWatch(File file) {
+    public void unWatch(File file, WatchEvent.Kind<?>... eventKinds) {
         synchronized (watchContextQueue) {
             WatchContext watchContext = getWatchContext(file);
             if (Objects.isNull(watchContext)) {
                 return;
             }
-            watchContext.removeWatchedFile(file);
+            watchContext.removeWatchedFile(file, eventKinds);
             if (watchContext.watchedCount() == 0) {
                 watchContextQueue.remove(watchContext);
             }
@@ -139,11 +139,16 @@ public class FileEventMonitor<T> implements AutoCloseable {
             this.eventKinds = eventKinds;
             this.extra = extra;
         }
+
+        public int removeEventKinds(WatchEvent.Kind<?>... eventKinds) {
+            this.eventKinds.removeAll(Arrays.stream(eventKinds).collect(Collectors.toSet()));
+            return this.eventKinds.size();
+        }
     }
 
     private class WatchContext {
         private WatchKey watchKey; // 目录的监听句柄
-        private final Map<File, WatchedFileHolder> watchedFiles = new HashMap<>(); // 真正想监听的文件
+        private final Map<String, WatchedFileHolder> watchedFiles = new HashMap<>(); // 真正想监听的文件，同一个目录下的文件名称不可能重复，所以可作为key
 
         public WatchContext(File file) throws IOException {
             register(file.getParentFile().toPath());
@@ -161,13 +166,20 @@ public class FileEventMonitor<T> implements AutoCloseable {
         }
 
         public void addWatchedFile(File file, WatchEvent.Kind<?>[] eventKinds, T extra) {
-            watchedFiles.put(file, new WatchedFileHolder(file, Arrays.stream(eventKinds).collect(Collectors.toSet()), extra));
+            watchedFiles.put(file.getName(), new WatchedFileHolder(file, Arrays.stream(eventKinds).collect(Collectors.toSet()), extra));
         }
 
-        public void removeWatchedFile(File file) {
-            watchedFiles.remove(file);
-            if (watchedCount() == 0 && watchKey.isValid()) {
-                watchKey.cancel();
+        public void removeWatchedFile(File file, WatchEvent.Kind<?>... eventKinds) {
+            WatchedFileHolder fileHolder = watchedFiles.get(file.getName());
+            if (Objects.isNull(fileHolder)) {
+                return;
+            }
+            // eventKinds为null表示移除整个文件的监听
+            if (Objects.isNull(eventKinds) || eventKinds.length == 0 || fileHolder.removeEventKinds(eventKinds) == 0) {
+                watchedFiles.remove(file.getName());
+                if (watchedCount() == 0 && watchKey.isValid()) {
+                    watchKey.cancel();
+                }
             }
         }
 
@@ -178,7 +190,7 @@ public class FileEventMonitor<T> implements AutoCloseable {
         public WatchedFileHolder getWatchedFileHolder(Path relativePath, WatchEvent.Kind<?> eventKind) { // 触发事件的文件
             Path watchedDir = (Path) watchKey.watchable();
             Path absolutePath = watchedDir.resolve(relativePath);
-            WatchedFileHolder fileHolder = watchedFiles.get(absolutePath.toFile());
+            WatchedFileHolder fileHolder = watchedFiles.get(absolutePath.toFile().getName());
             if (Objects.isNull(fileHolder) || !fileHolder.eventKinds.contains(eventKind)) {
                 return null;
             }
