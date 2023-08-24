@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -17,8 +14,8 @@ import java.util.stream.Collectors;
  * @date 2023/8/19
  */
 public class FileEventMonitor<T> implements AutoCloseable {
-    private final Queue<WatchContext> watchContextQueue = new LinkedList<>(); // 由于对队列的操作加了锁，此处不需要使用并发队列
-    private final WatchService watchService;
+    private final Queue<WatchContext> watchContextQueue = new ConcurrentLinkedQueue<>();
+    private WatchService watchService;
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1, // 一个扫描线程
             runnable -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(runnable);
@@ -37,23 +34,38 @@ public class FileEventMonitor<T> implements AutoCloseable {
     @Override
     public void close() throws IOException {
         watchService.close();
+        watchService = null; // help gc
         scheduledExecutor.shutdownNow();
         watchContextQueue.clear();
     }
 
-    public void startWatch(FileEventCallback<T> callback) {
+    public void startWatch(FileEventCallback<T> callback) throws IOException {
+        synchronized (watchContextQueue) { // 确保原子操作
+            if (Objects.isNull(watchService)) { // stopWatch之后startWatch，此时watchService为null
+                watchService = FileSystems.getDefault().newWatchService();
+                for (WatchContext watchContext : watchContextQueue) {
+                    watchContext.register();  // 重新恢复之前注册的文件的监听，stopWatch之后注册的监听也在其中
+                }
+            }
+        }
         scheduledFuture = scheduledExecutor.scheduleAtFixedRate(new WatchTask(callback), 0, watchInterval, TimeUnit.MILLISECONDS);
     }
 
-    public void stopWatch() {
-        scheduledFuture.cancel(true);
+    public void stopWatch() throws IOException {
+        scheduledFuture.cancel(false); // false表示如果扫描线程在处理，则等它处理完
+        // watchContextQueue.clear(); // 队列不能清空，因为下次重新startWatch时之前的注册信息不能丢掉，
+        watchService.close(); // 关闭watchService，否则取消监听后操作系统层面仍在继续监听，浪费资源
+        watchService = null; // help gc
     }
 
     public void watch(File file, T extra, WatchEvent.Kind<?>... eventKinds) throws IOException {
         synchronized (watchContextQueue) {
+            if (Objects.isNull(watchService)) { // stopWatch之后watch，此时watchService为null
+                watchService = FileSystems.getDefault().newWatchService();
+            }
             WatchContext watchContext = getWatchContext(file);
             if (Objects.isNull(watchContext)) {
-                watchContext = new WatchContext(file);
+                watchContext = new WatchContext(file); // 耗时操作
                 watchContextQueue.add(watchContext);
             }
             watchContext.addWatchedFile(file, eventKinds, extra);
@@ -130,11 +142,19 @@ public class FileEventMonitor<T> implements AutoCloseable {
     }
 
     private class WatchContext {
-        private final WatchKey watchKey; // 目录的监听句柄
+        private WatchKey watchKey; // 目录的监听句柄
         private final Map<File, WatchedFileHolder> watchedFiles = new HashMap<>(); // 真正想监听的文件
 
         public WatchContext(File file) throws IOException {
-            watchKey = file.getParentFile().toPath().register(watchService,
+            register(file.getParentFile().toPath());
+        }
+
+        public void register() throws IOException {
+            register((Path) watchKey.watchable());
+        }
+
+        private void register(Path dir) throws IOException {
+            watchKey = dir.register(watchService,
                     StandardWatchEventKinds.ENTRY_CREATE,
                     StandardWatchEventKinds.ENTRY_MODIFY,
                     StandardWatchEventKinds.ENTRY_DELETE);
@@ -146,7 +166,7 @@ public class FileEventMonitor<T> implements AutoCloseable {
 
         public void removeWatchedFile(File file) {
             watchedFiles.remove(file);
-            if (watchedCount() == 0) {
+            if (watchedCount() == 0 && watchKey.isValid()) {
                 watchKey.cancel();
             }
         }
