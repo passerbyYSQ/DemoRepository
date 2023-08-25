@@ -1,5 +1,7 @@
 package top.ysqorz.i18n.api;
 
+import top.ysqorz.i18n.api.generator.ConstInterfaceGenerator;
+
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -9,7 +11,7 @@ import java.util.*;
  * @author yaoshiquan
  * @date 2023/8/18
  */
-public abstract class AbstractMessageSource implements MessageSource {
+public abstract class AbstractMessageSource implements MessageSource, ConstInterfaceGenerator {
     private MessageSource parentMessageSource;
 
     @Override

@@ -60,14 +60,12 @@ public class PropertyBundleControl extends ResourceBundle.Control {
     }
 
     @Override
-    public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
-        String bundleName = toBundleName(baseName, locale);
+    public ResourceBundle newBundle(String basename, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
+        String bundleName = toBundleName(basename, locale);
         String resourceName = toResourceName(bundleName, "properties");
         File bundleFile = resourceLoader.getBundleFile(resourceName, format, loader);
-        ResourceBundle bundle;
-        try (InputStream inputStream = Files.newInputStream(bundleFile.toPath())) {
-            bundle = new PropertyResourceBundle(new InputStreamReader(inputStream, encoding));
-        }
+        InputStream inputStream = Files.newInputStream(bundleFile.toPath());
+        ResourceBundle bundle = new PropertyResourceBundle(new InputStreamReader(inputStream, encoding));
         if (Objects.nonNull(callback)) {
             callback.onResourceBundleCreated(bundleFile, bundle);
         }
@@ -75,7 +73,7 @@ public class PropertyBundleControl extends ResourceBundle.Control {
     }
 
     @Override
-    public long getTimeToLive(String baseName, Locale locale) {
+    public long getTimeToLive(String basename, Locale locale) {
         return cacheMillis;
     }
 

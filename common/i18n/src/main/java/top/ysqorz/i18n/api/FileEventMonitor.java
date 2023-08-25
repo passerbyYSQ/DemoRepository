@@ -33,29 +33,45 @@ public class FileEventMonitor<T> implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        watchService.close();
-        watchService = null; // help gc
-        scheduledExecutor.shutdownNow();
-        watchContextQueue.clear();
-    }
-
-    public void startWatch(FileEventCallback<T> callback) throws IOException {
-        synchronized (watchContextQueue) { // 确保原子操作
-            if (Objects.isNull(watchService)) { // stopWatch之后startWatch，此时watchService为null
-                watchService = FileSystems.getDefault().newWatchService();
-                for (WatchContext watchContext : watchContextQueue) {
-                    watchContext.register();  // 重新恢复之前注册的文件的监听，stopWatch之后注册的监听也在其中
+        if (Objects.nonNull(watchService)) {
+            synchronized (watchContextQueue) {
+                if (Objects.nonNull(watchService)) {
+                    watchService.close();
+                    watchService = null; // help gc
+                    scheduledExecutor.shutdownNow();
+                    watchContextQueue.clear();
                 }
             }
         }
-        scheduledFuture = scheduledExecutor.scheduleAtFixedRate(new WatchTask(callback), 0, watchInterval, TimeUnit.MILLISECONDS);
+    }
+
+    public void startWatch(FileEventCallback<T> callback) throws IOException {
+        if (Objects.isNull(watchService)) {
+            synchronized (watchContextQueue) { // 确保原子操作
+                if (Objects.isNull(watchService)) { // stopWatch之后startWatch，此时watchService为null
+                    watchService = FileSystems.getDefault().newWatchService();
+                    for (WatchContext watchContext : watchContextQueue) {
+                        watchContext.register();  // 重新恢复之前注册的文件的监听，stopWatch之后注册的监听也在其中
+                    }
+                }
+                if (Objects.isNull(scheduledFuture)) {
+                    scheduledFuture = scheduledExecutor.scheduleAtFixedRate(new WatchTask(callback), 0, watchInterval, TimeUnit.MILLISECONDS);
+                }
+            }
+        }
     }
 
     public void stopWatch() throws IOException {
-        scheduledFuture.cancel(false); // false表示如果扫描线程在处理，则等它处理完
-        // watchContextQueue.clear(); // 队列不能清空，因为下次重新startWatch时之前的注册信息不能丢掉，
-        watchService.close(); // 关闭watchService，否则取消监听后操作系统层面仍在继续监听，浪费资源
-        watchService = null; // help gc
+        if (Objects.nonNull(watchService)) {
+            synchronized (watchContextQueue) {
+                if (Objects.nonNull(watchService)) {
+                    scheduledFuture.cancel(false); // false表示如果扫描线程在处理，则等它处理完
+                    // watchContextQueue.clear(); // 队列不能清空，因为下次重新startWatch时之前的注册信息不能丢掉，
+                    watchService.close(); // 关闭watchService，否则取消监听后操作系统层面仍在继续监听，浪费资源
+                    watchService = null; // help gc
+                }
+            }
+        }
     }
 
     public void watch(File file, T extra, WatchEvent.Kind<?>... eventKinds) throws IOException {
@@ -72,7 +88,7 @@ public class FileEventMonitor<T> implements AutoCloseable {
         }
     }
 
-    public void unWatch(File file, WatchEvent.Kind<?>... eventKinds) {
+    public void unWatch(File file, WatchEvent.Kind<?>... eventKinds) throws IOException {
         synchronized (watchContextQueue) {
             WatchContext watchContext = getWatchContext(file);
             if (Objects.isNull(watchContext)) {
@@ -85,7 +101,7 @@ public class FileEventMonitor<T> implements AutoCloseable {
         }
     }
 
-    private WatchContext getWatchContext(File file) {
+    private WatchContext getWatchContext(File file) throws IOException {
         for (WatchContext watchContext : watchContextQueue) {
             if (watchContext.isSameWatch(file)) {
                 return watchContext;
@@ -111,8 +127,7 @@ public class FileEventMonitor<T> implements AutoCloseable {
                     handleWatchEvent(watchContext);
                 }
             } catch (Exception ex) {
-                // 防止抛出异常导致线程挂掉
-                ex.printStackTrace();
+                ex.printStackTrace(); // 防止单次处理任务时抛出异常导致扫描线程挂掉
             }
         }
 
@@ -188,18 +203,16 @@ public class FileEventMonitor<T> implements AutoCloseable {
         }
 
         public WatchedFileHolder getWatchedFileHolder(Path relativePath, WatchEvent.Kind<?> eventKind) { // 触发事件的文件
-            Path watchedDir = (Path) watchKey.watchable();
-            Path absolutePath = watchedDir.resolve(relativePath);
-            WatchedFileHolder fileHolder = watchedFiles.get(absolutePath.toFile().getName());
+            WatchedFileHolder fileHolder = watchedFiles.get(relativePath.toString()); // 相对路径，其实就是文件名称
             if (Objects.isNull(fileHolder) || !fileHolder.eventKinds.contains(eventKind)) {
                 return null;
             }
             return fileHolder;
         }
 
-        public boolean isSameWatch(File file) {
+        public boolean isSameWatch(File file) throws IOException {
             Path watchedDir = (Path) watchKey.watchable(); // 实际注册监听的目录
-            return file.getParentFile().equals(watchedDir.toFile());
+            return Files.isSameFile(watchedDir, file.getParentFile().toPath());
         }
     }
 

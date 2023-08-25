@@ -1,5 +1,7 @@
 package top.ysqorz.i18n.api;
 
+import top.ysqorz.i18n.api.model.ConstInterfaceMeta;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -131,6 +133,35 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         }
     }
 
+    @Override
+    public List<ConstInterfaceMeta> loadAllCodes(Locale... supportedLocales) {
+        try {
+            PropertyBundleControl control = (PropertyBundleControl) this.control;
+            List<ConstInterfaceMeta> constInterfaceMetas = new ArrayList<>();
+            String packagePath = ConstInterfaceMeta.class.getPackage().getName() + ".constant";
+            for (String basename : basenameSet) {
+                ConstInterfaceMeta constInterfaceMeta = new ConstInterfaceMeta(packagePath, basename);
+                for (Locale locale : supportedLocales) {
+                    ResourceBundle bundle = control.newBundle(basename, locale, null, classLoader, true);
+                    Enumeration<String> codes = bundle.getKeys();
+                    while (codes.hasMoreElements()) {
+                        String code = codes.nextElement();
+                        constInterfaceMeta.put(code, code);
+                    }
+                }
+                constInterfaceMetas.add(constInterfaceMeta);
+            }
+            return constInterfaceMetas;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void generateConstInterfaces() {
+    }
+
     public class ResourceBundleHolder {
         private ResourceBundle resourceBundle;
 
@@ -177,13 +208,11 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         }
 
         public void refresh() {
-            // 尝试加锁失败，可能其他线程已经持锁在刷新，所以当前线程不需要等待去刷新，直接返回
-            // 独占加锁之后必须再判断是否过期
-            if (!refreshLock.tryLock() || !isExpired()) {
-                return;
-            }
+            refreshLock.lock();
             try {
-                doRefresh();
+                if (isExpired()) {
+                    doRefresh();
+                }
             } finally {
                 refreshLock.unlock();
             }

@@ -9,9 +9,9 @@ import java.util.Locale;
  * @author yaoshiquan
  * @date 2023/8/23
  */
-public class RequestLocaleContextResolver implements LocaleContextResolver<HttpServletRequest> {
+public class RequestLocaleContextResolver extends AbstractLocaleContextResolver<HttpServletRequest> {
     @Override
-    public Locale resolveLocaleContext(HttpServletRequest request) {
+    public Locale getLocaleContext(HttpServletRequest args) {
         // 请求头 -> 请求参数 -> 会话参数
         return null;
     }

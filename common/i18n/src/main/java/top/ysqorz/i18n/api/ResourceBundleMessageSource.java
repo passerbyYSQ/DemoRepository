@@ -1,9 +1,6 @@
 package top.ysqorz.i18n.api;
 
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 /**
  * ...
@@ -20,7 +17,12 @@ public abstract class ResourceBundleMessageSource extends AbstractMessageSource 
     protected ClassLoader classLoader;
 
     public ResourceBundleMessageSource(ResourceBundle.Control control) {
+        this(control, null);
+    }
+
+    public ResourceBundleMessageSource(ResourceBundle.Control control, ClassLoader classLoader) {
         this.control = control;
+        this.classLoader = Objects.isNull(classLoader) ? this.getClass().getClassLoader() : classLoader;
     }
 
     protected ResourceBundle getResourceBundle(String basename, Locale locale) {

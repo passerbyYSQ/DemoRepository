@@ -8,9 +8,10 @@ import java.util.Locale;
  * @author yaoshiquan
  * @date 2023/8/23
  */
-public class OREConfigLocaleContextResolver implements LocaleContextResolver<Void> {
+public class OREConfigLocaleContextResolver extends AbstractLocaleContextResolver<Void> {
     @Override
-    public Locale resolveLocaleContext(Void args) {
+    public Locale getLocaleContext(Void args) {
+        // 从ZWTeamworks的安装目录下读取多语言配置
         return null;
     }
 }
