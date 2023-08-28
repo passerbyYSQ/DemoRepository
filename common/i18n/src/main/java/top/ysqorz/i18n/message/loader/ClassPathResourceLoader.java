@@ -1,4 +1,4 @@
-package top.ysqorz.i18n.api;
+package top.ysqorz.i18n.message.loader;
 
 import java.io.File;
 

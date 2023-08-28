@@ -1,6 +1,4 @@
-package top.ysqorz.i18n.api;
-
-import top.ysqorz.i18n.api.generator.ConstInterfaceGenerator;
+package top.ysqorz.i18n.message;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -28,6 +26,13 @@ public abstract class AbstractMessageSource implements MessageSource, ConstInter
     }
 
     private String getMessageFromParent(String code, Object[] args, Locale locale) {
+        MessageSource parent;
+        while (Objects.nonNull(parent = getParentMessageSource())) {
+            String message = parent.getMessage(code, args, locale);
+            if (Objects.nonNull(message)) {
+                return message;
+            }
+        }
         return null;
     }
 

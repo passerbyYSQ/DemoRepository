@@ -1,4 +1,4 @@
-package top.ysqorz.i18n.api.resolver;
+package top.ysqorz.i18n.resolver;
 
 import java.util.List;
 import java.util.Locale;
@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author yaoshiquan
  * @date 2023/8/24
  */
-public abstract class AbstractLocaleContextResolver<T> implements LocaleContextResolver<T> {
+public abstract class AbstractLocaleContextResolver implements LocaleContextResolver {
     private Locale defaultLocale;
     private List<Locale> supportedLocales;
 
@@ -35,8 +35,8 @@ public abstract class AbstractLocaleContextResolver<T> implements LocaleContextR
     }
 
     @Override
-    public Locale resolveLocaleContext(T args) {
-        Locale localeContext = getLocaleContext(args); // 获取当前的语言环境
+    public Locale resolveLocaleContext() {
+        Locale localeContext = getLocaleContext(); // 获取当前的语言环境
         if (Objects.isNull(localeContext)) {
             localeContext = defaultLocale;
         }
@@ -48,7 +48,7 @@ public abstract class AbstractLocaleContextResolver<T> implements LocaleContextR
         return null;
     }
 
-    public abstract Locale getLocaleContext(T args);
+    public abstract Locale getLocaleContext();
 
     @Override
     public List<Locale> getSupportedLocales() {

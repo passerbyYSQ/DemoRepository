@@ -1,11 +1,18 @@
-package top.ysqorz.i18n.api;
+package top.ysqorz.i18n.message.properties;
 
-import top.ysqorz.i18n.api.model.ConstInterfaceMeta;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import top.ysqorz.i18n.common.CommonUtils;
+import top.ysqorz.i18n.common.ConstInterfaceMeta;
+import top.ysqorz.i18n.common.FileEventMonitor;
+import top.ysqorz.i18n.message.contol.PropertyBundleControl;
+import top.ysqorz.i18n.message.loader.ResourceLoader;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.text.MessageFormat;
@@ -133,12 +140,11 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         }
     }
 
-    @Override
     public List<ConstInterfaceMeta> loadAllCodes(Locale... supportedLocales) {
         try {
             PropertyBundleControl control = (PropertyBundleControl) this.control;
             List<ConstInterfaceMeta> constInterfaceMetas = new ArrayList<>();
-            String packagePath = ConstInterfaceMeta.class.getPackage().getName() + ".constant";
+            String packagePath = String.join(".", ConstInterfaceMeta.class.getPackage().getName(), "constant");
             for (String basename : basenameSet) {
                 ConstInterfaceMeta constInterfaceMeta = new ConstInterfaceMeta(packagePath, basename);
                 for (Locale locale : supportedLocales) {
@@ -146,7 +152,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
                     Enumeration<String> codes = bundle.getKeys();
                     while (codes.hasMoreElements()) {
                         String code = codes.nextElement();
-                        constInterfaceMeta.put(code, code);
+                        constInterfaceMeta.addProps(code, code);
                     }
                 }
                 constInterfaceMetas.add(constInterfaceMeta);
@@ -159,7 +165,29 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
     }
 
     @Override
-    public void generateConstInterfaces() {
+    public void generateConstInterfaces(File destDir, Locale... supportedLocales) throws IOException {
+        Configuration config = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+        File templateDir = CommonUtils.getClassPathResource(this.getClass(), "template");
+        config.setDirectoryForTemplateLoading(templateDir);
+        Template template = config.getTemplate("const_interface.ftl");
+        if (Objects.isNull(destDir)) {
+            File javaDir = CommonUtils.getStandardJavaDirByClass(this.getClass());
+            String packagePath = ConstInterfaceMeta.class.getPackage().getName() + ".constant";
+            destDir = new File(javaDir, packagePath.replace(".", File.separator));
+        }
+        List<ConstInterfaceMeta> constInterfaceMetas = loadAllCodes(supportedLocales);
+        if (Objects.isNull(constInterfaceMetas)) {
+            return;
+        }
+        for (ConstInterfaceMeta constInterfaceMeta : constInterfaceMetas) {
+            String filename = constInterfaceMeta.getClassName() + ".java";
+            try (OutputStream outputStream = Files.newOutputStream(new File(destDir, filename).toPath());
+                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
+                template.process(constInterfaceMeta, writer);
+            } catch (TemplateException e) {
+                throw new IOException(e);
+            }
+        }
     }
 
     public class ResourceBundleHolder {

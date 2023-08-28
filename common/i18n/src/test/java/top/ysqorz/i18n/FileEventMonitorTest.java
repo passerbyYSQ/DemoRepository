@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import top.ysqorz.i18n.api.FileEventMonitor;
+import top.ysqorz.i18n.common.FileEventMonitor;
 
 import java.io.File;
 import java.io.FileWriter;

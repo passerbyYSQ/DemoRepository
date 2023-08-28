@@ -1,4 +1,4 @@
-package top.ysqorz.i18n.api;
+package top.ysqorz.i18n.common;
 
 import java.io.File;
 import java.io.IOException;

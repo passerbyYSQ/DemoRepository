@@ -1,4 +1,6 @@
-package top.ysqorz.i18n.api;
+package top.ysqorz.i18n.message.contol;
+
+import top.ysqorz.i18n.message.loader.ResourceLoader;
 
 import java.io.*;
 import java.nio.charset.Charset;
