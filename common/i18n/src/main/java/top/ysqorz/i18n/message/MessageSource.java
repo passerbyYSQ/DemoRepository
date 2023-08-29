@@ -7,9 +7,10 @@ import java.util.Locale;
  * @date 2023/8/17
  */
 public interface MessageSource {
-    String getMessage(String code, Object[] args, String defaultMessage, Locale locale);
 
-    String getMessage(String code, Object[] args, Locale locale);
+    String getMessage(String code, String defaultMessage, Locale locale, Object... args);
+
+    String getMessage(String code, Locale locale, Object... args);
 
     void addMessage(String code, String value, Locale locale);
 

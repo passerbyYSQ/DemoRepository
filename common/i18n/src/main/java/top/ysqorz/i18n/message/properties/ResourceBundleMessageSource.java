@@ -32,9 +32,7 @@ public abstract class ResourceBundleMessageSource extends AbstractMessageSource 
     }
 
     public void addBasename(String... basename) {
-    }
-
-    public void setBasenameSet(LinkedHashSet<String> basenameSet) {
+        basenameSet.addAll(Arrays.asList(basename));
     }
 
     public Set<String> getBasenameSet() {

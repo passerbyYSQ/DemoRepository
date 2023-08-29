@@ -37,11 +37,13 @@ public class CommonUtilsTest {
         Assert.assertEquals("MyRootConfig", CommonUtils.toUpperCamelCase("myRootConfig"));
         Assert.assertEquals("Myrootconfig", CommonUtils.toUpperCamelCase("myrootconfig"));
         Assert.assertEquals("MyRootConfig", CommonUtils.toUpperCamelCase("MyRootConfig"));
+        Assert.assertEquals("I18nMessages", CommonUtils.toUpperCamelCase("i18n/messages"));
     }
 
     @Test
     public void testToScreamingSnake() {
         Assert.assertEquals("MY_ROOT_CONFIG", CommonUtils.toScreamingSnake("MyRootConfig"));
         Assert.assertEquals("MY_ORE_ROOT_CONFIG", CommonUtils.toScreamingSnake("MyORERootConfig"));
+        Assert.assertEquals("LOGIN_USERNAME", CommonUtils.toScreamingSnake("login.username"));
     }
 }

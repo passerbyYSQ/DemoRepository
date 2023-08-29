@@ -17,7 +17,7 @@ public class ConstInterfaceMeta {
 
     public ConstInterfaceMeta(String packagePath, String className) {
         this.packagePath = packagePath;
-        this.className = CommonUtils.toUpperCamelCase(className);
+        this.className = CommonUtils.toUpperCamelCase(className) + "Code";
     }
 
     public void addProps(String key, String value) {

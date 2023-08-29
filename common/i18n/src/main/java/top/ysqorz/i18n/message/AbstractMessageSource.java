@@ -13,7 +13,7 @@ public abstract class AbstractMessageSource implements MessageSource, ConstInter
     private MessageSource parentMessageSource;
 
     @Override
-    public String getMessage(String code, Object[] args, Locale locale) {
+    public String getMessage(String code, Locale locale, Object... args) {
         final MessageFormat messageFormat = getMessageFormat(code, locale);
         if (Objects.nonNull(messageFormat)) {
             // 有缓存。同MessageFormat不允许并发format，但是不同线程竞争同一个MessageFormat的几率非常小
@@ -28,7 +28,7 @@ public abstract class AbstractMessageSource implements MessageSource, ConstInter
     private String getMessageFromParent(String code, Object[] args, Locale locale) {
         MessageSource parent;
         while (Objects.nonNull(parent = getParentMessageSource())) {
-            String message = parent.getMessage(code, args, locale);
+            String message = parent.getMessage(code, locale, args);
             if (Objects.nonNull(message)) {
                 return message;
             }
@@ -37,8 +37,8 @@ public abstract class AbstractMessageSource implements MessageSource, ConstInter
     }
 
     @Override
-    public String getMessage(String code, Object[] args, String defaultMessage, Locale locale) {
-        String message = getMessage(code, args, locale);
+    public String getMessage(String code, String defaultMessage, Locale locale, Object... args) {
+        String message = getMessage(code, locale, args);
         return Objects.isNull(message) ? defaultMessage : message;
     }
 
@@ -63,6 +63,10 @@ public abstract class AbstractMessageSource implements MessageSource, ConstInter
 
     @Override
     public MessageSource getRootMessageSource() {
-        return null;
+        MessageSource current = this;
+        while (Objects.nonNull(current.getParentMessageSource())) {
+            current = current.getParentMessageSource();
+        }
+        return current;
     }
 }

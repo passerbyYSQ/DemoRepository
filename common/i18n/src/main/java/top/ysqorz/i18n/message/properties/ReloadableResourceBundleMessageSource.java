@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 /**
  * 可重新载入的资源包消息源，支持缓存过期和及时更新
@@ -28,7 +29,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ReloadableResourceBundleMessageSource extends ResourceBundleMessageSource
         implements PropertyBundleControl.BundleControlCallback,
-        FileEventMonitor.FileEventCallback<ReloadableResourceBundleMessageSource.ResourceBundleHolder> {
+        FileEventMonitor.FileEventCallback<ReloadableResourceBundleMessageSource.WatchedFilePayload> {
+
+    private static final Logger log = Logger.getLogger(ReloadableResourceBundleMessageSource.class.getSimpleName());
+
     /**
      * ResourceBundleHolder缓存，一级key为basename，二级key为locale
      */
@@ -42,7 +46,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
     /**
      * 资源文件监听器，通过监听文件修改来及时更新缓存
      */
-    private FileEventMonitor<ResourceBundleHolder> fileEventMonitor;
+    private FileEventMonitor<WatchedFilePayload> fileEventMonitor;
 
     public ReloadableResourceBundleMessageSource(ResourceLoader resourceLoader) throws IOException {
         this(resourceLoader, StandardCharsets.UTF_8, PropertyBundleControl.TTL_NO_EXPIRATION_CONTROL, false);
@@ -108,43 +112,51 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
 
     }
 
-    private ResourceBundleHolder getResourceBundleHolder(ResourceBundle bundle) {
-        Map<Locale, ResourceBundleHolder> bundleMap = cachedResourceBundles.get(bundle.getBaseBundleName());
-        if (Objects.isNull(bundleMap)) {
-            return null;
+    public static class WatchedFilePayload {
+        private final String basename;
+        private final Locale locale;
+
+        public WatchedFilePayload(String basename, Locale locale) {
+            this.basename = basename;
+            this.locale = locale;
         }
-        return bundleMap.get(bundle.getLocale());
     }
 
     /**
      * 加载资源文件并建ResourceBundle对象时会回调到该方法
      */
     @Override
-    public void onResourceBundleCreated(File bundleFile, ResourceBundle bundle) {
-        if (Objects.isNull(fileEventMonitor)) {
-            return;
-        }
+    public void onResourceBundleCreated(File bundleFile, ResourceBundle bundle, String basename, Locale locale) { // 此时的ResourceBundle还是半成品
         try {
             // 第一次载入和后续的重新载入都会回调到这里，watch内部会防止文件重复监听
-            ResourceBundleHolder bundleHolder = getResourceBundleHolder(bundle);
-            fileEventMonitor.watch(bundleFile, bundleHolder, StandardWatchEventKinds.ENTRY_MODIFY);
+            fileEventMonitor.watch(bundleFile, new WatchedFilePayload(basename, locale), StandardWatchEventKinds.ENTRY_MODIFY);
+            log.info(String.format("file watched: %s%n", bundleFile.getAbsolutePath()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onEventOccurred(File bundleFile, ResourceBundleHolder bundleHolder, WatchEvent.Kind<?> eventKind) {
-        if (StandardWatchEventKinds.ENTRY_MODIFY.equals(eventKind)) {
-            bundleHolder.refresh();
+    public void onEventOccurred(File bundleFile, WatchedFilePayload extra, WatchEvent.Kind<?> eventKind) {
+        if (!StandardWatchEventKinds.ENTRY_MODIFY.equals(eventKind)) {
+            return;
         }
+        Map<Locale, ResourceBundleHolder> holderMap = cachedResourceBundles.get(extra.basename);
+        if (Objects.isNull(holderMap)) {
+            return;
+        }
+        ResourceBundleHolder bundleHolder = holderMap.get(extra.locale);
+        if (Objects.isNull(bundleHolder)) {
+            return;
+        }
+        bundleHolder.refresh();
+        log.info(String.format("file modified: %s%n", bundleFile.getAbsolutePath()));
     }
 
-    public List<ConstInterfaceMeta> loadAllCodes(Locale... supportedLocales) {
+    public List<ConstInterfaceMeta> loadAllCodes(String packagePath, Locale... supportedLocales) {
         try {
             PropertyBundleControl control = (PropertyBundleControl) this.control;
             List<ConstInterfaceMeta> constInterfaceMetas = new ArrayList<>();
-            String packagePath = String.join(".", ConstInterfaceMeta.class.getPackage().getName(), "constant");
             for (String basename : basenameSet) {
                 ConstInterfaceMeta constInterfaceMeta = new ConstInterfaceMeta(packagePath, basename);
                 for (Locale locale : supportedLocales) {
@@ -164,18 +176,20 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         }
     }
 
+    /**
+     * @param subPackagePath 相对于 top.ysqorz.i18n.common.model 的路径
+     */
     @Override
-    public void generateConstInterfaces(File destDir, Locale... supportedLocales) throws IOException {
+    public void generateConstInterfaces(String subPackagePath, Locale... supportedLocales) throws IOException {
         Configuration config = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         File templateDir = CommonUtils.getClassPathResource(this.getClass(), "template");
         config.setDirectoryForTemplateLoading(templateDir);
         Template template = config.getTemplate("const_interface.ftl");
-        if (Objects.isNull(destDir)) {
-            File javaDir = CommonUtils.getStandardJavaDirByClass(this.getClass());
-            String packagePath = ConstInterfaceMeta.class.getPackage().getName() + ".constant";
-            destDir = new File(javaDir, packagePath.replace(".", File.separator));
-        }
-        List<ConstInterfaceMeta> constInterfaceMetas = loadAllCodes(supportedLocales);
+        String packagePath = CommonUtils.joinStr(".",
+                ConstInterfaceMeta.class.getPackage().getName(), "constant", subPackagePath.replace("/", "."));
+        File javaDir = CommonUtils.getStandardJavaDirByClass(this.getClass());
+        File destDir = new File(javaDir, packagePath.replace(".", File.separator));
+        List<ConstInterfaceMeta> constInterfaceMetas = loadAllCodes(packagePath, supportedLocales);
         if (Objects.isNull(constInterfaceMetas)) {
             return;
         }

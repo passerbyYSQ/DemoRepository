@@ -66,10 +66,13 @@ public class PropertyBundleControl extends ResourceBundle.Control {
         String bundleName = toBundleName(basename, locale);
         String resourceName = toResourceName(bundleName, "properties");
         File bundleFile = resourceLoader.getBundleFile(resourceName, format, loader);
+        if (Objects.isNull(bundleFile) || !bundleFile.exists()) {
+            return null;
+        }
         InputStream inputStream = Files.newInputStream(bundleFile.toPath());
-        ResourceBundle bundle = new PropertyResourceBundle(new InputStreamReader(inputStream, encoding));
+        PropertyResourceBundle bundle = new PropertyResourceBundle(new InputStreamReader(inputStream, encoding)); // 注意是半成品
         if (Objects.nonNull(callback)) {
-            callback.onResourceBundleCreated(bundleFile, bundle);
+            callback.onResourceBundleCreated(bundleFile, bundle, basename, locale);
         }
         return bundle;
     }
@@ -80,6 +83,6 @@ public class PropertyBundleControl extends ResourceBundle.Control {
     }
 
     public interface BundleControlCallback {
-        void onResourceBundleCreated(File bundleFile, ResourceBundle bundle);
+        void onResourceBundleCreated(File bundleFile, ResourceBundle bundle, String basename, Locale locale);
     }
 }

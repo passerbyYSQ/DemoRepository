@@ -1,6 +1,5 @@
 package top.ysqorz.i18n.message;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -11,5 +10,5 @@ import java.util.Locale;
  * @date 2023/8/24
  */
 public interface ConstInterfaceGenerator {
-    void generateConstInterfaces(File destDir, Locale... supportedLocales) throws IOException;
+    void generateConstInterfaces(String subPackagePath, Locale... supportedLocales) throws IOException;
 }
