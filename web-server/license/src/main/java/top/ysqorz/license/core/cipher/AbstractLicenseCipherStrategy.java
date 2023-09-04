@@ -1,7 +1,7 @@
 package top.ysqorz.license.core.cipher;
 
-import top.ysqorz.license.api.TrialLicenseCipherStrategy;
 import top.ysqorz.license.api.TrialLicense;
+import top.ysqorz.license.api.TrialLicenseCipherStrategy;
 import top.ysqorz.license.api.TrialLicenseTranslator;
 
 import java.io.File;
@@ -20,12 +20,7 @@ public abstract class AbstractLicenseCipherStrategy implements TrialLicenseCiphe
 
     @Override
     public TrialLicense decrypt(File cipherFile) {
-        try {
-            return translator.translate(decrypt0(cipherFile));
-        } catch (Exception e) {
-            e.printStackTrace(); // 打印解析错误的异常
-            return null;
-        }
+        return translator.translate(decrypt0(cipherFile));
     }
 
     protected abstract void encrypt0(String plainText, File cipherFile);

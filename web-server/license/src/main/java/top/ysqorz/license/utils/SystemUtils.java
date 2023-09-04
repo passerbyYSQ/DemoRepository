@@ -1,12 +1,8 @@
 package top.ysqorz.license.utils;
 
-import org.junit.Test;
-
 import java.net.*;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class SystemUtils {
