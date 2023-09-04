@@ -45,7 +45,7 @@ public class FileEventMonitorTest {
         Object extra = new Object();
         fileEventMonitor.watch(file, extra, StandardWatchEventKinds.ENTRY_MODIFY);
         fileEventMonitor.watch(new File("E:\\Project\\IdeaProjects\\DemoRepository\\common\\i18n\\target\\test-classes\\demo.txt"),
-                null, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
+                null, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
         fileEventMonitor.startWatch((file1, extra1, eventKind) ->
                 System.out.printf("Detected file event: %s, event: %s, time: %s%n", file1.getAbsolutePath(), eventKind, new Date())
         );

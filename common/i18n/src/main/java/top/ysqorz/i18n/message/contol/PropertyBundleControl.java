@@ -6,10 +6,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * 单例即可
@@ -75,6 +72,16 @@ public class PropertyBundleControl extends ResourceBundle.Control {
             callback.onResourceBundleCreated(bundleFile, bundle, basename, locale);
         }
         return bundle;
+    }
+
+    @Override
+    public Locale getFallbackLocale(String baseName, Locale locale) {
+        return null;
+    }
+
+    @Override
+    public List<String> getFormats(String baseName) {
+        return Collections.singletonList("java.properties");
     }
 
     @Override

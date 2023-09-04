@@ -1,15 +1,11 @@
 package top.ysqorz.i18n.common;
 
-import com.sun.istack.internal.Nullable;
-
 import java.io.File;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ...
@@ -18,6 +14,13 @@ import java.util.Optional;
  * @date 2023/8/25
  */
 public class CommonUtils {
+    public static List<String> splitStr(String str, String delimiter) {
+        return Arrays.stream(str.split(delimiter))
+                .map(String::trim)
+                .filter(s -> !isEmpty(s))
+                .collect(Collectors.toList());
+    }
+
     /**
      * 使用指定分隔符，拼接字符串
      *
@@ -25,7 +28,7 @@ public class CommonUtils {
      * @param strs      需要拼接的多个字符串，可以为null
      * @return 拼接后的新字符串
      */
-    public static String joinStr(String delimiter, @Nullable String... strs) {
+    public static String joinStr(String delimiter, String... strs) {
         if (isEmpty(strs)) {
             return "";
         }

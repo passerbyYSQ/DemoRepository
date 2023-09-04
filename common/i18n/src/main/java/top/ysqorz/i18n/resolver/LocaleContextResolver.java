@@ -1,7 +1,7 @@
 package top.ysqorz.i18n.resolver;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * ...
@@ -12,5 +12,5 @@ import java.util.Locale;
 public interface LocaleContextResolver {
     Locale resolveLocaleContext();
 
-    List<Locale> getSupportedLocales();
+    Set<Locale> resolveSupportedLocales();
 }

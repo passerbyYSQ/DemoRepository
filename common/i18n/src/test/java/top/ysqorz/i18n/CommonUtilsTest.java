@@ -13,6 +13,7 @@ import java.io.File;
  * @date 2023/8/25
  */
 public class CommonUtilsTest {
+
     @Test
     public void testGetJavaDir() {
         File javaDir = CommonUtils.getStandardJavaDirByClass(this.getClass());

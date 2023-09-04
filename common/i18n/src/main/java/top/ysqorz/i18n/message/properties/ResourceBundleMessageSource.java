@@ -19,16 +19,19 @@ public abstract class ResourceBundleMessageSource extends AbstractMessageSource 
     protected ClassLoader classLoader;
 
     public ResourceBundleMessageSource(ResourceBundle.Control control) {
-        this(control, null);
-    }
-
-    public ResourceBundleMessageSource(ResourceBundle.Control control, ClassLoader classLoader) {
         this.control = control;
-        this.classLoader = Objects.isNull(classLoader) ? this.getClass().getClassLoader() : classLoader;
     }
 
     protected ResourceBundle getResourceBundle(String basename, Locale locale) {
-        return ResourceBundle.getBundle(basename, locale, classLoader, control); // ResourceBundle内部有缓存
+        if (Objects.isNull(classLoader)) {
+            classLoader = getClass().getClassLoader();
+        }
+        try {
+            return ResourceBundle.getBundle(basename, locale, classLoader, control); // ResourceBundle内部有缓存
+        } catch (Exception e) {
+            e.printStackTrace(); // 获取不到会抛出异常MissingResourceException
+            return null;
+        }
     }
 
     public void addBasename(String... basename) {

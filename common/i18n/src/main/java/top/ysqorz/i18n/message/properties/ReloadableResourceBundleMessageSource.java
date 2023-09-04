@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -74,6 +75,9 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
     protected MessageFormat getMessageFormat(String code, Locale locale) {
         for (String basename : basenameSet) {
             ResourceBundleHolder bundleHolder = getResourceBundleHolder(basename, locale);
+            if (Objects.isNull(bundleHolder)) {
+                continue;
+            }
             MessageFormat messageFormat = bundleHolder.getMessageFormat(code);
             if (Objects.nonNull(messageFormat)) {
                 return messageFormat;
@@ -93,7 +97,12 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
             if (Objects.isNull(bundleHolder = bundleMap.get(locale))) { // 双重检测锁
                 synchronized (cachedResourceBundles) {
                     if (Objects.isNull(bundleHolder = bundleMap.get(locale))) {
-                        bundleHolder = new ResourceBundleHolder(basename, locale);
+                        ResourceBundle bundle = getResourceBundle(basename, locale);// 已禁用缓存，载入ResourceBundle
+                        if (Objects.isNull(bundle)) {
+                            log.log(Level.WARNING, String.format("Load resource bundle failed, resource file missing, basename: %s, locale: %s", basename, locale));
+                            return null;
+                        }
+                        bundleHolder = new ResourceBundleHolder(bundle);
                         bundleMap.put(locale, bundleHolder);
                     }
                 }
@@ -130,7 +139,6 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         try {
             // 第一次载入和后续的重新载入都会回调到这里，watch内部会防止文件重复监听
             fileEventMonitor.watch(bundleFile, new WatchedFilePayload(basename, locale), StandardWatchEventKinds.ENTRY_MODIFY);
-            log.info(String.format("file watched: %s%n", bundleFile.getAbsolutePath()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -161,6 +169,9 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
                 ConstInterfaceMeta constInterfaceMeta = new ConstInterfaceMeta(packagePath, basename);
                 for (Locale locale : supportedLocales) {
                     ResourceBundle bundle = control.newBundle(basename, locale, null, classLoader, true);
+                    if (Objects.isNull(bundle)) {
+                        continue;
+                    }
                     Enumeration<String> codes = bundle.getKeys();
                     while (codes.hasMoreElements()) {
                         String code = codes.nextElement();
@@ -177,7 +188,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
     }
 
     /**
-     * @param subPackagePath 相对于 top.ysqorz.i18n.common.model 的路径
+     * @param subPackagePath 相对于 top.ysqorz.i18n.common.model.constant 的路径
      */
     @Override
     public void generateConstInterfaces(String subPackagePath, Locale... supportedLocales) throws IOException {
@@ -194,8 +205,14 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
             return;
         }
         for (ConstInterfaceMeta constInterfaceMeta : constInterfaceMetas) {
-            String filename = constInterfaceMeta.getClassName() + ".java";
-            try (OutputStream outputStream = Files.newOutputStream(new File(destDir, filename).toPath());
+            File constFile = new File(destDir, constInterfaceMeta.getClassName() + ".java");
+            File parentDir = constFile.getParentFile();
+            if (!parentDir.exists()) {
+                if (!parentDir.mkdirs()) {
+                    throw new IOException("Dir created failed: " + parentDir.getAbsolutePath());
+                }
+            }
+            try (OutputStream outputStream = Files.newOutputStream(constFile.toPath());
                  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
                 template.process(constInterfaceMeta, writer);
             } catch (TemplateException e) {
@@ -219,8 +236,8 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
          */
         private final Map<String, MessageFormat> cachedMessageFormats = new HashMap<>();
 
-        public ResourceBundleHolder(String basename, Locale locale) {
-            this.resourceBundle = getResourceBundle(basename, locale); // 已禁用缓存，载入ResourceBundle
+        public ResourceBundleHolder(ResourceBundle bundle) {
+            this.resourceBundle = bundle;
             updateNextExpiredTimestamp();
         }
 
@@ -269,7 +286,13 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         }
 
         private void doRefresh() {
-            resourceBundle = getResourceBundle(resourceBundle.getBaseBundleName(), resourceBundle.getLocale()); // 已禁用缓存，载入ResourceBundle
+            String basename = resourceBundle.getBaseBundleName();
+            Locale locale = resourceBundle.getLocale();
+            resourceBundle = getResourceBundle(basename, locale); // 已禁用缓存，载入ResourceBundle
+            if (Objects.isNull(resourceBundle)) {
+                log.log(Level.WARNING, String.format("Refresh failed, resource file missing, basename: %s, locale: %s", basename, locale));
+                return;
+            }
             cachedMessageFormats.clear();
             Enumeration<String> keys = resourceBundle.getKeys();
             while (keys.hasMoreElements()) {

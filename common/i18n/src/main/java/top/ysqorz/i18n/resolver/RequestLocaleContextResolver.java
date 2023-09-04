@@ -1,6 +1,7 @@
 package top.ysqorz.i18n.resolver;
 
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * ...
@@ -14,4 +15,10 @@ public class RequestLocaleContextResolver extends AbstractLocaleContextResolver 
         // 请求头 -> 请求参数 -> 会话参数
         return null;
     }
+
+    @Override
+    public Set<Locale> getSupportedLocales() {
+        return null;
+    }
+
 }

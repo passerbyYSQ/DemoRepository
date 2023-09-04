@@ -22,18 +22,10 @@ public abstract class AbstractMessageSource implements MessageSource, ConstInter
                 return messageFormat.format(resolveArgs(args));
             }
         }
-        return getMessageFromParent(code, args, locale);
-    }
-
-    private String getMessageFromParent(String code, Object[] args, Locale locale) {
-        MessageSource parent;
-        while (Objects.nonNull(parent = getParentMessageSource())) {
-            String message = parent.getMessage(code, locale, args);
-            if (Objects.nonNull(message)) {
-                return message;
-            }
+        if (Objects.isNull(parentMessageSource)) {
+            return null;
         }
-        return null;
+        return parentMessageSource.getMessage(code, locale, args);
     }
 
     @Override
