@@ -13,5 +13,6 @@
 
     <modules>
         <module>web-base</module>
+        <module>i18n</module>
     </modules>
 </project>

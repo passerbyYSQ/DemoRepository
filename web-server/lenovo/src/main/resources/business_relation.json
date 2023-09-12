@@ -1,0 +1,22 @@
+{
+  "relations": [
+    "rBiCntnts",
+    "rBiRef",
+    "rBomItmRvDsc",
+    "rBomItmRvRef",
+    "rBomItmRvSpc",
+    "rChgCtrl",
+    "rCollector",
+    "rDcBrkDwn",
+    "rDgtlMdDrft",
+    "rDsgnDtDpnd",
+    "rDsgnFmlyTbl",
+    "rPsdPrcRtData",
+    "rPsdPrcRtFrm",
+    "rRtFrmAttch",
+    "rUserMsgEvt",
+    "rUsrBiSub",
+    "rVaultFolder"
+  ]
+
+}

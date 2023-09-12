@@ -23,6 +23,7 @@
         <module>spring-batch</module>
         <module>signature</module>
         <module>transmittable-thread-local</module>
+        <module>lenovo</module>
     </modules>
 
     <dependencies>
@@ -44,6 +45,15 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <!--  配置部门私有仓库   -->
+        <repository>
+            <id>zwplm-maven-public</id>
+            <name>zwplm-maven-public</name>
+            <url>http://192.168.17.200:8088/repository/zwplm-maven-public/</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <!-- SpringBoot web应用的胖jar的打包插件，它会检查是否有且只有一个主类，所以非web模块不要声明该插件，否则install会报错 -->
@@ -53,5 +63,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

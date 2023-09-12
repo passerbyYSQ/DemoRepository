@@ -17,21 +17,24 @@ import java.util.stream.Collectors;
  * @author yaoshiquan
  * @date 2023/8/28
  */
-public class ClassPathPropsLocaleContextResolver extends AbstractLocaleContextResolver {
-    private final String configPath;
+public class PropsLocaleContextResolver extends AbstractLocaleContextResolver {
+    private final File configFile;
     private Properties props;
 
-    public ClassPathPropsLocaleContextResolver() throws IOException {
-        this("config/locale.properties");
+    public PropsLocaleContextResolver() throws IOException {
+        this("config/i18n.properties");
     }
 
-    public ClassPathPropsLocaleContextResolver(String configPath) throws IOException {
-        this.configPath = configPath;
+    public PropsLocaleContextResolver(String configPath) throws IOException {
+        this(CommonUtils.getClassPathResource(PropsLocaleContextResolver.class, configPath));
+    }
+
+    public PropsLocaleContextResolver(File configFile) throws IOException {
+        this.configFile = configFile;
         loadProps();
     }
 
     public void loadProps() throws IOException {
-        File configFile = CommonUtils.getClassPathResource(getClass(), configPath);
         if (Objects.isNull(configFile) || !configFile.exists()) {
             throw new FileNotFoundException();
         }

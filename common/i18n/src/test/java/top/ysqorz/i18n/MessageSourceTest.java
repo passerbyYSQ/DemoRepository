@@ -5,7 +5,8 @@ import org.junit.Test;
 import top.ysqorz.i18n.message.loader.ClassPathResourceLoader;
 import top.ysqorz.i18n.message.properties.ReloadableResourceBundleMessageSource;
 import top.ysqorz.i18n.message.properties.ResourceBundleMessageSource;
-import top.ysqorz.i18n.resolver.ClassPathPropsLocaleContextResolver;
+import top.ysqorz.i18n.message.properties.adapter.OREMessageSourceAdapter;
+import top.ysqorz.i18n.resolver.PropsLocaleContextResolver;
 import top.ysqorz.i18n.resolver.LocaleContextResolver;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class MessageSourceTest {
     @Before
     public void init() throws IOException {
         resourceLoader = new ClassPathResourceLoader();
-        localeContextResolver = new ClassPathPropsLocaleContextResolver();
+        localeContextResolver = new PropsLocaleContextResolver();
     }
 
     @Test
@@ -42,5 +43,10 @@ public class MessageSourceTest {
         messageSource.addBasename("i18n/messages");
         Locale[] supportedLocales = localeContextResolver.resolveSupportedLocales().toArray(new Locale[0]);
         messageSource.generateConstInterfaces("omf", supportedLocales);
+    }
+
+    @Test
+    public void testOREMessageSource() throws IOException {
+        OREMessageSourceAdapter.main(null);
     }
 }

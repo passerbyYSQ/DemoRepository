@@ -42,7 +42,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
     /**
      * 缓存的有效期
      */
-    private final long cacheMillis;
+    protected long cacheMillis;
 
     /**
      * 资源文件监听器，通过监听文件修改来及时更新缓存

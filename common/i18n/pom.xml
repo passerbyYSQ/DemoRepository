@@ -3,19 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>DemoRepository</artifactId>
+        <artifactId>common</artifactId>
         <groupId>top.ysqorz</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>i18n</artifactId>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
+    <name>i18n</name>
 
     <dependencies>
         <dependency>
@@ -32,6 +27,12 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.32</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zwteamworks.core</groupId>
+            <artifactId>core_bootstrap</artifactId>
+            <version>2.1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
