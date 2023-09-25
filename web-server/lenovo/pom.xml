@@ -12,6 +12,14 @@
     <groupId>top.ysqorz.lenovo</groupId>
     <artifactId>lenovo</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <!-- SpringBoot web应用的胖jar的打包插件，它会检查是否有且只有一个主类，所以非web模块不要声明该插件，否则install会报错 -->

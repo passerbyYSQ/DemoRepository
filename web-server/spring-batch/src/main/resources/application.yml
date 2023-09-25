@@ -1,3 +1,13 @@
+custom:
+  login:
+    default-password: Zwsoft.2023
+  csv:
+    # 账号和用户
+    account-user: csv/02 用户.csv
+    # 用户组成员
+    group-member: csv/02 用户组成员.csv
+
+
 spring:
   datasource:
     # batch的使用的数据源
@@ -15,8 +25,8 @@ spring:
     # 目标数据源
     target-data:
       username: root
-      password: zwplm2022
-      url: jdbc:mysql://192.168.9.162:3306/default_default?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
+      password: ysqJYKL2010
+      url: jdbc:mysql://127.0.0.1:3306/default_default?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useUnicode=true
       driver-class-name: com.mysql.cj.jdbc.Driver
   # 当有多个DataSource时，如果不指定主数据源，sql.nit不会执行:
   sql:

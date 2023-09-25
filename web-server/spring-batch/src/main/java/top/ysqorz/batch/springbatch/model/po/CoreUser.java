@@ -1,15 +1,18 @@
-package top.ysqorz.batch.springbatch.model;
+package top.ysqorz.batch.springbatch.model.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+import top.ysqorz.batch.springbatch.model.Constant;
 
 /**
  * 用户
  */
 @TableName("CoreUser")
 @Data
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 public class CoreUser extends BaseEntity {
 
@@ -88,4 +91,8 @@ public class CoreUser extends BaseEntity {
     @TableField("AuthoriseLevel")
     private String authoriseLevel;
 
+    @Override
+    public String getClassName() {
+        return Constant.CLASS_CORE_USER;
+    }
 }

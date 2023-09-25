@@ -1,7 +1,7 @@
 package top.ysqorz.batch.springbatch.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import top.ysqorz.batch.springbatch.model.BaseEntity;
+import top.ysqorz.batch.springbatch.model.po.BaseEntity;
 
 /**
  * 不加这个Mapper会报错：com.baomidou.mybatisplus.core.exceptions.MybatisPlusException: can not find lambda cache

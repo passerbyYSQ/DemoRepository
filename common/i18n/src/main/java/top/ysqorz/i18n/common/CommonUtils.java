@@ -33,12 +33,19 @@ public class CommonUtils {
             return "";
         }
         StringBuilder sbd = new StringBuilder();
-        for (int i = 0; i < strs.length; i++) {
-            if (isEmpty(strs[i].trim())) {
+        int idx = 0;
+        while (idx < strs.length) {
+            String trimmed;
+            if (isEmpty(strs[idx]) || isEmpty(trimmed = strs[idx].trim())) {
+                idx++;
                 continue;
             }
-            sbd.append(strs[i].trim());
-            if (!isEmpty(sbd) && i < strs.length - 1 && !isEmpty(strs[i + 1])) {
+            sbd.append(trimmed);
+            idx++;
+            while (idx < strs.length && isEmpty(strs[idx]) && isEmpty(strs[idx].trim())) {
+                idx++;
+            }
+            if (idx < strs.length) {
                 sbd.append(delimiter);
             }
         }
@@ -52,7 +59,9 @@ public class CommonUtils {
      * @return 是否为空
      */
     public static boolean isEmpty(Object obj) {
-        if (obj instanceof Optional) {
+        if (obj == null) {
+            return true;
+        } else if (obj instanceof Optional) {
             return !((Optional<?>) obj).isPresent();
         } else if (obj instanceof CharSequence) {
             return ((CharSequence) obj).length() == 0;
@@ -82,43 +91,44 @@ public class CommonUtils {
     public static String toUpperCamelCase(String str) {
         StringBuilder result = new StringBuilder();
         char[] chs = str.toCharArray();
-        // 前导大写超过两个，则保留
         int idx = 0;
-        while (idx < chs.length && Character.isUpperCase(chs[idx])) {
-            idx++;
-        }
-        if (idx > 1) {
-            result.append(chs, 0, idx);
-        } else {
-            idx = 0;
-        }
-        for (int i = idx; i < chs.length; ) {
-            if (i < chs.length - 1) {
-                idx = -2;
-                if (i == 0 && Character.isLetter(chs[i])) { // 首字母大写
-                    idx = -1;
+        while (idx < chs.length) {
+            int p = -2;
+            if (idx == 0 && Character.isLetter(chs[idx])) { // 首字母大写
+                p = -1;
+            }
+            if (!isLetterOrNum(chs[idx]) && idx < chs.length - 1 && isLetterOrNum(chs[idx + 1])) { // 数字和字母算作一类
+                p = idx;
+            }
+            if (p != -2) {
+                idx = p + 1;
+                while (idx < chs.length && Character.isUpperCase(chs[idx])) {
+                    idx++;
                 }
-                if (!isLetterOrNum(chs[i]) && isLetterOrNum(chs[i + 1])) { // 数字和字母算作一类
-                    idx = i;
+                // 连续大写超过三个则保留 example: simple_UIService_impl => SimpleUIServiceImpl
+                int cnt = idx - p - 1;
+                if (cnt >= 3) {
+                    result.append(chs, p + 1, cnt);
+                    continue;
                 }
-                if (idx != -2) {
-                    // example: My_Root_Config
-                    result.append(Character.toUpperCase(chs[idx + 1]));
-                    int p = idx + 2;
-                    while (p < chs.length && Character.isUpperCase(chs[p])) {
-                        result.append(Character.toLowerCase(chs[p]));
-                        p++;
+                // example: My_Root_Config => MyRootConfig
+                idx = p + 1; // 重置idx
+                if (idx < chs.length) {
+                    result.append(Character.toUpperCase(chs[idx]));
+                    idx++;
+                    while (idx < chs.length && Character.isUpperCase(chs[idx])) {
+                        result.append(Character.toLowerCase(chs[idx]));
+                        idx++;
                     }
-                    i = p;
                     continue;
                 }
             }
             // 去除前导数字；去除连续的特殊字符
             // 其他没有任何可以区分单词的情况，如果是字母或数字，则保留本身
-            if (result.length() > 0 && isLetterOrNum(chs[i])) {
-                result.append(chs[i]);
+            if (idx < chs.length && result.length() > 0 && isLetterOrNum(chs[idx])) {
+                result.append(chs[idx]);
             }
-            i++;
+            idx++;
         }
         return result.toString();
     }

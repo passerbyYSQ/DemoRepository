@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
+import top.ysqorz.batch.springbatch.mapper.IBaseEntityMapper;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -73,7 +74,8 @@ public class SqlSessionFactoryConfig extends MybatisPlusAutoConfiguration {
             // 注意不能写成sqlSessionFactory(dataSource)，这样调用的是代理之后方法
             SqlSessionFactory sqlSessionFactory = super.sqlSessionFactory(dataSource);
             // Mapper接口的包路径
-            sqlSessionFactory.getConfiguration().addMappers("top.ysqorz.batch.springbatch.mapper");
+            String mapperPackage = IBaseEntityMapper.class.getPackage().getName();
+            sqlSessionFactory.getConfiguration().addMappers(mapperPackage);
             // 分页插件
             sqlSessionFactory.getConfiguration().addInterceptor(mybatisPlusInterceptor());
             return sqlSessionFactory;

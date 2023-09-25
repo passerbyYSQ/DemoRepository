@@ -1,4 +1,4 @@
-package top.ysqorz.batch.springbatch.batch;
+package top.ysqorz.batch.springbatch.export;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -18,17 +17,17 @@ import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ObjectUtils;
+import top.ysqorz.batch.springbatch.batch.MyBatisPlusPagingReader;
 import top.ysqorz.batch.springbatch.mapper.ICoreUserMapper;
-import top.ysqorz.batch.springbatch.model.CoreUser;
+import top.ysqorz.batch.springbatch.model.po.CoreUser;
 
 import javax.annotation.Resource;
 import java.util.Date;
 
-@EnableBatchProcessing
-@Configuration
+//@EnableBatchProcessing
+//@Configuration
 @Slf4j
 public class CoreUserDb2CsvJobConfig {
     @Resource
@@ -74,12 +73,13 @@ public class CoreUserDb2CsvJobConfig {
     }
 
     @Bean
-    public Step coreUserDb2CsvStep(ItemReader<CoreUser> coreUserReader) {
+    public Step coreUserDb2CsvStep(ItemReader<CoreUser> coreUserReader, ItemProcessor<CoreUser, CoreUser> coreUserProcessor,
+                                   FlatFileItemWriter<CoreUser> coreUserCsvWriter) {
         return stepBuilderFactory.get("coreUserDb2CsvStep")
                 .<CoreUser, CoreUser>chunk(3)
                 .reader(coreUserReader)
-                .processor(coreUserProcessor())
-                .writer(coreUserPrinter()) // 调用带有@Bean的方法会返回代理对象？？会再创建一个吗
+                .processor(coreUserProcessor)
+                .writer(coreUserCsvWriter) // 调用带有@Bean的方法会返回代理对象？？会再创建一个吗
                 .build();
     }
 

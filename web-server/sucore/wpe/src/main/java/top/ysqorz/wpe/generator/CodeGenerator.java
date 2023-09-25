@@ -1,7 +1,6 @@
 package top.ysqorz.wpe.generator;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -147,7 +146,7 @@ public class CodeGenerator {
     public static JSONObject loadClassTree() throws FileNotFoundException {
         //File classPath = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX);
         String path = String.join(File.separator, ResourceUtils.CLASSPATH_URL_PREFIX, "json", "sucore_class.json");
-        String json = FileReader.create(ResourceUtils.getFile(path)).readString();
-        return JSONUtil.parseObj(json).getJSONObject("data");
+        String json = FileUtil.readUtf8String(ResourceUtils.getFile(path));
+        return JSONUtil.parseObj(json);
     }
 }

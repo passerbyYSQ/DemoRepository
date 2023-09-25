@@ -51,7 +51,7 @@ public class ZWTUtils {
     public static List<JSONObject> queryObject(String className, JSONObject filter) {
         JSONObject params = new JSONObject()
                 .set("clsName", className)
-                .set("filter", filter);
+                .set("filter", filter.set("IsDepleted", "-"));
         IPCRequestDTO reqDTO = new IPCRequestDTO("QueryObject", "clsName", params);
         return dispatch(reqDTO).getBeanList("objset", JSONObject.class);
     }

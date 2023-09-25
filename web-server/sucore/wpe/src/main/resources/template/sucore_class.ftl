@@ -15,8 +15,10 @@ import java.io.Serializable;
  */<#if !isDynamic>
 @TableName("${className}")</#if>
 @Data
+@Accessors(chain = true)
 @EqualsAndHashCode<#if parent??>(callSuper = true)</#if>
 public<#if isAbstract> abstract</#if> class ${className}<#if parent??> extends ${parent.className}</#if> implements Serializable {
+
     <#if !isDynamic>
     @TableField(exist = false)</#if>
     private static final long serialVersionUID = 1L;
