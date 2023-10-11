@@ -8,7 +8,8 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.springframework.util.ResourceUtils;
-import top.ysqorz.wpe.model.SucoreClassDataModel;
+import top.ysqorz.wpe.model.AttributeMeta;
+import top.ysqorz.wpe.model.SucoreClassMeta;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -35,12 +36,12 @@ public class CodeGenerator {
 //                .addAttr(Long.class, "userID", "用户标识")
 //                .addAttr(Integer.class, "age", "年龄");
         File srcPath = FileUtil.getParent(classPath, 2);
-        List<SucoreClassDataModel> modeList = loadDataModel();
+        List<SucoreClassMeta> modeList = loadDataModel();
 
         List<String> subPathList = new ArrayList<>();
         Collections.addAll(subPathList, "src", "main", "java");
         Collections.addAll(subPathList, CodeGenerator.class.getPackage().getName().split("\\."));
-        for (SucoreClassDataModel dataModel : modeList) {
+        for (SucoreClassMeta dataModel : modeList) {
             List<String> tempSubPathList = new ArrayList<>(subPathList);
             tempSubPathList.add(dataModel.getModule());
             File outputDir = new File(srcPath, String.join(File.separator, tempSubPathList));
@@ -56,17 +57,17 @@ public class CodeGenerator {
         }
     }
 
-    public static List<SucoreClassDataModel> loadDataModel() throws FileNotFoundException {
+    public static List<SucoreClassMeta> loadDataModel() throws FileNotFoundException {
         JSONObject tree = loadClassTree();
         Queue<JSONObject> queue = new LinkedList<>();
         queue.offer(tree);
-        List<SucoreClassDataModel> modelList = new ArrayList<>();
+        List<SucoreClassMeta> modelList = new ArrayList<>();
         while (!queue.isEmpty()) {
             JSONObject current = queue.poll();
 //            if (current.getBool("isDynamic", Boolean.FALSE)) { // 过滤动态类
 //                continue;
 //            }
-            SucoreClassDataModel dataModel = transformDataModel(current);
+            SucoreClassMeta dataModel = transformDataModel(current);
             modelList.add(dataModel);
 
             List<JSONObject> children = current.getBeanList("children", JSONObject.class);
@@ -93,24 +94,24 @@ public class CodeGenerator {
         return modelList;
     }
 
-    public static SucoreClassDataModel transformDataModel(JSONObject current) {
+    public static SucoreClassMeta transformDataModel(JSONObject current) {
         String module = current.getStr("module");
         String packageName = CodeGenerator.class.getPackage().getName() + "." + module;
-        SucoreClassDataModel dataModel = new SucoreClassDataModel()
+        SucoreClassMeta dataModel = new SucoreClassMeta()
                 .setModule(module)
                 .setPackageName(packageName)
                 .setClassName(current.getStr("className"))
                 .setClassComment(current.getStr("classDisplayLabel"))
                 .setIsAbstract(current.getBool("isAbstract", Boolean.FALSE))
                 .setIsDynamic(current.getBool("isDynamic", Boolean.FALSE))
-                .setParent(current.get("ParentDataModel", SucoreClassDataModel.class));
+                .setParent(current.get("ParentDataModel", SucoreClassMeta.class));
         List<JSONObject> normalAttaches = current.getBeanList("normalAttaches", JSONObject.class);
         List<JSONObject> constants = current.getBeanList("constants", JSONObject.class);
         if (ObjectUtil.isNotEmpty(normalAttaches)) {
-            List<SucoreClassDataModel.Attribute> attrList = normalAttaches.stream()
-//                    .filter(attr -> {
-//                        return "PERSISTENT".equalsIgnoreCase(attr.getStr("storageType")); // 过滤动态属性，只保留持久属性
-//                    })
+            List<AttributeMeta> attrList = normalAttaches.stream()
+                    .filter(attr -> {
+                        return "PERSISTENT".equalsIgnoreCase(attr.getStr("storageType")); // 过滤动态属性，只保留持久属性
+                    })
                     .map(attr -> {
                         StringBuilder comment = new StringBuilder(attr.getStr("displayName"));
                         String attrName = attr.getStr("attrName");
@@ -126,7 +127,7 @@ public class CodeGenerator {
                                 comment.append("，").append(constValue).append("对象的UUID");
                             }
                         }
-                        return new SucoreClassDataModel.Attribute(attrName, comment.toString());
+                        return new AttributeMeta(attrName, comment.toString());
                     })
                     .collect(Collectors.toList());
             dataModel.setAttrs(attrList);

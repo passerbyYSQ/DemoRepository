@@ -137,4 +137,98 @@ public class CommonUtils {
                 .filter(s -> !ObjectUtils.isEmpty(s))
                 .collect(collector);
     }
+
+    public static boolean isLetterOrNum(char c) {
+        return Character.isLetter(c) || Character.isDigit(c);
+    }
+
+    /**
+     * 大写驼峰
+     *
+     * @param str 需处理字符串
+     * @return 大写驼峰字符串
+     */
+    public static String toUpperCamelCase(String str) {
+        StringBuilder result = new StringBuilder();
+        char[] chs = str.toCharArray();
+        int idx = 0;
+        while (idx < chs.length) {
+            int p = -2;
+            if (idx == 0 && Character.isLetter(chs[idx])) { // 首字母大写
+                p = -1;
+            }
+            if (idx < chs.length - 1 && !isLetterOrNum(chs[idx]) && isLetterOrNum(chs[idx + 1])) { // 数字和字母算作一类
+                p = idx;
+            }
+            if (p != -2) {
+                idx = p + 1;
+                while (idx < chs.length && Character.isUpperCase(chs[idx])) {
+                    idx++;
+                }
+                // 连续大写超过三个则保留 example: simple_UIService_impl => SimpleUIServiceImpl
+                int cnt = idx - p - 1;
+                if (cnt >= 3) {
+                    result.append(chs, p + 1, cnt);
+                    continue;
+                }
+                // example: My_Root_Config => MyRootConfig
+                idx = p + 1; // 重置idx
+                if (idx < chs.length) {
+                    result.append(Character.toUpperCase(chs[idx]));
+                    idx++;
+                    while (idx < chs.length && Character.isUpperCase(chs[idx])) {
+                        result.append(Character.toLowerCase(chs[idx]));
+                        idx++;
+                    }
+                    continue;
+                }
+            }
+            // 去除前导数字；去除连续的特殊字符
+            // 其他没有任何可以区分单词的情况，如果是字母或数字，则保留本身
+            if (idx < chs.length && result.length() > 0 && isLetterOrNum(chs[idx])) {
+                result.append(chs[idx]);
+            }
+            idx++;
+        }
+        return result.toString();
+    }
+
+
+    /**
+     * 大写蛇形命名 ABC_ROOT_CSA
+     *
+     * @param str 需处理字符串
+     * @return 蛇形命名字符串
+     */
+    public static String toScreamingSnake(String str) {
+        StringBuilder result = new StringBuilder();
+        char[] chs = str.toCharArray();
+        for (int i = 0; i < chs.length; i++) {
+            // result.length() == 0 用于去除前导的数字
+            if ((result.length() == 0 && Character.isLetter(chs[i])) || (result.length() > 0 && isLetterOrNum(chs[i]))) {
+                result.append(Character.toUpperCase(chs[i]));
+            }
+            if (i < str.length() - 1) {
+                // example: MyRootConfig => MY_ROOT_CONFIG
+                if (Character.isLetter(chs[i]) && Character.isLetter(chs[i + 1]) &&
+                        Character.isLowerCase(chs[i]) && Character.isUpperCase(chs[i + 1])) {
+                    result.append("_");
+                }
+                // example: login.name => LOGIN_NAME
+                // result.length() > 0 用于去除前导的非字母
+                if (result.length() > 0 && !Character.isLetter(chs[i]) && Character.isLetter(chs[i + 1])) {
+                    result.append("_");
+                }
+            }
+            // example: MyORERootConfig => MY_ORE_ROOT_CONFIG
+            if (i < str.length() - 2) {
+                if (Character.isLetter(chs[i]) && Character.isLetter(chs[i + 1]) && Character.isLetter(chs[i + 2]) &&
+                        Character.isUpperCase(chs[i]) && Character.isUpperCase(chs[i + 1]) && Character.isLowerCase(chs[i + 2])) {
+                    result.append("_");
+                }
+            }
+        }
+        return result.toString();
+    }
+
 }

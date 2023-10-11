@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;</#if>
 import lombok.Data;
 import lombok.EqualsAndHashCode;<#if parent?? && packageName != parent.packageName>
+import lombok.experimental.Accessors;
 import ${parent.packageName}.${parent.className};</#if>
 
 import java.io.Serializable;
