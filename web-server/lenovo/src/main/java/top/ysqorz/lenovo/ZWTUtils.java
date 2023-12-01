@@ -69,6 +69,23 @@ public class ZWTUtils {
         }
     }
 
+    public static JSONObject createAccount(String account, String userName) {
+        JSONObject reqDTO = new JSONObject()
+                .set("source", "DEFAULT")
+                .set("account", account)
+                .set("userName", userName);
+        try (HttpResponse response = HttpUtil.createPost(getServer() + "/core/auth/account/create")
+                .header("Authorization", getJWT())
+                .body(JSONUtil.toJsonStr(reqDTO))
+                .execute()) {
+            JSONObject result = JSONUtil.parseObj(response.body());
+            if (result.getInt("code") != 0) {
+                throw new RuntimeException(result.getStr("msg"));
+            }
+            return result.getByPath("data.params", JSONObject.class);
+        }
+    }
+
     public static String getServer() {
         return config.getStr("url");
     }

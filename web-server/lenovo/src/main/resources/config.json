@@ -1,4 +1,4 @@
 {
-  "url": "http://192.168.9.162:4080",
-  "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJBY2NvdW50IjoiYWRtaW4iLCJVc2VyTmFtZSI6ImFkbWluIiwiVXNlcklEIjoiYWRtaW4iLCJpc3MiOiJaV1RlYW13b3JrcyIsImV4cCI6MTY5NTM1MjU3NCwiaWF0IjoxNjk1MzUwNzc0fQ.0H_W0203F894aLfV7vt2AUYTrFxiFLnXqa1BclCR_dY"
+  "url": "https://zwplmedu-api.zwsoft.cn",
+  "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJBY2NvdW50IjoiYWRtaW4iLCJVc2VyTmFtZSI6ImFkbWluIiwiVXNlcklEIjoiYWRtaW4iLCJpc3MiOiJaV1RlYW13b3JrcyIsImV4cCI6MTY5ODIyNjc5MSwiaWF0IjoxNjk4MjI0OTkxfQ.vGOCVMoxksGOhCX0b6d4S7W0ODTqi1_HlYryJKke5MM"
 }

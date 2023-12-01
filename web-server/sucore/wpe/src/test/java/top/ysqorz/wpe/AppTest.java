@@ -18,7 +18,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import static org.junit.Assert.assertTrue;
 
@@ -41,6 +43,23 @@ public class AppTest
         generateCsvRowVOJava(new File("E:\\Project\\ZW\\master\\sucore\\custom\\data_migration\\src\\main\\resources\\csv\\bo_Document_ALL_ALL.csv"));
     }
 
+    @Test
+    public void testLock() {
+        String lock1 = String.valueOf(1270381781);
+        String lock2 = String.valueOf(1270381781);
+        System.out.println(lock1.intern());
+        System.out.println(lock2.intern());
+    }
+
+    @Test
+    public void testPollQueue() {
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(1);
+
+        Integer poll1 = queue.poll();
+        int poll2 = queue.poll();
+        System.out.println(poll2);
+    }
     public void generateCsvRowVOJava(File csvFile) throws Exception {
         CsvReadConfig csvReadConfig = new CsvReadConfig()
                 .setHeaderLineNo(1)
