@@ -1,6 +1,6 @@
 package top.ysqorz.i18n.message.contol;
 
-import top.ysqorz.i18n.message.loader.ResourceLoader;
+import top.ysqorz.i18n.message.loader.I18nResourceLoader;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -23,14 +23,14 @@ public class PropertyBundleControl extends ResourceBundle.Control {
      * ResourceBundle的缓存时间，默认永不过期
      */
     private long cacheMillis = TTL_NO_EXPIRATION_CONTROL;
-    private final ResourceLoader resourceLoader;
+    private final I18nResourceLoader resourceLoader;
     private BundleControlCallback callback;
 
-    public PropertyBundleControl(ResourceLoader resourceLoader) {
+    public PropertyBundleControl(I18nResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 
-    public PropertyBundleControl(ResourceLoader resourceLoader, Charset encoding, long cacheMillis) {
+    public PropertyBundleControl(I18nResourceLoader resourceLoader, Charset encoding, long cacheMillis) {
         this.resourceLoader = resourceLoader;
         this.encoding = encoding;
         this.cacheMillis = cacheMillis;
@@ -54,7 +54,7 @@ public class PropertyBundleControl extends ResourceBundle.Control {
     }
 
     // 由于构造方法必须传入ResourceLoader，因此无需提供setter
-    public ResourceLoader getResourceLoader() {
+    public I18nResourceLoader getResourceLoader() {
         return resourceLoader;
     }
 

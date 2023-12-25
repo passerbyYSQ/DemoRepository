@@ -1,10 +1,16 @@
 package top.ysqorz.i18n.common;
 
+import tech.sucore.config.EnvironmentInfo;
+import top.ysqorz.i18n.common.constant.I18nConstant;
+import top.ysqorz.i18n.message.ConstInterfaceGenerator;
+
 import java.io.File;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -13,7 +19,62 @@ import java.util.stream.Collectors;
  * @author yaoshiquan
  * @date 2023/8/25
  */
-public class CommonUtils {
+public class I18nUtils {
+    public static final Pattern I18N_DELIMITER_PATTERN = Pattern.compile("\n\\|>>>(.*?)<<<\\|\n");
+
+    public static void generateConstInterfacesByCMD(ThrowableFunction<String[], ConstInterfaceGenerator> generatorFunc, String[] args) throws Exception {
+        String lang = I18nUtils.getCmdArgs("-" + I18nConstant.PROPS_LANG, null, args);
+        if (I18nUtils.isEmpty(lang)) {
+            printArgsInfo();
+            return;
+        }
+        try (ConstInterfaceGenerator generator = generatorFunc.apply(args)) {
+            String pkgPath = I18nUtils.getCmdArgs("-p", I18nConstant.class.getPackage().getName(), args);
+            String destDir = I18nUtils.getCmdArgs("-d", ".", args);
+            Locale[] locales = Arrays.stream(lang.split(",")).map(String::trim).map(Locale::forLanguageTag).toArray(Locale[]::new);
+            generator.generateConstInterfaces(pkgPath, new File(destDir), locales);
+        }
+    }
+
+    public interface ThrowableFunction<T, R> {
+        R apply(T t) throws Exception;
+    }
+
+    private static void printArgsInfo() {
+        System.out.println("Args Options Description:");
+        System.out.println("-i: Installation name. ex: default");
+        System.out.println("-p: Package path for constant interface. ex: tech.sucore.common.constant");
+        System.out.println("-d: The directory for generating constant interfaces. ex: D:\\temp");
+        System.out.println("-lang: (*) Multiple languages involved in generating constant interfaces. ex: zh-CN,en-US");
+    }
+
+    public static File getStandardI18nDir() {
+        return new File(EnvironmentInfo.getSystemConfigPath(), "i18n");
+    }
+
+    public static File getCustomI18nDir(String installation) {
+        return new File(EnvironmentInfo.getInstallationConfigPath(installation), "i18n");
+    }
+
+    public static String subTranslatedFailMsg(String failMsg) {
+        Matcher matcher = I18N_DELIMITER_PATTERN.matcher(failMsg);
+        if (!matcher.find()) {
+            return failMsg;
+        }
+        return failMsg.substring(0, matcher.start());
+    }
+
+    public static String getCmdArgs(String key, String defValue, String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].trim().equals(key.trim())) {
+                if (i + 1 < args.length) {
+                    return args[i + 1].trim();
+                }
+            }
+        }
+        return defValue;
+    }
+
     public static List<String> splitStr(String str, String delimiter) {
         return Arrays.stream(str.split(delimiter))
                 .map(String::trim)
@@ -97,7 +158,7 @@ public class CommonUtils {
             if (idx == 0 && Character.isLetter(chs[idx])) { // 首字母大写
                 p = -1;
             }
-            if (!isLetterOrNum(chs[idx]) && idx < chs.length - 1 && isLetterOrNum(chs[idx + 1])) { // 数字和字母算作一类
+            if (idx < chs.length - 1 && !isLetterOrNum(chs[idx]) && isLetterOrNum(chs[idx + 1])) { // 数字和字母算作一类
                 p = idx;
             }
             if (p != -2) {
@@ -144,14 +205,19 @@ public class CommonUtils {
         StringBuilder result = new StringBuilder();
         char[] chs = str.toCharArray();
         for (int i = 0; i < chs.length; i++) {
-            // example: login.name => LOGIN_NAME
-            if (isLetterOrNum(chs[i])) {
+            // result.length() == 0 用于去除前导的数字
+            if ((result.length() == 0 && Character.isLetter(chs[i])) || (result.length() > 0 && isLetterOrNum(chs[i]))) {
                 result.append(Character.toUpperCase(chs[i]));
             }
-            // example: MyRootConfig => MY_ROOT_CONFIG
             if (i < str.length() - 1) {
-                if (Character.isLetter(chs[i + 1]) && Character.isUpperCase(chs[i + 1]) &&
-                        !Character.isUpperCase(chs[i])) {
+                // example: MyRootConfig => MY_ROOT_CONFIG
+                if (Character.isLetter(chs[i]) && Character.isLetter(chs[i + 1]) &&
+                        Character.isLowerCase(chs[i]) && Character.isUpperCase(chs[i + 1])) {
+                    result.append("_");
+                }
+                // example: login.name => LOGIN_NAME
+                // result.length() > 0 用于去除前导的非字母
+                if (result.length() > 0 && !Character.isLetter(chs[i]) && Character.isLetter(chs[i + 1])) {
                     result.append("_");
                 }
             }
@@ -187,7 +253,7 @@ public class CommonUtils {
      * @return 所在类路径
      */
     public static File getStandardJavaFileByClass(Class<?> clazz) {
-        File javaDir = CommonUtils.getStandardJavaDirByClass(clazz);
+        File javaDir = I18nUtils.getStandardJavaDirByClass(clazz);
         if (Objects.isNull(javaDir)) {
             return null;
         }

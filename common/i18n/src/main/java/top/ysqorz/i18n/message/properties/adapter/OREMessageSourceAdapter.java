@@ -5,12 +5,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tech.sucore.config.CusConfigInfo;
 import tech.sucore.config.EnvironmentInfo;
-import top.ysqorz.i18n.common.CommonUtils;
+import top.ysqorz.i18n.common.I18nUtils;
+import top.ysqorz.i18n.common.constant.I18nConstant;
 import top.ysqorz.i18n.message.contol.PropertyBundleControl;
-import top.ysqorz.i18n.message.loader.adapter.OREResourceLoader;
+import top.ysqorz.i18n.message.loader.adapter.OREI18nResourceLoader;
 import top.ysqorz.i18n.message.properties.ReloadableResourceBundleMessageSource;
-import top.ysqorz.i18n.resolver.LocaleContextResolver;
-import top.ysqorz.i18n.resolver.adapter.OREConfigLocaleContextResolver;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -27,31 +26,48 @@ import java.util.*;
  */
 public class OREMessageSourceAdapter extends ReloadableResourceBundleMessageSource {
 
-    public static void main(String[] args) throws IOException {
-        String installation = CommonUtils.isEmpty(args) ? "default" : args[0];
-        OREMessageSourceAdapter oreMessageSourceAdapter = new OREMessageSourceAdapter(installation);
-        oreMessageSourceAdapter.generateConstInterfaces();
+    // -i default  -p tech.sucore.common.constant  -d D:\temp  -lang zh-CN,en-US
+    public static void main(String[] args) throws Exception {
+        I18nUtils.generateConstInterfacesByCMD(args1 -> {
+            String installation = I18nUtils.getCmdArgs("-i", "default", args1);
+            return new OREMessageSourceAdapter(installation);
+        }, args);
+    }
+
+    private Locale defaultLocale = Locale.getDefault();
+
+    public OREMessageSourceAdapter() throws IOException {
+        this("default");
     }
 
     public OREMessageSourceAdapter(String installation) throws IOException {
-        super(new OREResourceLoader(installation), StandardCharsets.UTF_8, Duration.ofMillis(30).toMillis(), true);
+        super(new OREI18nResourceLoader(installation), StandardCharsets.UTF_8, Duration.ofMinutes(30).toMillis(), true);
         initCacheMillisFromConfig();
         initBasename();
     }
 
-    public void initCacheMillisFromConfig() {
-        CusConfigInfo cusConfig = new CusConfigInfo(getInstallation());
-        String cacheMillis = cusConfig.getUserParam("i18n.cache.resource.bundle.millis");
-        if (Objects.isNull(cacheMillis)) {
-            return;
-        }
-        this.cacheMillis = Long.parseLong(cacheMillis);
+    public Locale getDefaultLocale() {
+        return defaultLocale;
     }
 
-    public void generateConstInterfaces() throws IOException {
-        LocaleContextResolver localeContextResolver = new OREConfigLocaleContextResolver(getInstallation());
-        Locale[] supportedLocales = localeContextResolver.resolveSupportedLocales().toArray(new Locale[0]);
-        generateConstInterfaces("", supportedLocales);
+    public String getMessage(String code, String... args) {
+        return getMessage(code, getDefaultLocale(), args);
+    }
+
+    public String getMessage(String code, String defaultMessage, String... args) {
+        return getMessage(code, defaultMessage, getDefaultLocale(), args);
+    }
+
+    public void initCacheMillisFromConfig() {
+        CusConfigInfo cusConfig = new CusConfigInfo(getInstallation(), true);
+        String cacheMillis = cusConfig.getUserParam(I18nConstant.PROPS_RESOURCE_BUNDLE_CACHE_MILLIS);
+        if (Objects.nonNull(cacheMillis)) {
+            this.cacheMillis = Long.parseLong(cacheMillis);
+        }
+        String langTag = cusConfig.getUserParam(I18nConstant.PROP_LOCALE_CONTEXT);
+        if (Objects.nonNull(langTag)) {
+            this.defaultLocale = Locale.forLanguageTag(langTag);
+        }
     }
 
     public void initBasename() throws IOException {
@@ -60,13 +76,14 @@ public class OREMessageSourceAdapter extends ReloadableResourceBundleMessageSour
         modules.addAll(parseStandardModule());
         // 客户化模块
         modules.addAll(parseCustomModule());
+        Collections.reverse(modules);
         // 一个模块一个basename
         String[] basenameList = modules.stream().map(module -> module.toUpperCase() + "_messages").toArray(String[]::new);
         addBasename(basenameList);
     }
 
     public List<String> parseStandardModule() throws IOException {
-        String subPath = CommonUtils.joinStr(File.separator, "modules", "meta.build");
+        String subPath = I18nUtils.joinStr(File.separator, "modules", "meta.build");
         File metaBuildFile = new File(EnvironmentInfo.getStandardMetaPath(), subPath);
         return parseMetaBuildFile(metaBuildFile);
     }
@@ -79,7 +96,7 @@ public class OREMessageSourceAdapter extends ReloadableResourceBundleMessageSour
 
     public String getInstallation() {
         PropertyBundleControl control = (PropertyBundleControl) this.control;
-        OREResourceLoader resourceLoader = (OREResourceLoader) control.getResourceLoader();
+        OREI18nResourceLoader resourceLoader = (OREI18nResourceLoader) control.getResourceLoader();
         return resourceLoader.getInstallation();
     }
 
@@ -92,7 +109,7 @@ public class OREMessageSourceAdapter extends ReloadableResourceBundleMessageSour
                 Node moduleNode = moduleNodes.item(i);
                 Node buildIndexAttr = moduleNode.getAttributes().getNamedItem("build_index");
                 String moduleName = moduleNode.getTextContent().trim();
-                if (Objects.isNull(buildIndexAttr) || CommonUtils.isEmpty(moduleName)) {
+                if (Objects.isNull(buildIndexAttr) || I18nUtils.isEmpty(moduleName)) {
                     continue;
                 }
                 Integer buildIndex = Integer.valueOf(buildIndexAttr.getNodeValue().trim());
@@ -103,5 +120,4 @@ public class OREMessageSourceAdapter extends ReloadableResourceBundleMessageSour
             throw new IOException("meta.build file parsed failed: " + metaBuildFile.getAbsolutePath(), ex);
         }
     }
-
 }

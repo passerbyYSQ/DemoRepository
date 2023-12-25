@@ -2,9 +2,12 @@ package top.ysqorz.i18n;
 
 import org.junit.Assert;
 import org.junit.Test;
-import top.ysqorz.i18n.common.CommonUtils;
+import top.ysqorz.i18n.common.I18nUtils;
 
 import java.io.File;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * ...
@@ -12,7 +15,40 @@ import java.io.File;
  * @author yaoshiquan
  * @date 2023/8/25
  */
-public class CommonUtilsTest {
+public class I18nUtilsTest {
+
+    @Test
+    public void testLocale() {
+        Locale zh1 = Locale.forLanguageTag("zh-CN");
+        Locale zh2 = Locale.forLanguageTag("zh_CN");
+        Locale root = Locale.ROOT;
+        Locale def = Locale.getDefault();
+        System.out.println(123);
+
+        Map<String, Object> map = new HashMap<>();
+        System.out.println(Locale.forLanguageTag(String.class.cast(map.get("a"))));
+    }
+
+    @Test
+    public void testPattern() {
+        String input = "hahaha\n|>>>xxxxx<<<|\n";
+        String patternString = "\n\\|>>>(.*?)<<<\\|\n";
+
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            // 获取匹配字符串的起始索引
+            int startIndex = matcher.start();
+            System.out.println("Start Index: " + startIndex);
+            System.out.println("【"+ input.substring(0, startIndex) + "】");
+
+            // 匹配的内容在 group(1) 中
+//            String matchedText = matcher.group(1);
+//            System.out.println("Matched Text: " + matchedText);
+        }
+    }
+
     @Test
     public void testRev() {
 //        System.out.println(1 + 'A');
@@ -65,7 +101,7 @@ public class CommonUtilsTest {
 
     @Test
     public void testGetJavaDir() {
-        File javaDir = CommonUtils.getStandardJavaDirByClass(this.getClass());
+        File javaDir = I18nUtils.getStandardJavaDirByClass(this.getClass());
         Assert.assertNotNull(javaDir);
         System.out.println(javaDir.getAbsolutePath());
         Assert.assertTrue(javaDir.exists());
@@ -73,7 +109,7 @@ public class CommonUtilsTest {
 
     @Test
     public void testClassPathResource() {
-        File ftl = CommonUtils.getClassPathResource(this.getClass(), "template/const_interface.ftl");
+        File ftl = I18nUtils.getClassPathResource(this.getClass(), "template/const_interface.ftl");
         Assert.assertNotNull(ftl);
         System.out.println(ftl.getAbsolutePath());
         Assert.assertTrue(ftl.exists());
@@ -81,19 +117,19 @@ public class CommonUtilsTest {
 
     @Test
     public void testToUpperCamelCase() {
-        Assert.assertEquals("MyRootConfig", CommonUtils.toUpperCamelCase("MY_ROOT_CONFIG"));
-        Assert.assertEquals("MyRootConfig", CommonUtils.toUpperCamelCase("My_Root_Config"));
-        Assert.assertEquals("MyRootConfig", CommonUtils.toUpperCamelCase("my_root_config"));
-        Assert.assertEquals("MyRootConfig", CommonUtils.toUpperCamelCase("myRootConfig"));
-        Assert.assertEquals("Myrootconfig", CommonUtils.toUpperCamelCase("myrootconfig"));
-        Assert.assertEquals("MyRootConfig", CommonUtils.toUpperCamelCase("MyRootConfig"));
-        Assert.assertEquals("I18nMessages", CommonUtils.toUpperCamelCase("i18n/messages"));
+        Assert.assertEquals("MyRootConfig", I18nUtils.toUpperCamelCase("MY_ROOT_CONFIG"));
+        Assert.assertEquals("MyRootConfig", I18nUtils.toUpperCamelCase("My_Root_Config"));
+        Assert.assertEquals("MyRootConfig", I18nUtils.toUpperCamelCase("my_root_config"));
+        Assert.assertEquals("MyRootConfig", I18nUtils.toUpperCamelCase("myRootConfig"));
+        Assert.assertEquals("Myrootconfig", I18nUtils.toUpperCamelCase("myrootconfig"));
+        Assert.assertEquals("MyRootConfig", I18nUtils.toUpperCamelCase("MyRootConfig"));
+        Assert.assertEquals("I18nMessages", I18nUtils.toUpperCamelCase("i18n/messages"));
     }
 
     @Test
     public void testToScreamingSnake() {
-        Assert.assertEquals("MY_ROOT_CONFIG", CommonUtils.toScreamingSnake("MyRootConfig"));
-        Assert.assertEquals("MY_ORE_ROOT_CONFIG", CommonUtils.toScreamingSnake("MyORERootConfig"));
-        Assert.assertEquals("LOGIN_USERNAME", CommonUtils.toScreamingSnake("login.username"));
+        Assert.assertEquals("MY_ROOT_CONFIG", I18nUtils.toScreamingSnake("MyRootConfig"));
+        Assert.assertEquals("MY_ORE_ROOT_CONFIG", I18nUtils.toScreamingSnake("MyORERootConfig"));
+        Assert.assertEquals("LOGIN_USERNAME", I18nUtils.toScreamingSnake("login.username"));
     }
 }

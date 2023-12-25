@@ -11,7 +11,7 @@ import java.net.URL;
  * @author yaoshiquan
  * @date 2023/8/19
  */
-public class ClassPathResourceLoader implements ResourceLoader {
+public class ClassPathI18nResourceLoader implements I18nResourceLoader {
     @Override
     public File getBundleFile(String resourceName, String format, ClassLoader loader) {
         File file = null;

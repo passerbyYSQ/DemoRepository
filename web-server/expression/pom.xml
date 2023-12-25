@@ -10,4 +10,43 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>expression</artifactId>
     <name>expression</name>
+    <dependencies>
+        <dependency>
+            <groupId>top.ysqorz</groupId>
+            <artifactId>i18n</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>top.ysqorz.license</groupId>
+            <artifactId>license-private</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/license-private-1.0.0.jar</systemPath>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <!-- 指定要运行的主类 -->
+                    <mainClass>top.ysqorz.expression.i18n.WebBaseMessageSourceAdapter</mainClass>
+                    <arguments>
+                        <argument>-i</argument>
+                        <argument>default</argument>
+                        <argument>-p</argument>
+                        <argument>tech.sucore.common.constant</argument>
+                        <argument>-d</argument>
+                        <argument>${project.basedir}/src/main/java/tech/sucore/common/constant</argument>
+                        <argument>-lang</argument>
+                        <argument>zh-CN,en-US</argument>
+                    </arguments>
+                    <classpathScope>compile</classpathScope>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

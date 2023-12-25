@@ -1,6 +1,6 @@
 package top.ysqorz.i18n.resolver;
 
-import top.ysqorz.i18n.common.CommonUtils;
+import top.ysqorz.i18n.common.I18nUtils;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public abstract class AbstractLocaleContextResolver implements LocaleContextReso
             return localeContext; // 缓存
         }
         Locale localeContext = getLocaleContext();
-        if (CommonUtils.isRootLocale(localeContext)) {
+        if (I18nUtils.isRootLocale(localeContext)) {
             if (Objects.isNull(defaultLocale)) {
                 localeContext = Locale.getDefault();
             } else {

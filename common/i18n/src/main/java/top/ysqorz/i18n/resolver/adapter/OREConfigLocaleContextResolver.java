@@ -2,7 +2,7 @@ package top.ysqorz.i18n.resolver.adapter;
 
 import tech.sucore.config.CusConfigInfo;
 import tech.sucore.config.EnvironmentInfo;
-import top.ysqorz.i18n.common.CommonUtils;
+import top.ysqorz.i18n.common.I18nUtils;
 import top.ysqorz.i18n.resolver.AbstractLocaleContextResolver;
 import top.ysqorz.i18n.resolver.PropsLocaleContextResolver;
 
@@ -33,10 +33,10 @@ public class OREConfigLocaleContextResolver extends AbstractLocaleContextResolve
     public Locale getLocaleContext() {
         String localeContextStr = cusConfig.getUserParam("i18n.locale.context");
         Locale localeContext = null;
-        if (!CommonUtils.isEmpty(localeContextStr)) {
+        if (!I18nUtils.isEmpty(localeContextStr)) {
             localeContext = Locale.forLanguageTag(localeContextStr);
         }
-        if (CommonUtils.isRootLocale(localeContext)) {
+        if (I18nUtils.isRootLocale(localeContext)) {
             localeContext = localeContextResolver.getLocaleContext();
         }
         return localeContext;
@@ -46,7 +46,7 @@ public class OREConfigLocaleContextResolver extends AbstractLocaleContextResolve
     public Set<Locale> getSupportedLocales() {
         String supportedLocalesStr = cusConfig.getUserParam("i18n.locale.supported");
         Set<Locale> supportedLocales = null;
-        if (!CommonUtils.isEmpty(supportedLocalesStr)) {
+        if (!I18nUtils.isEmpty(supportedLocalesStr)) {
             supportedLocales = parseSupportedLocales(supportedLocalesStr);
         }
         if (Objects.isNull(supportedLocales)) {
@@ -56,7 +56,7 @@ public class OREConfigLocaleContextResolver extends AbstractLocaleContextResolve
     }
 
     public Set<Locale> parseSupportedLocales(String str) {
-        return CommonUtils.splitStr(str, ",")
+        return I18nUtils.splitStr(str, ",")
                 .stream().map(Locale::forLanguageTag)
                 .collect(Collectors.toSet());
     }

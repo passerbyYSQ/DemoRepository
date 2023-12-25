@@ -9,6 +9,6 @@ import java.io.IOException;
  * @author yaoshiquan
  * @date 2023/8/19
  */
-public interface ResourceLoader {
+public interface I18nResourceLoader {
     File getBundleFile(String resourceName, String format, ClassLoader loader) throws IOException;
 }

@@ -17,11 +17,11 @@ public class ConstInterfaceMeta {
 
     public ConstInterfaceMeta(String packagePath, String className) {
         this.packagePath = packagePath;
-        this.className = CommonUtils.toUpperCamelCase(className) + "Code";
+        this.className = I18nUtils.toUpperCamelCase(className) + "Code";
     }
 
     public void addProps(String key, String value) {
-        props.put(CommonUtils.toScreamingSnake(key), value);
+        props.put(I18nUtils.toScreamingSnake(key), value);
     }
 
     public Map<String, String> getProps() {

@@ -1,13 +1,13 @@
 package top.ysqorz.i18n.message.properties;
 
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import top.ysqorz.i18n.common.CommonUtils;
 import top.ysqorz.i18n.common.ConstInterfaceMeta;
 import top.ysqorz.i18n.common.FileEventMonitor;
 import top.ysqorz.i18n.message.contol.PropertyBundleControl;
-import top.ysqorz.i18n.message.loader.ResourceLoader;
+import top.ysqorz.i18n.message.loader.I18nResourceLoader;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -49,7 +49,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
      */
     private FileEventMonitor<WatchedFilePayload> fileEventMonitor;
 
-    public ReloadableResourceBundleMessageSource(ResourceLoader resourceLoader) throws IOException {
+    public ReloadableResourceBundleMessageSource(I18nResourceLoader resourceLoader) throws IOException {
         this(resourceLoader, StandardCharsets.UTF_8, PropertyBundleControl.TTL_NO_EXPIRATION_CONTROL, false);
     }
 
@@ -59,7 +59,7 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
      * @param cacheMillis    缓存的有效期
      * @param enableMonitor  是否开启资源文件监听器
      */
-    public ReloadableResourceBundleMessageSource(ResourceLoader resourceLoader, Charset encoding, long cacheMillis,
+    public ReloadableResourceBundleMessageSource(I18nResourceLoader resourceLoader, Charset encoding, long cacheMillis,
                                                  boolean enableMonitor) throws IOException {
         // 由于ResourceBundle没有提供API清除单个ResourceBundle的缓存，因此禁用ResourceBundle内部缓存，由当前类来统一管理缓存
         super(new PropertyBundleControl(resourceLoader, encoding, PropertyBundleControl.TTL_DONT_CACHE));
@@ -91,17 +91,18 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         ResourceBundleHolder bundleHolder = bundleMap.get(locale);
         if (Objects.nonNull(bundleHolder)) {
             if (bundleHolder.isExpired()) { // 缓存已过期，则刷新
-                bundleHolder.refresh();
+                bundleHolder.refresh(true);
             }
+            log.log(Level.WARNING, String.format("Get resource bundle from cache, basename: %s, locale: %s", basename, locale));
         } else {
             if (Objects.isNull(bundleHolder = bundleMap.get(locale))) { // 双重检测锁
                 synchronized (cachedResourceBundles) {
                     if (Objects.isNull(bundleHolder = bundleMap.get(locale))) {
                         ResourceBundle bundle = getResourceBundle(basename, locale);// 已禁用缓存，载入ResourceBundle
                         if (Objects.isNull(bundle)) {
-                            log.log(Level.WARNING, String.format("Load resource bundle failed, resource file missing, basename: %s, locale: %s", basename, locale));
                             return null;
                         }
+                        log.log(Level.WARNING, String.format("Put resource bundle into cache, basename: %s, locale: %s", basename, locale));
                         bundleHolder = new ResourceBundleHolder(bundle);
                         bundleMap.put(locale, bundleHolder);
                     }
@@ -119,6 +120,15 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
     @Override
     public void setMessage(String code, String value, Locale local) {
 
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (Objects.nonNull(fileEventMonitor)) {
+            fileEventMonitor.close();
+        }
+        cachedResourceBundles.values().forEach(Map::clear);
+        cachedResourceBundles.clear();
     }
 
     public static class WatchedFilePayload {
@@ -157,8 +167,8 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         if (Objects.isNull(bundleHolder)) {
             return;
         }
-        bundleHolder.refresh();
-        log.info(String.format("file modified: %s%n", bundleFile.getAbsolutePath()));
+        log.info(String.format("File modified: %s", bundleFile.getAbsolutePath()));
+        bundleHolder.refresh(false);
     }
 
     public List<ConstInterfaceMeta> loadAllCodes(String packagePath, Locale... supportedLocales) {
@@ -187,34 +197,26 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
         }
     }
 
-    /**
-     * @param subPackagePath 相对于 top.ysqorz.i18n.common.model.constant 的路径
-     */
     @Override
-    public void generateConstInterfaces(String subPackagePath, Locale... supportedLocales) throws IOException {
+    public void generateConstInterfaces(String packagePath, File destDir, Locale... supportedLocales) throws IOException {
         Configuration config = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-        File templateDir = CommonUtils.getClassPathResource(this.getClass(), "template");
-        config.setDirectoryForTemplateLoading(templateDir);
+        config.setTemplateLoader(new ClassTemplateLoader(this.getClass().getClassLoader(), "template"));
         Template template = config.getTemplate("const_interface.ftl");
-        String packagePath = CommonUtils.joinStr(".",
-                ConstInterfaceMeta.class.getPackage().getName(), "constant", subPackagePath.replace("/", "."));
-        File javaDir = CommonUtils.getStandardJavaDirByClass(this.getClass());
-        File destDir = new File(javaDir, packagePath.replace(".", File.separator));
+        if (!destDir.exists()) {
+            if (!destDir.mkdirs()) {
+                throw new IOException("Create dirs failed: " + destDir.getAbsolutePath());
+            }
+        }
         List<ConstInterfaceMeta> constInterfaceMetas = loadAllCodes(packagePath, supportedLocales);
         if (Objects.isNull(constInterfaceMetas)) {
             return;
         }
         for (ConstInterfaceMeta constInterfaceMeta : constInterfaceMetas) {
-            File constFile = new File(destDir, constInterfaceMeta.getClassName() + ".java");
-            File parentDir = constFile.getParentFile();
-            if (!parentDir.exists()) {
-                if (!parentDir.mkdirs()) {
-                    throw new IOException("Dir created failed: " + parentDir.getAbsolutePath());
-                }
-            }
-            try (OutputStream outputStream = Files.newOutputStream(constFile.toPath());
+            File javaFile = new File(destDir, constInterfaceMeta.getClassName() + ".java");
+            try (OutputStream outputStream = Files.newOutputStream(javaFile.toPath());
                  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
                 template.process(constInterfaceMeta, writer);
+                log.info("Constant interface generated in " + javaFile.getAbsolutePath());
             } catch (TemplateException e) {
                 throw new IOException(e);
             }
@@ -266,10 +268,10 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
             return expiredTimeStamp != PropertyBundleControl.TTL_NO_EXPIRATION_CONTROL && System.currentTimeMillis() > expiredTimeStamp;
         }
 
-        public void refresh() {
+        public void refresh(boolean checkExpired) {
             refreshLock.lock();
             try {
-                if (isExpired()) {
+                if (!checkExpired || isExpired()) {
                     doRefresh();
                 }
             } finally {
@@ -301,6 +303,8 @@ public class ReloadableResourceBundleMessageSource extends ResourceBundleMessage
                 cachedMessageFormats.put(key, new MessageFormat(pattern, resourceBundle.getLocale()));
             }
             updateNextExpiredTimestamp();
+            log.info(String.format("Resource bundle refreshed, basename: %s, locale: %s, expiredTimeStamp: %s",
+                    basename, locale, new Date(expiredTimeStamp)));
         }
     }
 }

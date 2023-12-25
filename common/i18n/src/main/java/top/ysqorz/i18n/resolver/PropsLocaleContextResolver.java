@@ -1,6 +1,6 @@
 package top.ysqorz.i18n.resolver;
 
-import top.ysqorz.i18n.common.CommonUtils;
+import top.ysqorz.i18n.common.I18nUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +26,7 @@ public class PropsLocaleContextResolver extends AbstractLocaleContextResolver {
     }
 
     public PropsLocaleContextResolver(String configPath) throws IOException {
-        this(CommonUtils.getClassPathResource(PropsLocaleContextResolver.class, configPath));
+        this(I18nUtils.getClassPathResource(PropsLocaleContextResolver.class, configPath));
     }
 
     public PropsLocaleContextResolver(File configFile) throws IOException {
@@ -59,7 +59,7 @@ public class PropsLocaleContextResolver extends AbstractLocaleContextResolver {
         if (Objects.isNull(supportedLocalesStr)) {
             return null;
         }
-        return CommonUtils.splitStr(supportedLocalesStr, ",")
+        return I18nUtils.splitStr(supportedLocalesStr, ",")
                 .stream().map(Locale::forLanguageTag)
                 .collect(Collectors.toSet());
     }

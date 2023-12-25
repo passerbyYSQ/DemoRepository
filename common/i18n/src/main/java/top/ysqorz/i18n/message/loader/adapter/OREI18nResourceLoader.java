@@ -1,7 +1,7 @@
 package top.ysqorz.i18n.message.loader.adapter;
 
 import tech.sucore.config.EnvironmentInfo;
-import top.ysqorz.i18n.message.loader.ResourceLoader;
+import top.ysqorz.i18n.message.loader.I18nResourceLoader;
 
 import java.io.File;
 
@@ -14,10 +14,10 @@ import java.io.File;
  * @author yaoshiquan
  * @date 2023/9/1
  */
-public class OREResourceLoader implements ResourceLoader {
+public class OREI18nResourceLoader implements I18nResourceLoader {
     private final String installation;
 
-    public OREResourceLoader(String installation) {
+    public OREI18nResourceLoader(String installation) {
         this.installation = installation;
     }
 
