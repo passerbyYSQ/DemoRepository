@@ -23,12 +23,14 @@ public class ImportJobConfig {
     private Step accountUserCsv2DbStep;
     @Resource
     private Step groupMemberCsv2DbStep;
+    @Resource
+    private Step documentCsv2DbStep;
 
     @Bean
     public Job importJob() {
         return jobBuilderFactory.get("importJob")
-                .start(accountUserCsv2DbStep)
-                .next(groupMemberCsv2DbStep)
+                .start(documentCsv2DbStep)
+//                .next(groupMemberCsv2DbStep)
                 .incrementer(new RunIdIncrementer()) // 保证可以多次执行
                 .build();
     }

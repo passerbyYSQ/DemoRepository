@@ -13,17 +13,18 @@ import java.io.Serializable;
 
 /**
  * ${classComment}
- */<#if !isDynamic>
+ */<#if !isDynamic && !isAbstract>
 @TableName("${className}")</#if>
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode<#if parent??>(callSuper = true)</#if>
 public<#if isAbstract> abstract</#if> class ${className}<#if parent??> extends ${parent.className}</#if> implements Serializable {
 
-    <#if !isDynamic>
+    <#if !isAbstract><#if !isDynamic>
     @TableField(exist = false)</#if>
     private static final long serialVersionUID = 1L;
 
+    </#if>
     <#list attrs! as attr>
     /**
      * ${attr.comment}

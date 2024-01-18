@@ -27,22 +27,25 @@ import java.util.zip.ZipOutputStream;
 @Slf4j
 public class PackageImportResultExecutor {
     public static List<String> SQL_FILE_NAME_LIST = Arrays.asList(
-            "aticnvrtreq.sql",
+            "document.sql",
+            "rbicntnts.sql",
             "caddrawing.sql",
-            "designmaster.sql",
-            "designrev.sql",
-            "raticnvrtbi.sql",
-            "raticnvrtsd.sql",
-            "raticnvrttd.sql",
-            "rdsgncntnts.sql",
-            "rvaultfolder.sql",
-            "thngenreq.sql",
-            "zipfile.sql"
+            "cadmodel.sql",
+            "excelfile.sql",
+            "genfile.sql",
+            "pdffile.sql",
+            "pptfile.sql",
+            "rrevision.sql",
+            "wordfile.sql",
+            "xmlfile.sql",
+            "zipfile.sql",
+            "dev_rVaultFold.sql",
+            "bom_document_rel.sql"
     );
 
     public static void main(String[] args) throws IOException {
-        File dir = new File("E:\\工作\\客户-项目\\山西电机\\导入数据包");
-        packageImportResult("E:\\工作\\客户-项目\\山西电机\\导入数据包\\汇总数据1-69956", dir.listFiles());
+        File dir = new File("E:\\工作\\客户-项目\\中兴\\数据迁移\\文档数据导入汇总");
+        packageImportResult("E:\\工作\\客户-项目\\中兴\\数据迁移\\文档数据导入汇总\\汇总", dir);
     }
 
     public static void packageImportResult(String outDirPath, File... dirs) throws IOException {
@@ -69,21 +72,21 @@ public class PackageImportResultExecutor {
         }
         // 汇总SQL文件
         try (PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(targetSqlFile, true)))) {
-            printWriter.println("BEGIN TRANSACTION;"); // 写入开启事务
+//            printWriter.println("BEGIN TRANSACTION;"); // 写入开启事务
             for (String sqlFileName : SQL_FILE_NAME_LIST) { // 先按照类型归并
                 for (File sourceDir : sourceDirs) { // 遍历所有源目录
                     append2TargetSqlFile(new File(sourceDir, sqlFileName), printWriter);
                 }
             }
-            printWriter.println("UPDATE `rvaultfolder`" + System.lineSeparator() +
-                    "SET `UUID_L` = (" + System.lineSeparator() +
-                    "    SELECT `UUID`" + System.lineSeparator() +
-                    "    FROM `vault`" + System.lineSeparator() +
-                    "    WHERE `Name` = 'SXDJVault'" + System.lineSeparator() +
-                    "    LIMIT 1" + System.lineSeparator() +
-                    ")" + System.lineSeparator() +
-                    "WHERE `UUID_L` = '666cf442-7c44-11ee-85cb-04421ae5fd71';");
-            printWriter.println("COMMIT;");
+//            printWriter.println("UPDATE `rvaultfolder`" + System.lineSeparator() +
+//                    "SET `UUID_L` = (" + System.lineSeparator() +
+//                    "    SELECT `UUID`" + System.lineSeparator() +
+//                    "    FROM `vault`" + System.lineSeparator() +
+//                    "    WHERE `Name` = 'SXDJVault'" + System.lineSeparator() +
+//                    "    LIMIT 1" + System.lineSeparator() +
+//                    ")" + System.lineSeparator() +
+//                    "WHERE `UUID_L` = '666cf442-7c44-11ee-85cb-04421ae5fd71';");
+//            printWriter.println("COMMIT;");
         }
         // 初始化空的压缩包
         try (ZipOutputStream outZip = new ZipOutputStream(Files.newOutputStream(new File(outDir, "SXDJVault.zip").toPath()), StandardCharsets.UTF_8)) {
@@ -155,12 +158,12 @@ public class PackageImportResultExecutor {
                 return false;
             }
         }
-        for (String fileName : fileNameSet) {
-            if (fileName.contains("SXDJVault") && fileName.endsWith(".zip")) {
-                return true;
-            }
-        }
-        log.warn("目录：{}，缺少压缩文件：SXDJVault{}.zip", dir.getAbsolutePath(), "{占位符}");
-        return false;
+//        for (String fileName : fileNameSet) {
+//            if (fileName.contains("SXDJVault") && fileName.endsWith(".zip")) {
+//                return true;
+//            }
+//        }
+//        log.warn("目录：{}，缺少压缩文件：SXDJVault{}.zip", dir.getAbsolutePath(), "{占位符}");
+        return true;
     }
 }

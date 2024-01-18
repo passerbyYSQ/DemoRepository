@@ -1273,176 +1273,6 @@
                           "constName": "RelationShipLeft",
                           "constValue": "contains"
                         }
-                      ],
-                      "children": [
-                        {
-                          "title": "TestTypePrmtrzdDvd",
-                          "key": "TestTypePrmtrzdDvd",
-                          "level": 6,
-                          "className": "TestTypePrmtrzdDvd",
-                          "classAlias": "PricePrmtrzdDvd",
-                          "classDisplayLabel": "类型关系参数表",
-                          "module": "zxt",
-                          "isAbstract": false,
-                          "isDynamic": false,
-                          "superClassName": "PrmtrzdDvd",
-                          "constants": [
-                            {
-                              "constName": "ClassLeft",
-                              "constValue": "PrtCtlg"
-                            },
-                            {
-                              "constName": "ParamTableName",
-                              "constValue": "类型关系参数表"
-                            },
-                            {
-                              "constName": "RelationShipRight",
-                              "constValue": "belong"
-                            },
-                            {
-                              "constName": "ClassRight",
-                              "constValue": "PrtCtlg"
-                            },
-                            {
-                              "constName": "EnableSelfRelative",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "MustBeSameInBothSide",
-                              "constValue": "+"
-                            },
-                            {
-                              "constName": "EnableMultiple",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "RelationShipLeft",
-                              "constValue": "contains"
-                            }
-                          ],
-                          "normalAttaches": [
-                            {
-                              "attrName": "Type",
-                              "displayName": "类型",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            }
-                          ]
-                        },
-                        {
-                          "title": "TestDocTypePrmtrzdDvd",
-                          "key": "TestDocTypePrmtrzdDvd",
-                          "level": 6,
-                          "className": "TestDocTypePrmtrzdDvd",
-                          "classAlias": "PriceDocPrmtrzdDvd",
-                          "classDisplayLabel": "文档类型关系参数表",
-                          "module": "zxt",
-                          "isAbstract": false,
-                          "isDynamic": false,
-                          "superClassName": "PrmtrzdDvd",
-                          "constants": [
-                            {
-                              "constName": "ClassLeft",
-                              "constValue": "DocCtlg"
-                            },
-                            {
-                              "constName": "ParamTableName",
-                              "constValue": "文档类型关系参数表"
-                            },
-                            {
-                              "constName": "RelationShipRight",
-                              "constValue": "belong"
-                            },
-                            {
-                              "constName": "ClassRight",
-                              "constValue": "DocCtlg"
-                            },
-                            {
-                              "constName": "EnableSelfRelative",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "MustBeSameInBothSide",
-                              "constValue": "+"
-                            },
-                            {
-                              "constName": "EnableMultiple",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "RelationShipLeft",
-                              "constValue": "contains"
-                            }
-                          ],
-                          "normalAttaches": [
-                            {
-                              "attrName": "Type",
-                              "displayName": "类型",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            }
-                          ]
-                        },
-                        {
-                          "title": "TestDesignTypePrmtrzdDvd",
-                          "key": "TestDesignTypePrmtrzdDvd",
-                          "level": 6,
-                          "className": "TestDesignTypePrmtrzdDvd",
-                          "classAlias": "PriceDesignPrmtrzdDvd",
-                          "classDisplayLabel": "设计方案类型关系参数表",
-                          "module": "zxt",
-                          "isAbstract": false,
-                          "isDynamic": false,
-                          "superClassName": "PrmtrzdDvd",
-                          "constants": [
-                            {
-                              "constName": "ClassLeft",
-                              "constValue": "DesignCtlg"
-                            },
-                            {
-                              "constName": "ParamTableName",
-                              "constValue": "设计方案类型关系参数表"
-                            },
-                            {
-                              "constName": "RelationShipRight",
-                              "constValue": "belong"
-                            },
-                            {
-                              "constName": "ClassRight",
-                              "constValue": "DesignCtlg"
-                            },
-                            {
-                              "constName": "EnableSelfRelative",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "MustBeSameInBothSide",
-                              "constValue": "+"
-                            },
-                            {
-                              "constName": "EnableMultiple",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "RelationShipLeft",
-                              "constValue": "contains"
-                            }
-                          ],
-                          "normalAttaches": [
-                            {
-                              "attrName": "Type",
-                              "displayName": "类型",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            }
-                          ]
-                        }
                       ]
                     },
                     {
@@ -1538,74 +1368,6 @@
                       ],
                       "children": [
                         {
-                          "title": "TestDesignPricePrmtrzdPplt",
-                          "key": "TestDesignPricePrmtrzdPplt",
-                          "level": 6,
-                          "className": "TestDesignPricePrmtrzdPplt",
-                          "classAlias": "DesignPricePrmtrzdPplt",
-                          "classDisplayLabel": "设计方案价格参数表",
-                          "module": "zxt",
-                          "isAbstract": false,
-                          "isDynamic": false,
-                          "superClassName": "PrmtrzdPplt",
-                          "constants": [
-                            {
-                              "constName": "ClassLeft",
-                              "constValue": "DesignCtlg"
-                            },
-                            {
-                              "constName": "ParamTableName",
-                              "constValue": "设计方案价格参数表"
-                            },
-                            {
-                              "constName": "$UI.CreateForm.TestDesignPricePrmtrzdPplt",
-                              "constValue": "CreateForm"
-                            },
-                            {
-                              "constName": "RelationShipRight",
-                              "constValue": "belong"
-                            },
-                            {
-                              "constName": "ClassRight",
-                              "constValue": "DesignRev"
-                            },
-                            {
-                              "constName": "EnableSelfRelative",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "EnableMultiple",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "MustBeSameInBothSide",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "RelationShipLeft",
-                              "constValue": "contains"
-                            }
-                          ],
-                          "normalAttaches": [
-                            {
-                              "attrName": "TestZXCurrency",
-                              "displayName": "币种",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            },
-                            {
-                              "attrName": "TestZXPrice",
-                              "displayName": "价格",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            }
-                          ]
-                        },
-                        {
                           "title": "BusTypeParameterTable",
                           "key": "BusTypeParameterTable",
                           "level": 6,
@@ -1682,134 +1444,6 @@
                           ]
                         },
                         {
-                          "title": "TestDocPricePrmtrzdPplt",
-                          "key": "TestDocPricePrmtrzdPplt",
-                          "level": 6,
-                          "className": "TestDocPricePrmtrzdPplt",
-                          "classAlias": "DocPricePrmtrzdPplt",
-                          "classDisplayLabel": "文档价格参数表",
-                          "module": "zxt",
-                          "isAbstract": false,
-                          "isDynamic": false,
-                          "superClassName": "PrmtrzdPplt",
-                          "constants": [
-                            {
-                              "constName": "ClassLeft",
-                              "constValue": "DocCtlg"
-                            },
-                            {
-                              "constName": "ParamTableName",
-                              "constValue": "文档价格参数表"
-                            },
-                            {
-                              "constName": "RelationShipRight",
-                              "constValue": "belong"
-                            },
-                            {
-                              "constName": "ClassRight",
-                              "constValue": "Document"
-                            },
-                            {
-                              "constName": "EnableSelfRelative",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "MustBeSameInBothSide",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "EnableMultiple",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "RelationShipLeft",
-                              "constValue": "contains"
-                            }
-                          ],
-                          "normalAttaches": [
-                            {
-                              "attrName": "TestZXCurrency",
-                              "displayName": "币种",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            },
-                            {
-                              "attrName": "TestZXPrice",
-                              "displayName": "价格",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            }
-                          ]
-                        },
-                        {
-                          "title": "TestPricePrmtrzdPplt",
-                          "key": "TestPricePrmtrzdPplt",
-                          "level": 6,
-                          "className": "TestPricePrmtrzdPplt",
-                          "classAlias": "PricePrmtrzdPplt",
-                          "classDisplayLabel": "价格参数表",
-                          "module": "zxt",
-                          "isAbstract": false,
-                          "isDynamic": false,
-                          "superClassName": "PrmtrzdPplt",
-                          "constants": [
-                            {
-                              "constName": "ClassLeft",
-                              "constValue": "PrtCtlg"
-                            },
-                            {
-                              "constName": "ParamTableName",
-                              "constValue": "价格参数表"
-                            },
-                            {
-                              "constName": "RelationShipRight",
-                              "constValue": "belong"
-                            },
-                            {
-                              "constName": "ClassRight",
-                              "constValue": "CfmPrtMstr"
-                            },
-                            {
-                              "constName": "EnableSelfRelative",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "MustBeSameInBothSide",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "EnableMultiple",
-                              "constValue": "-"
-                            },
-                            {
-                              "constName": "RelationShipLeft",
-                              "constValue": "contains"
-                            }
-                          ],
-                          "normalAttaches": [
-                            {
-                              "attrName": "TestZXCurrency",
-                              "displayName": "币种",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            },
-                            {
-                              "attrName": "TestZXPrice",
-                              "displayName": "价格",
-                              "storageType": "PERSISTENT",
-                              "isVisible": true,
-                              "isEditable": true,
-                              "isRequired": false
-                            }
-                          ]
-                        },
-                        {
                           "title": "ECRPrmtrzdPplt",
                           "key": "ECRPrmtrzdPplt",
                           "level": 6,
@@ -1865,7 +1499,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "dynamicOption": "UserIDs"
                             },
                             {
@@ -1874,7 +1508,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "dynamicOption": "UserIDs"
                             },
                             {
@@ -1883,7 +1517,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "dynamicOption": "UserIDs"
                             },
                             {
@@ -1892,7 +1526,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "staticOption": "ZXSVOECRApplicableScope"
                             },
                             {
@@ -1901,7 +1535,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true
+                              "isRequired": false
                             },
                             {
                               "attrName": "ZXMeasures",
@@ -1917,8 +1551,8 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
-                              "staticOption": "ZXChangeReason"
+                              "isRequired": false,
+                              "staticOption": "ZXSVOECRChangeReason"
                             },
                             {
                               "attrName": "ZXChangeLevel",
@@ -1928,7 +1562,7 @@
                               "isEditable": true,
                               "isRequired": false,
                               "defaultValue": "3",
-                              "staticOption": "ZXSVOZXChangeLevel"
+                              "staticOption": "ZXSVOECRChangeLevel"
                             }
                           ]
                         },
@@ -1988,7 +1622,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true
+                              "isRequired": false
                             },
                             {
                               "attrName": "ZXWorkshopSection",
@@ -1996,7 +1630,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true
+                              "isRequired": false
                             },
                             {
                               "attrName": "ZXMajor",
@@ -2004,7 +1638,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true
+                              "isRequired": false
                             }
                           ]
                         },
@@ -2073,8 +1707,8 @@
                               "isVisible": true,
                               "isEditable": true,
                               "isRequired": false,
-                              "defaultValue": "0 6063铝",
-                              "staticOption": "ZXMaterial"
+                              "defaultValue": "0",
+                              "staticOption": "ZXSVOBlankingMaterial"
                             },
                             {
                               "attrName": "ZXSmallerEndCuttingDimensions",
@@ -2108,8 +1742,8 @@
                               "isVisible": true,
                               "isEditable": true,
                               "isRequired": false,
-                              "defaultValue": "S-扇形管",
-                              "staticOption": "ZXRawMaterialType"
+                              "defaultValue": "S",
+                              "staticOption": "ZXSVOBlankingMaterialStructure"
                             },
                             {
                               "attrName": "ZXTotalLengthOfUsage",
@@ -2126,8 +1760,8 @@
                               "isVisible": true,
                               "isEditable": true,
                               "isRequired": false,
-                              "defaultValue": "X无(不处理)",
-                              "staticOption": "ZXSurfaceTreatment"
+                              "defaultValue": "X",
+                              "staticOption": "ZXSVOBlankingSurfaceTreatment"
                             },
                             {
                               "attrName": "ZXSlantCuttingMethod",
@@ -2229,7 +1863,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "dynamicOption": "UserIDs"
                             },
                             {
@@ -2238,7 +1872,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "dynamicOption": "UserIDs"
                             },
                             {
@@ -2247,7 +1881,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "dynamicOption": "UserIDs"
                             },
                             {
@@ -2256,7 +1890,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
+                              "isRequired": false,
                               "staticOption": "ZXSVOECRApplicableScope"
                             },
                             {
@@ -2265,7 +1899,7 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true
+                              "isRequired": false
                             },
                             {
                               "attrName": "ZXMeasures",
@@ -2281,8 +1915,8 @@
                               "storageType": "PERSISTENT",
                               "isVisible": true,
                               "isEditable": true,
-                              "isRequired": true,
-                              "staticOption": "ZXChangeReason"
+                              "isRequired": false,
+                              "staticOption": "ZXSVOECRChangeReason"
                             },
                             {
                               "attrName": "ZXChangeLevel",
@@ -2292,7 +1926,7 @@
                               "isEditable": true,
                               "isRequired": false,
                               "defaultValue": "3",
-                              "staticOption": "ZXSVOZXChangeLevel"
+                              "staticOption": "ZXSVOECRChangeLevel"
                             }
                           ]
                         },
@@ -2361,8 +1995,8 @@
                               "isVisible": true,
                               "isEditable": true,
                               "isRequired": false,
-                              "defaultValue": "0 6063铝",
-                              "staticOption": "ZXMaterial"
+                              "defaultValue": "0",
+                              "staticOption": "ZXSVOBlankingMaterial"
                             },
                             {
                               "attrName": "ZXLength",
@@ -2379,8 +2013,8 @@
                               "isVisible": true,
                               "isEditable": true,
                               "isRequired": false,
-                              "defaultValue": "X无(不处理)",
-                              "staticOption": "ZXSurfaceTreatment"
+                              "defaultValue": "X",
+                              "staticOption": "ZXSVOBlankingSurfaceTreatment"
                             },
                             {
                               "attrName": "ZXPlateMaterialType",
@@ -2389,8 +2023,8 @@
                               "isVisible": true,
                               "isEditable": true,
                               "isRequired": false,
-                              "defaultValue": "V-直三角板",
-                              "staticOption": "ZXPlateMaterialType"
+                              "defaultValue": "V",
+                              "staticOption": "ZXSVOPlateMaterialType"
                             },
                             {
                               "attrName": "ZXWallThickness",
@@ -5282,7 +4916,7 @@
                               "displayName": "职务名",
                               "storageType": "PERSISTENT",
                               "isVisible": true,
-                              "isEditable": false,
+                              "isEditable": true,
                               "isRequired": true,
                               "dynamicOption": "PositionNames"
                             }
@@ -6342,7 +5976,15 @@
                           "isEditable": true,
                           "isRequired": false,
                           "defaultValue": "未分派",
-                          "staticOption": "ZXSVOBomSource"
+                          "staticOption": "ZXSVOPartsBomSource"
+                        },
+                        {
+                          "attrName": "CurrentRevision",
+                          "displayName": "当前版本",
+                          "storageType": "PERSISTENT",
+                          "isVisible": true,
+                          "isEditable": true,
+                          "isRequired": false
                         },
                         {
                           "attrName": "ReferenceType",
@@ -6391,9 +6033,10 @@
                           "displayName": "Qty",
                           "storageType": "PERSISTENT",
                           "isVisible": false,
-                          "isEditable": false,
+                          "isEditable": true,
                           "isRequired": false,
-                          "defaultValue": "1"
+                          "defaultValue": "1",
+                          "valueFormat": "^(?!0*(\\.0+)?$)\\d+(\\.\\d+)?$"
                         },
                         {
                           "attrName": "ViewID",
@@ -6458,6 +6101,14 @@
                           "storageType": "PERSISTENT",
                           "isVisible": true,
                           "isEditable": false,
+                          "isRequired": false
+                        },
+                        {
+                          "attrName": "CurrentSequence",
+                          "displayName": "当前迭代序列",
+                          "storageType": "PERSISTENT",
+                          "isVisible": true,
+                          "isEditable": true,
                           "isRequired": false
                         },
                         {
@@ -6761,17 +6412,6 @@
                     }
                   ],
                   "normalAttaches": [
-                    {
-                      "attrName": "Status",
-                      "displayName": "状态",
-                      "storageType": "PERSISTENT",
-                      "isVisible": true,
-                      "isEditable": true,
-                      "isRequired": false,
-                      "defaultValue": "激活",
-                      "isKeyMember": false,
-                      "staticOption": "ZXSVOMatStatus"
-                    },
                     {
                       "attrName": "LastUpdateUser",
                       "displayName": "最后一位更新者",
@@ -13118,7 +12758,7 @@
                                               "isVisible": true,
                                               "isEditable": true,
                                               "isRequired": false,
-                                              "defaultValue": "个",
+                                              "defaultValue": "EA（每个）",
                                               "staticOption": "ZXSVOPartsUnit"
                                             },
                                             {
@@ -13144,8 +12784,7 @@
                                               "storageType": "PERSISTENT",
                                               "isVisible": true,
                                               "isEditable": true,
-                                              "isRequired": false,
-                                              "dynamicOption": "ZXDVOMaterialSpecLibM"
+                                              "isRequired": false
                                             },
                                             {
                                               "attrName": "Specification",
@@ -13153,8 +12792,7 @@
                                               "storageType": "PERSISTENT",
                                               "isVisible": true,
                                               "isEditable": true,
-                                              "isRequired": false,
-                                              "dynamicOption": "ZXDVOMaterialSpecLibS"
+                                              "isRequired": false
                                             },
                                             {
                                               "attrName": "ZXMakeLot",
@@ -13196,8 +12834,7 @@
                                               "storageType": "PERSISTENT",
                                               "isVisible": true,
                                               "isEditable": true,
-                                              "isRequired": false,
-                                              "dynamicOption": "ZXDVOSupplierName"
+                                              "isRequired": false
                                             },
                                             {
                                               "attrName": "OrganizationUnit",
@@ -13215,7 +12852,7 @@
                                               "isVisible": true,
                                               "isEditable": true,
                                               "isRequired": false,
-                                              "defaultValue": "kg",
+                                              "defaultValue": "KG",
                                               "staticOption": "ZXSVOPartsWeightUnit"
                                             },
                                             {
@@ -13883,6 +13520,15 @@
                                       "isKeyMember": false
                                     },
                                     {
+                                      "attrName": "ZXRspnsblOrgName",
+                                      "displayName": "责任部门组织名称",
+                                      "storageType": "PERSISTENT",
+                                      "isVisible": true,
+                                      "isEditable": true,
+                                      "isRequired": false,
+                                      "isKeyMember": false
+                                    },
+                                    {
                                       "attrName": "ZXPendingECR",
                                       "displayName": "要发布的ECR",
                                       "storageType": "DYNAMIC",
@@ -13935,6 +13581,15 @@
                                       "storageType": "PERSISTENT",
                                       "isVisible": true,
                                       "isEditable": false,
+                                      "isRequired": false,
+                                      "isKeyMember": false
+                                    },
+                                    {
+                                      "attrName": "ZXRspnsblUserName",
+                                      "displayName": "责任人用户名称",
+                                      "storageType": "PERSISTENT",
+                                      "isVisible": true,
+                                      "isEditable": true,
                                       "isRequired": false,
                                       "isKeyMember": false
                                     },
@@ -14005,7 +13660,7 @@
                                     },
                                     {
                                       "attrName": "ID",
-                                      "displayName": "CodeNumber的映射属性",
+                                      "displayName": "文档编号",
                                       "storageType": "PERSISTENT",
                                       "isVisible": false,
                                       "isEditable": false,
@@ -14123,6 +13778,10 @@
                                       "superClassName": "Document",
                                       "constants": [
                                         {
+                                          "constName": "ZX_Default_VaultFolder",
+                                          "constValue": "/"
+                                        },
+                                        {
                                           "constName": "$UI.Mini.UpdateForm.DocTemplateBasic",
                                           "constValue": "UpdateForm"
                                         },
@@ -14141,6 +13800,10 @@
                                         {
                                           "constName": "$UI.TabbedPageUI.DocTemplate",
                                           "constValue": "TabbedPageUI"
+                                        },
+                                        {
+                                          "constName": "ZX_Default_Vault",
+                                          "constValue": "ZXVault"
                                         },
                                         {
                                           "constName": "$UI.QueryForm.DocTemplate",
@@ -16836,10 +16499,6 @@
                                 {
                                   "constName": "PopulateRelation",
                                   "constValue": "rCtlgPrtPplt"
-                                },
-                                {
-                                  "constName": "$UI.CreateForm.TestDesignPricePrmtrzdPplt",
-                                  "constValue": "CreateForm"
                                 },
                                 {
                                   "constName": "$UI.CreateForm.DocWrkInstrPrmtrzdPplt",
@@ -26099,8 +25758,15 @@
                           "isVisible": true,
                           "isEditable": true,
                           "isRequired": false,
-                          "defaultValue": "未分派",
-                          "staticOption": "ZXSVOBomSource"
+                          "defaultValue": "未分派"
+                        },
+                        {
+                          "attrName": "CurrentRevision",
+                          "displayName": "当前版本",
+                          "storageType": "DYNAMIC",
+                          "isVisible": true,
+                          "isEditable": true,
+                          "isRequired": false
                         },
                         {
                           "attrName": "ReferenceType",
@@ -26108,6 +25774,14 @@
                           "storageType": "DYNAMIC",
                           "isVisible": true,
                           "isEditable": false,
+                          "isRequired": false
+                        },
+                        {
+                          "attrName": "CurrentSequence",
+                          "displayName": "当前迭代序列",
+                          "storageType": "DYNAMIC",
+                          "isVisible": true,
+                          "isEditable": true,
                           "isRequired": false
                         },
                         {
@@ -26124,8 +25798,7 @@
                           "storageType": "DYNAMIC",
                           "isVisible": true,
                           "isEditable": true,
-                          "isRequired": false,
-                          "staticOption": "ZXSVOBomWorkUnit"
+                          "isRequired": false
                         },
                         {
                           "attrName": "ZXGroupLeader",
@@ -26133,8 +25806,7 @@
                           "storageType": "DYNAMIC",
                           "isVisible": true,
                           "isEditable": true,
-                          "isRequired": false,
-                          "dynamicOption": "UserNames"
+                          "isRequired": false
                         },
                         {
                           "attrName": "FindNumber",
@@ -26150,8 +25822,7 @@
                           "storageType": "DYNAMIC",
                           "isVisible": true,
                           "isEditable": true,
-                          "isRequired": false,
-                          "valueFormat": "[0-9].*"
+                          "isRequired": false
                         },
                         {
                           "attrName": "CADConfigName",
@@ -27988,27 +27659,11 @@
                   ],
                   "normalAttaches": [
                     {
-                      "attrName": "ViewNetworkID",
-                      "displayName": "BOM视图网络",
+                      "attrName": "ThumbnailID",
+                      "displayName": "缩略图标识",
                       "storageType": "DYNAMIC",
                       "isVisible": true,
-                      "isEditable": false,
-                      "isRequired": false
-                    },
-                    {
-                      "attrName": "TotalQty",
-                      "displayName": "总数量",
-                      "storageType": "DYNAMIC",
-                      "isVisible": true,
-                      "isEditable": false,
-                      "isRequired": false
-                    },
-                    {
-                      "attrName": "Description",
-                      "displayName": "描述",
-                      "storageType": "DYNAMIC",
-                      "isVisible": true,
-                      "isEditable": false,
+                      "isEditable": true,
                       "isRequired": false
                     },
                     {
@@ -28020,24 +27675,8 @@
                       "isRequired": false
                     },
                     {
-                      "attrName": "ParentBomLineUUID",
-                      "displayName": "父级BOM行唯一标识",
-                      "storageType": "DYNAMIC",
-                      "isVisible": true,
-                      "isEditable": false,
-                      "isRequired": false
-                    },
-                    {
-                      "attrName": "MarkedByOption",
-                      "displayName": "有结构选项标记",
-                      "storageType": "DYNAMIC",
-                      "isVisible": true,
-                      "isEditable": false,
-                      "isRequired": false
-                    },
-                    {
-                      "attrName": "MarkedByCI",
-                      "displayName": "有配置项标记",
+                      "attrName": "ProductName",
+                      "displayName": "产品名称",
                       "storageType": "DYNAMIC",
                       "isVisible": true,
                       "isEditable": false,
@@ -28052,6 +27691,14 @@
                       "isRequired": false
                     },
                     {
+                      "attrName": "ProcTaskID",
+                      "displayName": "任务标识",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
                       "attrName": "Unit",
                       "displayName": "数量单位",
                       "storageType": "DYNAMIC",
@@ -28060,8 +27707,24 @@
                       "isRequired": false
                     },
                     {
-                      "attrName": "OptionName",
-                      "displayName": "当前结构选项标识",
+                      "attrName": "BOMSource",
+                      "displayName": "零部件来源",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Remark",
+                      "displayName": "备注",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "LastUpdateUser",
+                      "displayName": "最后一位更新者",
                       "storageType": "DYNAMIC",
                       "isVisible": true,
                       "isEditable": false,
@@ -28074,6 +27737,22 @@
                       "isVisible": true,
                       "isEditable": false,
                       "isRequired": true
+                    },
+                    {
+                      "attrName": "CatalogFamily",
+                      "displayName": "分类族名称",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsInVault",
+                      "displayName": "是否位于数据仓库",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
                     },
                     {
                       "attrName": "PartName",
@@ -28125,13 +27804,12 @@
                       "isRequired": false
                     },
                     {
-                      "attrName": "IsStructureOptionLoaded",
-                      "displayName": "变量和选项已加载",
+                      "attrName": "IsFrozen",
+                      "displayName": "是否冻结",
                       "storageType": "DYNAMIC",
                       "isVisible": true,
                       "isEditable": false,
-                      "isRequired": false,
-                      "defaultValue": "-"
+                      "isRequired": false
                     },
                     {
                       "attrName": "ID",
@@ -28142,8 +27820,8 @@
                       "isRequired": false
                     },
                     {
-                      "attrName": "ReferenceDesignator",
-                      "displayName": "点位",
+                      "attrName": "ProcessID",
+                      "displayName": "当前流程",
                       "storageType": "DYNAMIC",
                       "isVisible": true,
                       "isEditable": false,
@@ -28158,11 +27836,452 @@
                       "isRequired": false
                     },
                     {
+                      "attrName": "ZXHaveDrawing",
+                      "displayName": "是否存在图纸",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ViewNetworkID",
+                      "displayName": "BOM视图网络",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsCataloged",
+                      "displayName": "是否零件族成员",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXPendingWorkflow",
+                      "displayName": "要发布的流程",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsRevisionLast",
+                      "displayName": "是否最新版本",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXHaveAgreements",
+                      "displayName": "是否存在协议",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ProductCode",
+                      "displayName": "产品代号",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXIsTraceablePart",
+                      "displayName": "是否追溯件",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ProcessCode",
+                      "displayName": "流程编号",
+                      "storageType": "DYNAMIC",
+                      "isVisible": false,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "MU",
+                      "displayName": "计量单位",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXMakeLot",
+                      "displayName": "制造批次、数量",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Make",
+                      "displayName": "是否自制件",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Sequence",
+                      "displayName": "子件更新序列号",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Weight",
+                      "displayName": "重量",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsExCode",
+                      "displayName": "使用外部系统的流水生成器",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Project",
+                      "displayName": "所属项目",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXGroupLeader",
+                      "displayName": "分组负责人",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "OrganizationUnit",
+                      "displayName": "所属组织单元",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsOfficial",
+                      "displayName": "是否正式",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsStructureOptionLoaded",
+                      "displayName": "变量和选项已加载",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false,
+                      "defaultValue": "-"
+                    },
+                    {
                       "attrName": "PartRevision",
                       "displayName": "零部件版本",
                       "storageType": "DYNAMIC",
                       "isVisible": true,
                       "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXLocker",
+                      "displayName": "锁定者",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ApproveStatusCode",
+                      "displayName": "审批完成状态码",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "HasSuccessor",
+                      "displayName": "是否存在后继",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "PartType",
+                      "displayName": "零件类型",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXIsSparePart",
+                      "displayName": "备用件",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Submiter",
+                      "displayName": "提交人",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "TotalQty",
+                      "displayName": "总数量",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Description",
+                      "displayName": "描述",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXMainPic",
+                      "displayName": "主图像",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXPendingECR",
+                      "displayName": "要发布的ECR",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsCheckOutLocked",
+                      "displayName": "是否被检出锁定",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXPendingECN",
+                      "displayName": "要发布的ECN",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "MarkedByOption",
+                      "displayName": "有结构选项标记",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "LifeCycleStatus",
+                      "displayName": "生命周期状态",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsStandardPart",
+                      "displayName": "是否标准件",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsProductAssembly",
+                      "displayName": "是产品顶级装配",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "HasPredesessor",
+                      "displayName": "是否存在前驱",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Executor",
+                      "displayName": "执行人",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXWorkUnit",
+                      "displayName": "工位",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsCheckOutCopy",
+                      "displayName": "是否为检出拷贝",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "CatalogPath",
+                      "displayName": "分类目录",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXAgreements",
+                      "displayName": "协议文件编码",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ParentBomLineUUID",
+                      "displayName": "父级BOM行唯一标识",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXFirstUsedBusType",
+                      "displayName": "首次使用车型",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "CheckOutUserID",
+                      "displayName": "检出者",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "IsSequenceLast",
+                      "displayName": "是否最新序列",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "MarkedByCI",
+                      "displayName": "有配置项标记",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Material",
+                      "displayName": "材料",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Specification",
+                      "displayName": "规格",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "Reviewer",
+                      "displayName": "审核人",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "OptionName",
+                      "displayName": "当前结构选项标识",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "SupplierName",
+                      "displayName": "供应商",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "CatalogName",
+                      "displayName": "分录目录",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ReferenceDesignator",
+                      "displayName": "点位",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": false,
+                      "isRequired": false
+                    },
+                    {
+                      "attrName": "ZXWeightUnit",
+                      "displayName": "重量单位",
+                      "storageType": "DYNAMIC",
+                      "isVisible": true,
+                      "isEditable": true,
                       "isRequired": false
                     }
                   ],

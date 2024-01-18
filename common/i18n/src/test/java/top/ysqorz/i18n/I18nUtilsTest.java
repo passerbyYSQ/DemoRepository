@@ -6,6 +6,8 @@ import top.ysqorz.i18n.common.I18nUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
+import java.util.logging.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +18,59 @@ import java.util.regex.Pattern;
  * @date 2023/8/25
  */
 public class I18nUtilsTest {
+
+    @Test
+    public void testLogFormat() {
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setFormatter(new SimpleFormatter() {
+            @Override
+            public String format(LogRecord record) {
+                String methodName = record.getSourceMethodName();
+                if (methodName.equalsIgnoreCase("loadAllCodes") || methodName.equals("verifyResourceBundleIntegrity")) {
+                    return record.getMessage() + System.lineSeparator();
+                } else {
+                    return super.format(record);
+                }
+            }
+        });
+        Logger log = Logger.getLogger(I18nUtilsTest.class.getSimpleName());
+        removeAllLoggerHandlers(log);
+        log.addHandler(consoleHandler);
+        log.info("123");
+    }
+
+    public void loadALLCodes(Logger log) {
+    }
+
+    public static void removeAllLoggerHandlers(Logger logger) {
+        Logger curr = logger;
+        while (Objects.nonNull(curr)) {
+            Handler[] handlers = curr.getHandlers();
+            for (Handler handler : handlers) {
+                curr.removeHandler(handler);
+            }
+            curr = curr.getParent();
+        }
+    }
+
+    @Test
+    public void testCompute() {
+        Map<String, Set<String>> map = new HashMap<>();
+        map.computeIfAbsent("a", new Function<String, Set<String>>() {
+            @Override
+            public Set<String> apply(String s) {
+                return new HashSet<>();
+            }
+        }).add("11111");
+    }
+
+    @Test
+    public void testLocaleEqual() {
+        Locale zh1 = Locale.forLanguageTag("zh-CN");
+        Locale zh2 = Locale.SIMPLIFIED_CHINESE;
+
+        System.out.println(zh1.equals(zh2));
+    }
 
     @Test
     public void testLocale() {

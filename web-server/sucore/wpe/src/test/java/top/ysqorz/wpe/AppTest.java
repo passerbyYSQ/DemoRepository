@@ -1,10 +1,8 @@
 package top.ysqorz.wpe;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.text.csv.CsvData;
-import cn.hutool.core.text.csv.CsvReadConfig;
-import cn.hutool.core.text.csv.CsvReader;
-import cn.hutool.core.text.csv.CsvUtil;
+import cn.hutool.core.text.csv.*;
 import cn.hutool.core.util.ObjectUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -17,12 +15,7 @@ import top.ysqorz.wpe.model.CsvRowVOMeta;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-import static org.junit.Assert.assertTrue;
+import java.util.*;
 
 /**
  * Unit test for simple App.
@@ -35,12 +28,31 @@ public class AppTest
     @Test
     public void shouldAnswerWithTrue()
     {
-        assertTrue( true );
+        System.out.println(Convert.toInt("2.00001"));
     }
 
     @Test
-    public void test() throws Exception {
-        generateCsvRowVOJava(new File("E:\\Project\\ZW\\master\\sucore\\custom\\data_migration\\src\\main\\resources\\csv\\bo_Document_ALL_ALL.csv"));
+    public void testGenerateCsvRowVO() throws Exception {
+        generateCsvRowVOJava(new File("E:\\Project\\IdeaProjects\\DemoRepository\\web-client\\py\\res\\bo_Document_ALL_ALL.csv"));
+    }
+
+    @Test
+    public void testFileSuffix() throws IOException {
+        CsvReadConfig csvReadConfig = new CsvReadConfig()
+                .setHeaderLineNo(0);
+        File csvFile = new File("E:\\Project\\ZW\\master\\sucore\\custom\\data_migration\\src\\main\\resources\\csv\\bo_Document.csv");
+        Set<String> suffixSet = new HashSet<>();
+        try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(csvFile.toPath()), StandardCharsets.UTF_8);
+             CsvReader csvReader = CsvUtil.getReader(reader, csvReadConfig)) {
+            CsvData csvData = csvReader.read();
+            for (int i = 0; i < csvData.getRowCount(); i++) {
+                CsvRow row = csvData.getRow(i);
+                List<String> rawList = row.getRawList();
+                String filePath = rawList.get(rawList.size() - 1);
+                suffixSet.add(FileUtil.getSuffix(filePath));
+            }
+        }
+        System.out.println(suffixSet);
     }
 
     @Test
@@ -61,8 +73,9 @@ public class AppTest
         System.out.println(poll2);
     }
     public void generateCsvRowVOJava(File csvFile) throws Exception {
+        int headerLine = 0;
         CsvReadConfig csvReadConfig = new CsvReadConfig()
-                .setHeaderLineNo(1)
+                .setHeaderLineNo(headerLine)
                 .setEndLineNo(1); // 只读取两行
         CsvRowVOMeta csvRowVOMeta = new CsvRowVOMeta();
 
@@ -82,7 +95,7 @@ public class AppTest
                 if (ObjectUtil.isEmpty(attr)) {
                     continue;
                 }
-                String alias = aliasList.get(i);
+                String alias = headerLine > 0 ? aliasList.get(i) : "";
                 attrMetaList.add(new AttributeMeta(attr, alias));
             }
             csvRowVOMeta.setAttrs(attrMetaList);

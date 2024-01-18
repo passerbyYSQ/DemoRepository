@@ -17,11 +17,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * sucore的持久化类代码生成器
- * TODO 抽象类不需要加上@TableName注解
+ * sucore类的代码生成器
  */
 public class CodeGenerator {
-    private static final boolean withExtend = true;
+    private static final boolean withExtend = false;
 
     public static void main(String[] args) throws IOException, TemplateException {
         File classPath = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX);
