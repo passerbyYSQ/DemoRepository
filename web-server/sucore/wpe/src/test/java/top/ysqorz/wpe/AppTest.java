@@ -33,7 +33,7 @@ public class AppTest
 
     @Test
     public void testGenerateCsvRowVO() throws Exception {
-        generateCsvRowVOJava(new File("E:\\Project\\IdeaProjects\\DemoRepository\\web-client\\py\\res\\bo_Document_ALL_ALL.csv"));
+        generateCsvRowVOJava(new File("E:\\Project\\ZW\\master\\sucore\\custom\\data_migration\\src\\main\\resources\\csv\\rel-b2b_Classified Item.csv"));
     }
 
     @Test

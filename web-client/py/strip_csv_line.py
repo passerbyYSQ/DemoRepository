@@ -1,7 +1,7 @@
 import os
 import csv
 
-input_file = 'csv/bo_Document_ALL_ALL.csv'  # 非标准的 CSV 文件路径
+input_file = 'csv/rel-b2b_Classified Item（文档）.csv'  # 非标准的 CSV 文件路径
 # 获取输入文件的文件名和扩展名
 file_name, file_ext = os.path.splitext(os.path.basename(input_file))
 output_file = os.path.join('res', file_name + ".csv")  # 标准的 CSV 文件路径
@@ -12,7 +12,7 @@ if not os.path.exists(output_dir):
 
 # 读取非标准的 CSV 文件
 with open(input_file, 'r', newline='', encoding='utf-8') as file:
-    reader = csv.reader(file)
+    reader = csv.reader(file, delimiter=',')
     rows = list(reader)
 
 # 处理每个单元格中的换行符和前后空格

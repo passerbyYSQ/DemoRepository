@@ -15,7 +15,7 @@ from pygtrans import Translate
 def translate(text: list, lang):
     # translator = Translator(timeout=Timeout(30))
     # translated = translator.translate(text, dest=lang)
-    client = Translate(proxies={'https': 'http://localhost:26001'}, timeout=16)
+    client = Translate(proxies={'https': 'http://localhost:7890'}, timeout=16)
     translated = client.translate(text, target=lang)
     sleep_time = random.randint(200, 400) / 1000
     time.sleep(sleep_time)  # 随机睡眠200~400 ms
@@ -43,7 +43,7 @@ def translate_properties(file_path, batch_limit, lang):
 
 def translate_write(batch_list, lang, res_file):
     values = [entry['value'] for entry in batch_list]
-    # delimiter = '|'  # 攒够一批次翻译，分隔符影响上下文，使用 | 能够隔离句意
+    # delimiter = '|'  # 攒够一批次翻译，分隔符影响上下文，测试发现使用 | 能够隔离句意
     # text = delimiter.join(values)  # 待翻译的文本
     translated_text = translate(values, lang)
     # translated_values = translated_text.split(delimiter)
@@ -51,7 +51,5 @@ def translate_write(batch_list, lang, res_file):
         res_file.write(f"{entry['key']}={str.strip(translated_text[index])}\n")
 
 
-# 调用频率限制。攒够5000字再去翻译
-# 随机时间间隔
 if __name__ == '__main__':
-    translate_properties('props/WEB_messages_zh_CN.properties', 1000, 'zh-TW')
+    translate_properties('props/PLF_messages_zh_CN.properties', 1000, 'zh-TW')  # 攒够1000字再去翻译

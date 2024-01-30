@@ -22,6 +22,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <poi.version>5.2.3</poi.version><!-- 升级至5.2.3 修复高危漏洞 -->
     </properties>
 
     <repositories>

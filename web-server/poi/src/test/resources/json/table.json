@@ -201,7 +201,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:44",
+            "ModifyTime": "2024年01月30日 09:13:19",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row0",
@@ -213,12 +213,12 @@
             "ObjectDisplayName": "null",
             "UUID_L": "d42abc7a-7781-4fd4-98c9-51f744369ddc",
             "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
-            "IdmImplementation": "+",
+            "IdmImplementation": "-",
             "IdmRelInputValue": "0",
             "IsFrozen": "-",
             "UUID": "91ead375-1385-4f73-952d-792a584435f5",
             "CreateTimeStamp": "1705645384541",
-            "ModifyTimeStamp": "1706529284865"
+            "ModifyTimeStamp": "1706577199093"
           }
         },
         "osattrs": {
@@ -794,7 +794,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:46",
+            "ModifyTime": "2024年01月30日 09:11:23",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row1",
@@ -811,7 +811,7 @@
             "IsFrozen": "-",
             "UUID": "3304d8e3-9ff2-4204-845c-d4953f6e4d8d",
             "CreateTimeStamp": "1705645384563",
-            "ModifyTimeStamp": "1706529286184"
+            "ModifyTimeStamp": "1706577083081"
           }
         },
         "osattrs": {
@@ -983,7 +983,7 @@
                       "rel": {
                         "sucore_class": "rIdmTableValue",
                         "IsDepleted": "-",
-                        "ModifyTime": "2024年01月19日 14:25:21",
+                        "ModifyTime": "2024年01月30日 09:13:27",
                         "Owner": "admin",
                         "SlaveDisplayName": "3.1:工程概况选用表_row1_cell2_Cell1 - - - null",
                         "MasterDisplayName": "设计说明书",
@@ -998,7 +998,7 @@
                         "IsFrozen": "-",
                         "UUID": "f00f850f-30a5-49eb-9d5f-987f7a8edc70",
                         "CreateTimeStamp": "1705645383022",
-                        "ModifyTimeStamp": "1705645521902"
+                        "ModifyTimeStamp": "1706577207090"
                       }
                     }
                   },
@@ -1032,7 +1032,7 @@
                       "rel": {
                         "sucore_class": "rIdmTableValue",
                         "IsDepleted": "-",
-                        "ModifyTime": "2024年01月19日 14:24:19",
+                        "ModifyTime": "2024年01月30日 09:13:31",
                         "Owner": "admin",
                         "SlaveDisplayName": "3.1:工程概况选用表_row1_cell2_Cell2 - - - null",
                         "MasterDisplayName": "设计说明书",
@@ -1047,7 +1047,7 @@
                         "IsFrozen": "-",
                         "UUID": "f5deae83-276f-4fe4-aa8b-af6a085344e4",
                         "CreateTimeStamp": "1705645383032",
-                        "ModifyTimeStamp": "1705645459643"
+                        "ModifyTimeStamp": "1706577211502"
                       }
                     }
                   },
@@ -1130,7 +1130,7 @@
                       "rel": {
                         "sucore_class": "rIdmTableValue",
                         "IsDepleted": "-",
-                        "ModifyTime": "2024年01月19日 14:23:16",
+                        "ModifyTime": "2024年01月30日 09:11:19",
                         "Owner": "admin",
                         "SlaveDisplayName": "3.1:工程概况选用表_row1_cell2_Cell4 - - - null",
                         "MasterDisplayName": "设计说明书",
@@ -1142,10 +1142,11 @@
                         "ObjectDisplayName": "null",
                         "UUID_L": "fe121e57-f1a3-4445-aa9a-ccced784e94e",
                         "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
+                        "IdmRelInputValue": "1232",
                         "IsFrozen": "-",
                         "UUID": "31830b3d-c118-48dd-90bb-f4b635b60c7a",
                         "CreateTimeStamp": "1705645383053",
-                        "ModifyTimeStamp": "1705645396947"
+                        "ModifyTimeStamp": "1706577079776"
                       }
                     }
                   },
@@ -1574,7 +1575,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:50",
+            "ModifyTime": "2024年01月30日 14:22:17",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row2",
@@ -1586,12 +1587,12 @@
             "ObjectDisplayName": "null",
             "UUID_L": "4616b05f-a394-4bd3-99de-c04294769f5b",
             "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
-            "IdmImplementation": "+",
+            "IdmImplementation": "-",
             "IdmRelInputValue": "0",
             "IsFrozen": "-",
             "UUID": "6ecf4871-4640-461f-8e13-f360eaa25880",
             "CreateTimeStamp": "1705645384570",
-            "ModifyTimeStamp": "1706529290617"
+            "ModifyTimeStamp": "1706595737279"
           }
         },
         "osattrs": {
@@ -2270,7 +2271,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:13",
+            "ModifyTime": "2024年01月30日 16:16:12",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row3",
@@ -2282,12 +2283,12 @@
             "ObjectDisplayName": "null",
             "UUID_L": "62001265-6e5e-4704-b0ea-b87ee4a5c049",
             "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
-            "IdmImplementation": "-",
+            "IdmImplementation": "+",
             "IdmRelInputValue": "0",
             "IsFrozen": "-",
             "UUID": "77e78a33-0d2f-4e69-81b3-2f93970d50a5",
             "CreateTimeStamp": "1705645384576",
-            "ModifyTimeStamp": "1706529253652"
+            "ModifyTimeStamp": "1706602572555"
           }
         },
         "osattrs": {
@@ -2665,7 +2666,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:13",
+            "ModifyTime": "2024年01月30日 16:16:14",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row4",
@@ -2677,12 +2678,12 @@
             "ObjectDisplayName": "null",
             "UUID_L": "cd6087b8-e9b4-45a1-b533-28e550a2e0ae",
             "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
-            "IdmImplementation": "-",
+            "IdmImplementation": "+",
             "IdmRelInputValue": "0",
             "IsFrozen": "-",
             "UUID": "e1f59b77-c2ee-4ec7-bb74-132efeb98d32",
             "CreateTimeStamp": "1705645384582",
-            "ModifyTimeStamp": "1706529253653"
+            "ModifyTimeStamp": "1706602574656"
           }
         },
         "osattrs": {
@@ -2906,7 +2907,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:14",
+            "ModifyTime": "2024年01月30日 16:16:15",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row5",
@@ -2918,12 +2919,12 @@
             "ObjectDisplayName": "null",
             "UUID_L": "10987144-8668-484e-ab8f-f18764e12ff2",
             "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
-            "IdmImplementation": "-",
+            "IdmImplementation": "+",
             "IdmRelInputValue": "0",
             "IsFrozen": "-",
             "UUID": "e73c81aa-6591-4ccb-b8c7-10af2a796daf",
             "CreateTimeStamp": "1705645384588",
-            "ModifyTimeStamp": "1706529254708"
+            "ModifyTimeStamp": "1706602575690"
           }
         },
         "osattrs": {
@@ -3629,7 +3630,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:13",
+            "ModifyTime": "2024年01月30日 14:22:18",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row8",
@@ -3646,7 +3647,7 @@
             "IsFrozen": "-",
             "UUID": "d63248a2-1a05-4e39-9f83-72736aa32a4f",
             "CreateTimeStamp": "1705645384605",
-            "ModifyTimeStamp": "1706529253699"
+            "ModifyTimeStamp": "1706595738719"
           }
         },
         "osattrs": {
@@ -4173,7 +4174,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:13",
+            "ModifyTime": "2024年01月30日 14:22:19",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row9",
@@ -4185,12 +4186,12 @@
             "ObjectDisplayName": "null",
             "UUID_L": "3f101ff8-cbc4-4b88-a6ea-3c538cd71d93",
             "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
-            "IdmImplementation": "-",
+            "IdmImplementation": "+",
             "IdmRelInputValue": "0",
             "IsFrozen": "-",
             "UUID": "c20c11c5-4591-4d92-9c67-91f626e21711",
             "CreateTimeStamp": "1705645384612",
-            "ModifyTimeStamp": "1706529253700"
+            "ModifyTimeStamp": "1706595739387"
           }
         },
         "osattrs": {
@@ -4613,7 +4614,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:13",
+            "ModifyTime": "2024年01月29日 21:26:45",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row10",
@@ -4625,12 +4626,12 @@
             "ObjectDisplayName": "null",
             "UUID_L": "9a6f716c-9fcf-4b66-a8ee-f660c1e71770",
             "UUID_R": "4b3c608d-aea8-4a46-a5cc-9935def0c69d",
-            "IdmImplementation": "-",
+            "IdmImplementation": "+",
             "IdmRelInputValue": "0",
             "IsFrozen": "-",
             "UUID": "a8a230c0-78aa-49b1-aa95-9e45776d50db",
             "CreateTimeStamp": "1705645384617",
-            "ModifyTimeStamp": "1706529253703"
+            "ModifyTimeStamp": "1706534805932"
           }
         },
         "osattrs": {
@@ -5294,7 +5295,7 @@
           "rel": {
             "sucore_class": "rIdmTableRowValue",
             "IsDepleted": "-",
-            "ModifyTime": "2024年01月29日 19:54:14",
+            "ModifyTime": "2024年01月29日 21:27:36",
             "Owner": "admin",
             "SlaveDisplayName": "设计说明书",
             "MasterDisplayName": "3.1:工程概况选用表_row11",
@@ -5311,7 +5312,7 @@
             "IsFrozen": "-",
             "UUID": "3ce123c1-42f8-4e4c-8d48-4d830fd087b6",
             "CreateTimeStamp": "1705645384623",
-            "ModifyTimeStamp": "1706529254754"
+            "ModifyTimeStamp": "1706534856953"
           }
         },
         "osattrs": {

@@ -24,6 +24,7 @@
         <module>signature</module>
         <module>transmittable-thread-local</module>
         <module>lenovo</module>
+        <module>poi</module>
     </modules>
 
     <dependencies>

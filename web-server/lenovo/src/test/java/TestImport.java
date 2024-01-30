@@ -4,6 +4,7 @@ import org.junit.Test;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -13,6 +14,13 @@ import java.util.Objects;
  * @date 2023/11/30
  */
 public class TestImport {
+
+    @Test
+    public void testLocale() {
+        System.out.println(Locale.getDefault().getDisplayName());
+        System.out.println(Locale.JAPAN.getDisplayName(Locale.JAPAN));
+        System.out.println(Locale.TRADITIONAL_CHINESE.getDisplayName(Locale.TRADITIONAL_CHINESE));
+    }
 
     @Test
     public void simple2Traditional() {
@@ -26,8 +34,8 @@ public class TestImport {
      */
     @Test
     public void test() throws IOException {
-        File srcFile = new File("E:\\Project\\ZW\\core_install\\ZWTeamworks\\config\\i18n\\WEB_messages_zh_CN.properties");
-        File targetFile = new File("E:\\Project\\ZW\\core_install\\ZWTeamworks\\config\\i18n\\WEB_messages_zh_TW.properties");
+        File srcFile = new File("E:\\Project\\ZW\\core_install\\ZWTeamworks\\config\\td\\zh.properties");
+        File targetFile = new File("E:\\Project\\ZW\\core_install\\ZWTeamworks\\config\\td\\zh_TW.properties");
         propValueSimple2Traditional(srcFile, targetFile);
     }
 
