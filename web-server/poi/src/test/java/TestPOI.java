@@ -2,12 +2,10 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 import org.scilab.forge.jlatexmath.TeXConstants;
@@ -35,13 +33,13 @@ public class TestPOI {
 
     /**
      * 3.1 工程概况选用表
-     *
+     * <p>
      * 设计说明书：ExpandCellChildValue
      * 计算说明书：ExpandCellChildValue
      */
     @Test
     public void test3() throws IOException {
-        String json = IoUtil.readUtf8(ResourceUtil.getStream("json/4.1.7 气压水罐容积计算表.json"));
+        String json = IoUtil.readUtf8(ResourceUtil.getStream("json/table.json"));
         JSONObject selectionTable = new JSONObject(json);
         OutputStream outputStream = Files.newOutputStream(new File("E:\\Project\\IdeaProjects\\DemoRepository\\web-server\\poi\\src\\test\\resources\\json", "result.xlsx").toPath());
         writeSelectionTableMatrix(selectionTable, outputStream);
@@ -56,21 +54,16 @@ public class TestPOI {
         String sheetName = selectionTable.getStr("ObjectDisplayName", "").replaceAll("[\\\\/*?\\[\\]:]", " ");
         Sheet sheet = ObjectUtil.isEmpty(sheetName) ? workbook.createSheet() : workbook.createSheet(sheetName);
 
-        // 创建单元格样式并设置自动换行
-        CellStyle cellStyle = workbook.createCellStyle();
-        // 设置水平居中对齐
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        // 设置垂直居中对齐
-//        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-
+        CellStyle headerCellStyle = createHeaderCellStyle(workbook);
+        CellStyle bodyCellStyle = createBodyCellStyle(workbook);
         List<CellRangeAddress> mergedRegions = new ArrayList<>();
 
         Row row = sheet.createRow(0);
-        for (int i = 0; i < header.size(); i++) { // TODO 表头居中
+        for (int i = 0; i < header.size(); i++) {
             JSONObject cellObj = header.getJSONObject(i);
             Cell cell = row.createCell(i);
             cell.setCellValue(cellObj.getStr("IdmItemText"));
-            cell.setCellStyle(cellStyle);
+            cell.setCellStyle(headerCellStyle);
 
             int rowSpan = Convert.toInt(cellObj.getStr("IdmIsRowspan"), 1);
             int colSpan = Convert.toInt(cellObj.getStr("IdmIsColspan"), 1);
@@ -80,11 +73,10 @@ public class TestPOI {
                         i, i + colSpan - 1
                 ));
             }
-
-            // 每一列设置最大字符数
-//            int width = 32; // 列宽，单位是字符数
-//            sheet.setColumnWidth(i, width * 256); // 乘以 256 是因为单位是 1/256 字符宽度
-//            sheet.autoSizeColumn(i, true);
+            String colWidth = cellObj.getStr("IdmWidth");
+//            if (ObjectUtil.isNotEmpty(colWidth)) {
+//                sheet.setColumnWidth(i, Convert.toInt(colWidth) * 256);
+//            }
         }
 
         JSONArray rowObjs = selectionTable.getByPath("osattrs.tableRows", JSONArray.class);
@@ -111,11 +103,12 @@ public class TestPOI {
 //                }
                 String cellText = getCellFormattedText(rowCellObj);
                 Cell cell = row.createCell(j);
-                if (StrUtil.isWrap(cellText, "$")) {
-                    insertLatexFormulaImage(sheet, currRowIndex, j, cellText);
-                } else {
-                    cell.setCellValue(cellText);
-                }
+                cell.setCellStyle(bodyCellStyle);
+//                if (StrUtil.isWrap(cellText, "$")) {
+//                    insertLatexFormulaImage(sheet, currRowIndex, j, cellText);
+//                } else {
+                cell.setCellValue(cellText);
+//                }
                 int rowSpan = Convert.toInt(rowCellObj.getStr("IdmIsRowspan"), 1);
                 int colSpan = Convert.toInt(rowCellObj.getStr("IdmIsColspan"), 1);
                 if (rowSpan > 1 || colSpan > 1) {
@@ -137,6 +130,30 @@ public class TestPOI {
 
         workbook.write(outputStream);
         workbook.close();
+    }
+
+    public CellStyle createBodyCellStyle(Workbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        // 设置边框样式
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); // 垂直居中
+        cellStyle.setWrapText(true); // 设置自动换行
+        return cellStyle;
+    }
+
+    public CellStyle createHeaderCellStyle(Workbook workbook) {
+        // 创建字体对象
+        Font font = workbook.createFont();
+        font.setBold(true); // 设置粗体
+        font.setFontName("黑体"); // 设置字体为黑体
+
+        CellStyle cellStyle = createBodyCellStyle(workbook);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER); // 设置水平居中对齐
+        cellStyle.setFont(font);
+        return cellStyle;
     }
 
     public void deleteRows(Sheet sheet, List<CellRangeAddress> mergedRegions, List<Integer> delRowIndexList) {
@@ -173,19 +190,19 @@ public class TestPOI {
                     // 将合并区域左上角的值复制到下一行
                     Cell srcCell = sheet.getRow(delRowIndex).getCell(cellAddress.getFirstColumn());
                     Cell destCell = sheet.getRow(delRowIndex + 1).getCell(cellAddress.getFirstColumn());
-                    CellUtil.copyCell(srcCell, destCell, new CellCopyPolicy(), new CellCopyContext());
+//                    CellUtil.copyCell(srcCell, destCell, new CellCopyPolicy(), new CellCopyContext());
                 }
                 int newLastRow = cellAddress.getLastRow() - 1; // 合并区域底边向上收缩一行
                 //sheet.removeMergedRegion(i); // 先移除合并区域。下面的Add导致下标变了
-                if (newLastRow >= cellAddress.getFirstRow() && cellAddress.getLastColumn() >= cellAddress.getFirstColumn()) { // 区域必须大于一个单元格
-                    // 暂存纠正后的合并区域
-                    fixedMergedRegions.add(
-                            new CellRangeAddress(
-                                    cellAddress.getFirstRow(), newLastRow,
-                                    cellAddress.getFirstColumn(), cellAddress.getLastColumn()
-                            )
-                    );
-                }
+                //if (newLastRow >= cellAddress.getFirstRow() && cellAddress.getLastColumn() >= cellAddress.getFirstColumn()) { // 区域必须大于一个单元格
+                // 暂存纠正后的合并区域
+                fixedMergedRegions.add(
+                        new CellRangeAddress(
+                                cellAddress.getFirstRow(), newLastRow,
+                                cellAddress.getFirstColumn(), cellAddress.getLastColumn()
+                        )
+                );
+                //}
             } else {
                 // 不需要处理
                 if (cellAddress.getFirstRow() > delRowIndex) {
@@ -203,7 +220,19 @@ public class TestPOI {
         }
 
         mergedRegions.clear();
-        mergedRegions.addAll(fixedMergedRegions);
+        for (CellRangeAddress mergedRegion : fixedMergedRegions) {
+            // 某一方向的坐标非法，跳过
+            int difRow = mergedRegion.getLastRow() - mergedRegion.getFirstRow();
+            int difCol = mergedRegion.getLastColumn() - mergedRegion.getFirstColumn();
+            if (difRow < 0 || difCol < 0) {
+                continue;
+            }
+            // 矩形只有一个单元格
+            if (difRow == 0 && difCol == 0) {
+                continue;
+            }
+            mergedRegions.add(mergedRegion);
+        }
     }
 
     public String getCellFormattedText(JSONObject cellObj) {
@@ -214,7 +243,9 @@ public class TestPOI {
         StringBuilder sbd = new StringBuilder();
         for (int i = 0; i < childCells.size(); i++) {
             JSONObject childCellObj = childCells.getJSONObject(i);
-            sbd.append(childCellObj.getStr("IdmItemText")); // TODO 待处理占位符。处理不同类型的单元格的值
+            String inputValue = ObjectUtil.defaultIfEmpty(childCellObj.getByPath("oattrs.rel.IdmRelInputValue", String.class), "____");
+            String textWithPlaceHolder = childCellObj.getStr("IdmItemText", "");
+            sbd.append(textWithPlaceHolder.replaceAll("\\$\\{([^{}]+)}", inputValue));
         }
         return sbd.toString();
     }
@@ -226,9 +257,11 @@ public class TestPOI {
 
         // Create a drawing patriarch to hold the image
         Drawing<?> drawing = sheet.createDrawingPatriarch();
+        Workbook workbook = sheet.getWorkbook();
 
         // Add a picture shape
-        ClientAnchor anchor = sheet.getWorkbook().getCreationHelper().createClientAnchor();
+        ClientAnchor anchor = workbook.getCreationHelper().createClientAnchor();
+//        anchor.setAnchorType(XSSFClientAnchor.AnchorType.MOVE_AND_RESIZE);
 
         anchor.setCol1(col);
         anchor.setRow1(row);
@@ -237,7 +270,7 @@ public class TestPOI {
         // Load the image
         try {
             BufferedImage image = (BufferedImage) formula.createBufferedImage(TeXConstants.STYLE_DISPLAY, 20, null, null);
-            int pictureIndex = sheet.getWorkbook().addPicture(bufferedImageToBytes(image), Workbook.PICTURE_TYPE_PNG);
+            int pictureIndex = workbook.addPicture(bufferedImageToBytes(image), Workbook.PICTURE_TYPE_PNG);
             Picture picture = drawing.createPicture(anchor, pictureIndex);
             // 自适应单元格大小
             picture.resize();
