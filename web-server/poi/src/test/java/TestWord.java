@@ -1,6 +1,7 @@
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import org.openxmlformats.schemas.officeDocument.x2006.math.CTOMath;
 import org.openxmlformats.schemas.officeDocument.x2006.math.CTOMathPara;
 import org.openxmlformats.schemas.officeDocument.x2006.math.CTR;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
 import uk.ac.ed.ph.snuggletex.SnuggleInput;
@@ -27,6 +29,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * ...
@@ -84,7 +88,7 @@ public class TestWord {
 
     @Test
     public void finalTest() throws Exception {
-        String json = IoUtil.readUtf8(ResourceUtil.getStream("json/4.1.7 气压水罐容积计算表.json"));
+        String json = IoUtil.readUtf8(ResourceUtil.getStream("json/3.1 工程概况选用表.json"));
         JSONObject selectionTable = new JSONObject(json);
         OutputStream outputStream = Files.newOutputStream(new File("E:\\Project\\IdeaProjects\\DemoRepository\\web-server\\poi\\src\\test\\resources\\json", "testWord.docx").toPath());
         writeSelectionTableMatrix(selectionTable, outputStream);
@@ -109,7 +113,8 @@ public class TestWord {
         XWPFTable table = document.createTable(numRows, numCols);
         table.setWidth("100%");
 
-
+        // Table  [][]    List<CellRangeAddress> mergedRegions
+        // Cell  List<>
         List<CellRangeAddress> mergedRegions = new ArrayList<>();
 
         // 表头
@@ -122,10 +127,9 @@ public class TestWord {
 //            cell.setWidthType(TableWidthType.NIL);
 
 //            cell.setText(cellObj.getStr("IdmItemText"));
-            XWPFParagraph paragraph = cell.getParagraphs().get(cell.getParagraphs().size() - 1);
+            XWPFParagraph paragraph = cell.getParagraphs().get(cell.getParagraphs().size() - 1);// 1
             paragraph.setAlignment(ParagraphAlignment.CENTER);
             XWPFRun run = paragraph.createRun();
-            run.setTextPosition(1);
             run.setText(cellObj.getStr("IdmItemText"));
 
             // 暂存合并区域
@@ -157,7 +161,7 @@ public class TestWord {
 
 //                cell.setWidthType(TableWidthType.PCT); // 百分比
 //                cell.setWidth("1%"); // TODO 列宽
-//                cell.setWidthType(TableWidthType.a);
+//                cell.setWidthType(1TableWidthType.a);
 //                cell.setText(cellText);
 
                 // 暂存合并区域
@@ -184,6 +188,7 @@ public class TestWord {
 //            }
 //        }
 
+
         // 创建段落
 
         // 插入数学公式
@@ -208,19 +213,45 @@ public class TestWord {
         System.out.println("表格插入完成。");
     }
 
-    public void setTableFontSize(XWPFTable table, int fontSize) {
-        // POI4不生效
-        for (XWPFTableRow row : table.getRows()) {
-            for (XWPFTableCell cell : row.getTableCells()) {
-                for (XWPFParagraph paragraph : cell.getParagraphs()) {
-//                    CTP ctp = paragraph.getCTP();
-//                    CTPPr ppr = ctp.isSetPPr() ? ctp.getPPr() : ctp.addNewPPr();
-//                    CTParaRPr paraRpr = ppr.isSetRPr() ? ppr.getRPr() : ppr.addNewRPr();
-//                    CTHpsMeasure fontSize1 = paraRpr.isSetSz() ? paraRpr.getSz() : paraRpr.addNewSz();
-//                    fontSize1.setVal(BigInteger.valueOf(fontSize));
+    @Test
+    public void testSplit() {
+//        List<Pair<String, String>> pairs = splitByPatternGroup("\\$(.*?)\\$", "$q_b$（m³/h）");
+        List<Pair<String, String>> pairs = splitByPatternGroup("\\$(.*?)\\$", "你好啊 $asdasdvdv12233$ 但是VS豆瓣v的 $assavc$");
+        for (Pair<String, String> pair : pairs) {
+            System.out.println(pair.getKey() + ": " + pair.getValue());
+        }
+    }
 
+    public List<Pair<String, String>> splitByPatternGroup(String regex, String str) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+        List<Pair<String, String>> parts = new ArrayList<>();
+        int currIndex = 0;
+        while (matcher.find()) {
+            String placeHolder = matcher.group(0);
+            int leftIndex = str.indexOf(placeHolder); // 占位符左侧下标
+            if (leftIndex > currIndex) {
+                parts.add(Pair.of("TEXT", str.substring(currIndex, leftIndex)));
+            }
+            parts.add(Pair.of("PLACEHOLDER", placeHolder));
+            currIndex = leftIndex + placeHolder.length();
+        }
+        parts.add(Pair.of("TEXT", str.substring(currIndex)));
+        return parts;
+    }
+
+    public void setTableFontSize(XWPFTable table, int fontSize) {
+        for (int i = 0; i < table.getRows().size(); i++) {
+            for (XWPFTableCell cell : table.getRow(i).getTableCells()) {
+                for (XWPFParagraph paragraph : cell.getParagraphs()) {
+                    if (i == 0) {
+                        paragraph.setAlignment(ParagraphAlignment.CENTER);
+                    }
                     for (XWPFRun run : paragraph.getRuns()) {
                         run.setFontSize(fontSize);
+                        if (i == 0) {
+                            run.setBold(true);
+                        }
                     }
                 }
             }
@@ -341,8 +372,12 @@ public class TestWord {
                     // 将合并区域左上角的值复制到下一行
                     XWPFTableCell srcCell = table.getRow(delRowIndex).getCell(cellAddress.getFirstColumn());
                     XWPFTableCell destCell = table.getRow(delRowIndex + 1).getCell(cellAddress.getFirstColumn());
-                    //destCell.getCTTc().setPArray(srcCell.getCTTc().getPArray());
-                    destCell.setText(srcCell.getText());
+                    for (int i = 0; i < destCell.getParagraphs().size(); i++) {
+                        destCell.removeParagraph(i);
+                    }
+                    for (XWPFParagraph paragraph : srcCell.getParagraphs()) {
+                        destCell.addParagraph(paragraph);
+                    }
                 }
                 int newLastRow = cellAddress.getLastRow() - 1; // 合并区域底边向上收缩一行
                 //sheet.removeMergedRegion(i); // 先移除合并区域。下面的Add导致下标变了
@@ -392,13 +427,12 @@ public class TestWord {
         if (ObjectUtil.isEmpty(childCells)) {
             return null;
         }
-
         XWPFParagraph paragraph = cell.getParagraphs().get(cell.getParagraphs().size() - 1);
         for (int i = 0; i < childCells.size(); i++) {
             JSONObject childCellObj = childCells.getJSONObject(i);
             String text = childCellObj.getStr("IdmItemText", "");
 
-            if (StrUtil.isWrap(text, "$")) {
+            if (StrUtil.isWrap(text, "$")) { //  $xxxxx$
                 String mathML = convertToMathML(text);
                 CTOMath ctoMath = getOMML(mathML);
                 // 创建段落
@@ -406,7 +440,7 @@ public class TestWord {
                 run.setText("");
                 // 将 MathML 插入段落
                 paragraph.getCTP().setOMathArray(new CTOMath[]{ctoMath}); // 不要addNewOMath
-            } else if (StrUtil.isWrap(text, "${", "}")) {
+            } else if (StrUtil.isWrap(text, "${", "}")) { // ${}
                 String inputValue = ObjectUtil.defaultIfEmpty(childCellObj.getByPath("oattrs.rel.IdmRelInputValue", String.class), "____");
                 XWPFRun run = paragraph.createRun();
                 run.setText(text.replaceAll("\\$\\{([^{}]+)}", inputValue));
@@ -484,11 +518,6 @@ public class TestWord {
         for (int rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
             for (int colIndex = startCol; colIndex <= endCol; colIndex++) {
                 XWPFTableCell cell = table.getRow(rowIndex).getCell(colIndex);
-
-//                cell.getCTTc().getTcPr().addNewGridSpan().setVal();
-
-//                cell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.CONTINUE);
-//                cell.getCTTc().addNewTcPr().addNewVMerge().setVal(STMerge.CONTINUE);
                 STMerge.Enum hm = STMerge.CONTINUE; // 水平
                 STMerge.Enum vm = STMerge.CONTINUE; // 竖直
                 if (rowIndex == startRow) {
@@ -497,17 +526,18 @@ public class TestWord {
                 if (colIndex == startCol) {
                     hm = STMerge.RESTART;
                 }
-                if (Objects.isNull(cell.getCTTc().getTcPr())) {
-                    cell.getCTTc().addNewTcPr();
+                CTTc ctTc = cell.getCTTc();
+                if (!ctTc.isSetTcPr()) {
+                    ctTc.addNewTcPr();
                 }
-                if (Objects.isNull(cell.getCTTc().getTcPr().getHMerge())) {
-                    cell.getCTTc().getTcPr().addNewHMerge();
+                if (!ctTc.getTcPr().isSetHMerge()) {
+                    ctTc.getTcPr().addNewHMerge();
                 }
-                cell.getCTTc().getTcPr().getHMerge().setVal(hm);
-                if (Objects.isNull(cell.getCTTc().getTcPr().getVMerge())) {
-                    cell.getCTTc().getTcPr().addNewVMerge();
+                ctTc.getTcPr().getHMerge().setVal(hm);
+                if (!ctTc.getTcPr().isSetVMerge()) {
+                    ctTc.getTcPr().addNewVMerge();
                 }
-                cell.getCTTc().getTcPr().getVMerge().setVal(vm);
+                ctTc.getTcPr().getVMerge().setVal(vm);
             }
         }
     }
@@ -517,17 +547,26 @@ public class TestWord {
         try {
             XWPFDocument document = new XWPFDocument();
             XWPFTable table = document.createTable(5, 5); // 创建一个5x5的表格
-
-            // 合并矩形区域
-            mergeCells(table, 1, 1, 3, 3);
+            table.setWidth("100%");
 
             // 填充表格内容
+            String[][] width = new String[5][5];
+            width[0] = new String[]{"20%", "10%", "30%", "0%"};
+            width[1] = new String[]{"20%", "10%", "30%", "20%", "20%"};
+            width[2] = new String[]{"20%", "10%", "30%", "20%", "20%"};
+            width[3] = new String[]{"20%", "10%", "30%", "20%", "20%"};
+            width[4] = new String[]{"20%", "10%", "30%", "20%", "20%"};
             for (int row = 0; row < 5; row++) {
                 for (int col = 0; col < 5; col++) {
                     XWPFTableCell cell = table.getRow(row).getCell(col);
+                    cell.setWidthType(TableWidthType.PCT);
+                    cell.setWidth(width[row][col]);
                     cell.setText("Cell " + (row + 1) + "-" + (col + 1));
                 }
             }
+
+            // 合并矩形区域
+            mergeCellsInRectangle(table, 1, 1, 2, 2);
 
             // 保存文档
             try (FileOutputStream out = new FileOutputStream("合并单元格的文档.docx")) {

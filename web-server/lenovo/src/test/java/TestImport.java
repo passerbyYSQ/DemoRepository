@@ -34,7 +34,7 @@ public class TestImport {
      */
     @Test
     public void test() throws IOException {
-        File srcFile = new File("E:\\Project\\ZW\\core_install\\ZWTeamworks\\config\\td\\zh.properties");
+        File srcFile = new File("E:\\Project\\ZW\\core_install\\ZWTeamworks\\config\\td\\zh-CN.properties");
         File targetFile = new File("E:\\Project\\ZW\\core_install\\ZWTeamworks\\config\\td\\zh_TW.properties");
         propValueSimple2Traditional(srcFile, targetFile);
     }

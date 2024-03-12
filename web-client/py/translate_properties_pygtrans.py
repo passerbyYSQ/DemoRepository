@@ -17,8 +17,8 @@ def translate(text: list, lang):
     # translated = translator.translate(text, dest=lang)
     client = Translate(proxies={'https': 'http://localhost:7890'}, timeout=16)
     translated = client.translate(text, target=lang)
-    sleep_time = random.randint(200, 400) / 1000
-    time.sleep(sleep_time)  # 随机睡眠200~400 ms
+    sleep_time = random.randint(400, 800) / 1000
+    time.sleep(sleep_time)  # 随机睡眠400~800 ms
     return [t.translatedText for t in translated]
 
 
@@ -52,4 +52,4 @@ def translate_write(batch_list, lang, res_file):
 
 
 if __name__ == '__main__':
-    translate_properties('props/PLF_messages_zh_CN.properties', 1000, 'zh-TW')  # 攒够1000字再去翻译
+    translate_properties('props/APC_messages_zh_CN.properties', 1000, 'en-US')  # 攒够1000字再去翻译

@@ -1,7 +1,7 @@
 import os
 import csv
 
-input_file = 'csv/rel-b2b_Classified Item（文档）.csv'  # 非标准的 CSV 文件路径
+input_file = 'csv/文档属性修复汇总.csv'  # 非标准的 CSV 文件路径
 # 获取输入文件的文件名和扩展名
 file_name, file_ext = os.path.splitext(os.path.basename(input_file))
 output_file = os.path.join('res', file_name + ".csv")  # 标准的 CSV 文件路径
@@ -21,7 +21,7 @@ for row in rows:
     if len(row) == 0:
         continue  # 跳过空行
     for i, cell in enumerate(row):
-        cell = cell.replace('\n', ' ').strip()  # 去掉换行符和前后空格
+        cell = cell.replace('\n', '<NEWLINE>').strip()  # 去掉换行符和前后空格
         row[i] = cell
     d = len(rows[0]) - len(row)
     if d >= 0:

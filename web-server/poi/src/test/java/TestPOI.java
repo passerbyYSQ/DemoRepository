@@ -39,7 +39,7 @@ public class TestPOI {
      */
     @Test
     public void test3() throws IOException {
-        String json = IoUtil.readUtf8(ResourceUtil.getStream("json/table.json"));
+        String json = IoUtil.readUtf8(ResourceUtil.getStream("json/3.1 工程概况选用表.json"));
         JSONObject selectionTable = new JSONObject(json);
         OutputStream outputStream = Files.newOutputStream(new File("E:\\Project\\IdeaProjects\\DemoRepository\\web-server\\poi\\src\\test\\resources\\json", "result.xlsx").toPath());
         writeSelectionTableMatrix(selectionTable, outputStream);
