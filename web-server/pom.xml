@@ -25,6 +25,7 @@
         <module>transmittable-thread-local</module>
         <module>lenovo</module>
         <module>poi</module>
+        <module>flowable</module>
     </modules>
 
     <dependencies>

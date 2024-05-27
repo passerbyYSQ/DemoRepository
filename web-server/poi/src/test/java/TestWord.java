@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
+import model.DocPageMargin;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
@@ -13,8 +14,7 @@ import org.junit.Test;
 import org.openxmlformats.schemas.officeDocument.x2006.math.CTOMath;
 import org.openxmlformats.schemas.officeDocument.x2006.math.CTOMathPara;
 import org.openxmlformats.schemas.officeDocument.x2006.math.CTR;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
 import uk.ac.ed.ph.snuggletex.SnuggleInput;
 import uk.ac.ed.ph.snuggletex.SnuggleSession;
@@ -461,6 +461,21 @@ public class TestWord {
             int numRows = 2;
             int numCols = 2;
             XWPFTable table = document.createTable(numRows, numCols); // 创建一个1行3列的表格
+
+            // 创建一个新的节
+            CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
+            CTPageSz pageSize = sectPr.addNewPgSz();
+            pageSize.setW(BigInteger.valueOf(16838)); // 设置页面宽度，单位为twip
+            pageSize.setH(BigInteger.valueOf(11906)); // 设置页面高度，单位为twip
+
+            // 设置页边距
+
+            CTPageMar pageMar = sectPr.addNewPgMar();
+            DocPageMargin pageMargin = DocPageMargin.narrow;
+            pageMar.setTop(pageMargin.getTwipTop());
+            pageMar.setBottom(pageMargin.getTwipBottom());
+            pageMar.setLeft(pageMargin.getTwipLeft());
+            pageMar.setRight(pageMargin.getTwipRight());
 
             // 设置表格宽度为页面宽度
             table.setWidth("100%");

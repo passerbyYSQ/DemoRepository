@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: ysqJYKL2010
+
+
+flowable:
+  idm:
+    app:
+      admin:
+        # 登录的用户名
+        user-id: admin
+        # 登录的密码
+        password: admin
+        # 用户的名字
+        first-name: Shiquan
+        last-name: Yao
+        email: 1127664027@qq.com
+
+
