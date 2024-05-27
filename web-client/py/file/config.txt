@@ -1,0 +1,2 @@
+copy=0
+D:\export=F:\export

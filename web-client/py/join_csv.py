@@ -33,5 +33,5 @@ def filter_csv(csv_path, out_path):
 
 
 if __name__ == '__main__':
-    #join_csv('E:\\工作\\客户-项目\\中兴\\数据导入第2轮\\业务数据包\\文档物理文件映射', 'res/文档物理文件映射.csv')
-    filter_csv('E:\\工作\\客户-项目\\中兴\\数据导入第2轮\\业务数据包\\bo_Document0.csv', 'res/bo_Document0_succeed.csv')
+    # join_csv('E:\\工作\\客户-项目\\中兴\\数据导入第2轮\\业务数据包\\文档物理文件映射', 'res/文档物理文件映射.csv')
+    filter_csv('csv/bo_Document0.csv', 'res/bo_Document0_succeed.csv')
